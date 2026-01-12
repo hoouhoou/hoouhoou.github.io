@@ -1,4 +1,4 @@
-## Hi there 👋
+🤔 I’m looking for help with ...
 
 <!--
 **hoouhoou/hoouhoou** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
