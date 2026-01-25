@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jiara Martins - Copywriter Portfolio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eaeaea;
+        }
+        
+        .intro {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            color: #1a1a1a;
+            margin-bottom: 5px;
+        }
+        
+        .tagline {
+            font-size: 1.5rem;
+            color: #555;
+            font-weight: 400;
+        }
+        
+        .about-me {
+            max-width: 400px;
+            background-color: #f0f0f0;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+        .about-me h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin: 40px 0;
+        }
+        
+        .section {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #4a6fa5;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section h2 i {
+            color: #4a6fa5;
+        }
+        
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .timeline-item {
+            border-left: 3px solid #4a6fa5;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .timeline-item:before {
+            content: "";
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #4a6fa5;
+            left: -7.5px;
+            top: 5px;
+        }
+        
+        .year {
+            font-weight: 700;
+            color: #2c3e50;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        
+        .item-title {
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+        
+        .item-detail {
+            color: #666;
+            font-style: italic;
+            margin-bottom: 8px;
+        }
+        
+        .item-description {
+            color: #555;
+        }
+        
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .skill-item {
+            background-color: #f0f7ff;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border-left: 4px solid #4a6fa5;
+        }
+        
+        .portfolio-section {
+            margin-top: 40px;
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(to right, #f8f9fa, #e9ecef);
+            border-radius: 10px;
+        }
+        
+        .portfolio-section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: #4a6fa5;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            background-color: #3a5a8a;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            color: #777;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 900px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 25px;
+            }
+            
+            .about-me {
+                max-width: 100%;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .skills-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .tagline {
+                font-size: 1.2rem;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="intro">
+            <h1>Copywriter</h1>
+            <p class="tagline">Jiara Martins</p>
+        </div>
+        
+        <div class="about-me">
+            <h2>about me</h2>
+            <p>Creative and detail-oriented copywriter with a passion for crafting compelling narratives that drive engagement and conversion. Combining a background in literature with digital marketing expertise.</p>
+        </div>
+    </header>
+    
+    <main>
+        <div class="content-grid">
+            <div class="section">
+                <h2><i class="fas fa-graduation-cap"></i> Education</h2>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="year">2020</div>
+                        <div class="item-title">De Loureigh University</div>
+                        <div class="item-detail">Cum Laude • Student Leadership Award</div>
+                        <div class="item-description">Bachelor of Arts in Literature with a Minor in Creative Writing</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2><i class="fas fa-briefcase"></i> Experience</h2>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="year">2023</div>
+                        <div class="item-title">Schuester Digital Media Group</div>
+                        <div class="item-detail">Senior Copywriter</div>
+                        <div class="item-description">Leading content strategy and copy development for key client accounts.</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="year">2022</div>
+                        <div class="item-title">Corentin Design Co.</div>
+                        <div class="item-detail">Junior Copywriter</div>
+                        <div class="item-description">Created marketing copy for web and print materials across multiple industries.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content-grid">
+            <div class="section">
+                <h2><i class="fas fa-tools"></i> Skills & Proficiencies</h2>
+                <p style="margin-bottom: 20px; color: #555;">what i can do</p>
+                <div class="skills-grid">
+                    <div class="skill-item">Search engine optimization</div>
+                    <div class="skill-item">Web content writing</div>
+                    <div class="skill-item">Social media marketing</div>
+                    <div class="skill-item">Project management</div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2><i class="fas fa-star"></i> Portfolio</h2>
+                <p style="margin-bottom: 20px; color: #555;">What i've done so far</p>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="year">2025</div>
+                        <div class="item-title">Website Redesign Project</div>
+                        <div class="item-description">Updating www.reallygreatsite.com with modern copy and improved UX writing.</div>
+                    </div>
+                </div>
+                <p style="margin-top: 25px;">For a comprehensive view of my work:</p>
+                <a href="https://www.reallygreatsite.com" class="btn" target="_blank">Click for full portfolio</a>
+                <p style="margin-top: 15px; font-size: 0.9rem; color: #777;"><strong>Note:</strong> Update this link with your actual portfolio URL</p>
+            </div>
+        </div>
+        
+        <div class="portfolio-section">
+            <h2>Ready to Bring Your Vision to Words?</h2>
+            <p>Let's collaborate on your next project. I specialize in creating copy that resonates with your audience and achieves your business goals.</p>
+            <a href="mailto:hello@example.com" class="btn">Contact Me</a>
+        </div>
+    </main>
+    
+    <footer>
+        <p>Jiara Martins &copy; 2023 | Portfolio Site</p>
+        <p style="margin-top: 5px;">Recreated from Canva design with custom HTML/CSS</p>
+    </footer>
+
+    <script>
+        // Simple animation for timeline items
+        document.addEventListener('DOMContentLoaded', function() {
+            const timelineItems = document.querySelectorAll('.timeline-item');
+            timelineItems.forEach((item, index) => {
+                item.style.opacity = '0';
+                item.style.transform = 'translateX(-20px)';
+                
+                setTimeout(() => {
+                    item.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    item.style.opacity = '1';
+                    item.style.transform = 'translateX(0)';
+                }, 100 * index);
+            });
+            
+            // Button interaction
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(button => {
+                button.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-3px)';
+                });
+                
+                button.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
