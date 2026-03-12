@@ -5,27 +5,197 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background-color: #f0f2f5; }
-        .dashboard-container { background: white; padding: 2rem; border-radius: 8px; max-width: 600px; margin: 0 auto; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        button { padding: 0.75rem 1.5rem; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 20px; }
-        button:hover { background-color: #c82333; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7fb;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        /* Header with logout button */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #ddd;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .header h1 {
+            font-size: 1.8rem;
+            color: #333;
+        }
+        .logout-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .logout-btn:hover {
+            background-color: #c82333;
+        }
+        /* Main layout: sidebar + main */
+        .main-layout {
+            display: flex;
+            flex: 1;
+        }
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: #fff;
+            border-right: 1px solid #ddd;
+            padding: 1.5rem;
+        }
+        .sidebar h2 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .sidebar ul {
+            list-style: none;
+        }
+        .sidebar li {
+            margin-bottom: 0.5rem;
+        }
+        .sidebar a {
+            text-decoration: none;
+            color: #007bff;
+            font-size: 0.95rem;
+        }
+        .sidebar a:hover {
+            text-decoration: underline;
+        }
+        /* Main content */
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            background-color: #f9f9f9;
+        }
+        .dataset-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        .dataset-card {
+            background-color: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            transition: box-shadow 0.2s;
+        }
+        .dataset-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+        .dataset-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+            color: #333;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 0.5rem;
+        }
+        .dataset-card .explore {
+            display: inline-block;
+            color: #28a745;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .dataset-card .explore:hover {
+            text-decoration: underline;
+        }
+        /* Footer */
+        .footer {
+            background-color: #fff;
+            border-top: 1px solid #ddd;
+            padding: 1rem;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #777;
+        }
+        hr {
+            margin: 1rem 0;
+            border: 0;
+            border-top: 1px solid #eee;
+        }
+        /* Small screen adjustment */
+        @media (max-width: 600px) {
+            .main-layout {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #ddd;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="dashboard-container">
-        <h1>Welcome to the Dashboard</h1>
-        <p>You have successfully logged in.</p>
-        <button id="logoutBtn">Log Out</button>
+    <div class="header">
+        <h1>Dashboard</h1>
+        <button class="logout-btn" id="logoutBtn">Log Out</button>
     </div>
 
+    <div class="main-layout">
+        <!-- Sidebar: default menu -->
+        <aside class="sidebar">
+            <h2>default</h2>
+            <ul>
+                <li><a href="#">Dashboard</a></li>
+                <li><a href="#">SPARQL</a></li>
+                <li><a href="#">Text Search</a></li>
+                <li><a href="#">Namespaces</a></li>
+                <li><a href="#">Triples</a></li>
+                <li><a href="#">Data Preview</a></li>
+                <li><a href="#">RDF Upload</a></li>
+                <li><a href="#">Spreadsheet</a></li>
+                <li><a href="#">Documentation</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main content: datasets -->
+        <main class="main-content">
+            <div class="dataset-grid">
+                <!-- List of datasets (from the image) -->
+                <div class="dataset-card"><h3>aeviro</h3><a href="#" class="explore">Explore Dataset</a></div>
+                <div class="dataset-card"><h3>FKRP</h3><a href="#" class="explore">Explore Dataset</a></div>
+                <div class="dataset-card"><h3>elixir</h3><a href="#" class="explore">Explore Dataset</a></div>
+                <div class="dataset-card"><h3>test</h3><a href="#" class="explore">Explore Dataset</a></div>
+                <div class="dataset-card"><h3>hpo</h3><a href="#" class="explore">Explore Dataset</a></div>
+                <div class="dataset-card"><h3>FSHD</h3><a href="#" class="explore">Explore Dataset</a></div>
+                <div class="dataset-card"><h3>DM</h3><a href="#" class="explore">Explore Dataset</a></div>
+                <div class="dataset-card"><h3>umls</h3><a href="#" class="explore">Explore Dataset</a></div>
+                <div class="dataset-card"><h3>demobar</h3><a href="#" class="explore">Explore Dataset</a></div>
+                <div class="dataset-card"><h3>EHDN</h3><a href="#" class="explore">Explore Dataset</a></div>
+                <div class="dataset-card"><h3>demo</h3><a href="#" class="explore">Explore Dataset</a></div>
+                <div class="dataset-card"><h3>default</h3><a href="#" class="explore">Explore Dataset</a></div>
+                <div class="dataset-card"><h3>srs</h3><a href="#" class="explore">Explore Dataset</a></div>
+                <div class="dataset-card"><h3>orpha</h3><a href="#" class="explore">Explore Dataset</a></div>
+                <div class="dataset-card"><h3>goa</h3><a href="#" class="explore">Explore Dataset</a></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        © University of Aveiro 2016 - Support provided by BMD Software, LDA
+    </footer>
+
     <script>
-        // Check if user is logged in (sessionStorage flag)
+        // Protect dashboard: redirect if not logged in
         if (sessionStorage.getItem('loggedIn') !== 'true') {
-            // Not logged in – redirect back to login
             window.location.href = 'index.html';
         }
 
-        // Logout button functionality
+        // Logout functionality
         document.getElementById('logoutBtn').addEventListener('click', function() {
             sessionStorage.removeItem('loggedIn');
             window.location.href = 'index.html';
