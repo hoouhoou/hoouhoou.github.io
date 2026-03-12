@@ -3,190 +3,162 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>MASTER LIST · Dashboard</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7fb;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f7fa;
+            color: #1e293b;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
-        /* Header with logout button */
+
+        /* Header / top bar */
         .header {
+            background-color: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 0.75rem 2rem;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            background-color: #fff;
-            padding: 1rem 2rem;
-            border-bottom: 1px solid #ddd;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
+
         .header h1 {
             font-size: 1.8rem;
-            color: #333;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: #0f172a;
         }
-        .logout-btn {
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 1rem;
-        }
-        .logout-btn:hover {
-            background-color: #c82333;
-        }
-        /* Main layout: sidebar + main */
-        .main-layout {
+
+        /* Navigation */
+        .nav-links {
             display: flex;
-            flex: 1;
-        }
-        /* Sidebar */
-        .sidebar {
-            width: 250px;
-            background-color: #fff;
-            border-right: 1px solid #ddd;
-            padding: 1.5rem;
-        }
-        .sidebar h2 {
-            font-size: 1.2rem;
-            margin-bottom: 1rem;
-            color: #555;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .sidebar ul {
+            align-items: center;
+            gap: 2rem;
             list-style: none;
+            flex-wrap: wrap;
         }
-        .sidebar li {
-            margin-bottom: 0.5rem;
-        }
-        .sidebar a {
+
+        .nav-links a {
             text-decoration: none;
-            color: #007bff;
-            font-size: 0.95rem;
+            color: #334155;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: color 0.2s;
+            padding: 0.25rem 0;
+            border-bottom: 2px solid transparent;
         }
-        .sidebar a:hover {
-            text-decoration: underline;
+
+        .nav-links a:hover {
+            color: #0f172a;
+            border-bottom-color: #3b82f6;
         }
-        /* Main content */
+
+        /* Special logout link (behaves like a button) */
+        .logout-link {
+            background-color: #ef4444;
+            color: white !important;
+            padding: 0.5rem 1rem !important;
+            border-radius: 6px;
+            border-bottom: none !important;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+        .logout-link:hover {
+            background-color: #dc2626;
+            color: white !important;
+            border-bottom: none !important;
+        }
+
+        /* Main content area – you can replace this with your own content */
         .main-content {
             flex: 1;
             padding: 2rem;
-            background-color: #f9f9f9;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
         }
-        .dataset-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 1rem;
+
+        /* Example placeholder – remove or replace as needed */
+        .welcome-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            text-align: center;
+            border: 1px solid #e2e8f0;
         }
-        .dataset-card {
-            background-color: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 6px;
-            padding: 1rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-            transition: box-shadow 0.2s;
+
+        .welcome-card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #0f172a;
         }
-        .dataset-card:hover {
-            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+
+        .welcome-card p {
+            color: #475569;
+            line-height: 1.6;
         }
-        .dataset-card h3 {
-            font-size: 1.1rem;
-            margin-bottom: 0.75rem;
-            color: #333;
-            border-bottom: 1px solid #f0f0f0;
-            padding-bottom: 0.5rem;
-        }
-        .dataset-card .explore {
-            display: inline-block;
-            color: #28a745;
-            text-decoration: none;
+
+        /* Footer with version */
+        .footer {
+            background-color: #ffffff;
+            border-top: 1px solid #e2e8f0;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: flex-end;
+            color: #64748b;
             font-size: 0.9rem;
             font-weight: 500;
         }
-        .dataset-card .explore:hover {
-            text-decoration: underline;
-        }
-        /* Footer */
-        .footer {
-            background-color: #fff;
-            border-top: 1px solid #ddd;
-            padding: 1rem;
-            text-align: center;
-            font-size: 0.9rem;
-            color: #777;
-        }
-        hr {
-            margin: 1rem 0;
-            border: 0;
-            border-top: 1px solid #eee;
-        }
-        /* Small screen adjustment */
-        @media (max-width: 600px) {
-            .main-layout {
+
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            .header {
                 flex-direction: column;
+                align-items: flex-start;
             }
-            .sidebar {
-                width: 100%;
-                border-right: none;
-                border-bottom: 1px solid #ddd;
+            .nav-links {
+                gap: 1rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>Dashboard</h1>
-        <button class="logout-btn" id="logoutBtn">Log Out</button>
-    </div>
+    <header class="header">
+        <h1>MASTER LIST</h1>
+        <ul class="nav-links">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">2026</a></li>
+            <li><a href="#">2025</a></li>
+            <li><a href="#">2024</a></li>
+            <li><a href="#">Contato</a></li>
+            <li><a href="#">Ferramentas</a></li>
+            <li><a href="#" class="logout-link" id="logoutBtn">LOG OUT</a></li>
+        </ul>
+    </header>
 
-    <div class="main-layout">
-        <!-- Sidebar: default menu -->
-        <aside class="sidebar">
-            <h2>default</h2>
-            <ul>
-                <li><a href="#">Dashboard</a></li>
-                <li><a href="#">SPARQL</a></li>
-                <li><a href="#">Text Search</a></li>
-                <li><a href="#">Namespaces</a></li>
-                <li><a href="#">Triples</a></li>
-                <li><a href="#">Data Preview</a></li>
-                <li><a href="#">RDF Upload</a></li>
-                <li><a href="#">Spreadsheet</a></li>
-                <li><a href="#">Documentation</a></li>
-            </ul>
-        </aside>
+    <main class="main-content">
+        <!-- Replace this with your own dashboard content -->
+        <div class="welcome-card">
+            <h2>Welcome to the Master List Dashboard</h2>
+            <p>This area is ready for your datasets, charts, or any other content.<br>
+            (You can replace this card with the dataset grid from the previous version if you like.)</p>
+        </div>
+    </main>
 
-        <!-- Main content: datasets -->
-        <main class="main-content">
-            <div class="dataset-grid">
-                <!-- List of datasets (from the image) -->
-                <div class="dataset-card"><h3>aeviro</h3><a href="#" class="explore">Explore Dataset</a></div>
-                <div class="dataset-card"><h3>FKRP</h3><a href="#" class="explore">Explore Dataset</a></div>
-                <div class="dataset-card"><h3>elixir</h3><a href="#" class="explore">Explore Dataset</a></div>
-                <div class="dataset-card"><h3>test</h3><a href="#" class="explore">Explore Dataset</a></div>
-                <div class="dataset-card"><h3>hpo</h3><a href="#" class="explore">Explore Dataset</a></div>
-                <div class="dataset-card"><h3>FSHD</h3><a href="#" class="explore">Explore Dataset</a></div>
-                <div class="dataset-card"><h3>DM</h3><a href="#" class="explore">Explore Dataset</a></div>
-                <div class="dataset-card"><h3>umls</h3><a href="#" class="explore">Explore Dataset</a></div>
-                <div class="dataset-card"><h3>demobar</h3><a href="#" class="explore">Explore Dataset</a></div>
-                <div class="dataset-card"><h3>EHDN</h3><a href="#" class="explore">Explore Dataset</a></div>
-                <div class="dataset-card"><h3>demo</h3><a href="#" class="explore">Explore Dataset</a></div>
-                <div class="dataset-card"><h3>default</h3><a href="#" class="explore">Explore Dataset</a></div>
-                <div class="dataset-card"><h3>srs</h3><a href="#" class="explore">Explore Dataset</a></div>
-                <div class="dataset-card"><h3>orpha</h3><a href="#" class="explore">Explore Dataset</a></div>
-                <div class="dataset-card"><h3>goa</h3><a href="#" class="explore">Explore Dataset</a></div>
-            </div>
-        </main>
-    </div>
-
-    <!-- Footer -->
     <footer class="footer">
-        © University of Aveiro 2016 - Support provided by BMD Software, LDA
+        V. 4.05
     </footer>
 
     <script>
@@ -196,7 +168,8 @@
         }
 
         // Logout functionality
-        document.getElementById('logoutBtn').addEventListener('click', function() {
+        document.getElementById('logoutBtn').addEventListener('click', function(e) {
+            e.preventDefault();  // prevent link navigation
             sessionStorage.removeItem('loggedIn');
             window.location.href = 'index.html';
         });
