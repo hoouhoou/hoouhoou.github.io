@@ -25,21 +25,16 @@
     </div>
 
     <script>
-        // Hardcoded password (change this as you like)
         const CORRECT_PASSWORD = "secret";
 
         document.getElementById('loginForm').addEventListener('submit', function(event) {
-            event.preventDefault(); // prevent form from actually submitting
-
+            event.preventDefault();
             const enteredPassword = document.getElementById('password').value;
 
             if (enteredPassword === CORRECT_PASSWORD) {
-                // Store a flag in sessionStorage to indicate user is logged in
                 sessionStorage.setItem('loggedIn', 'true');
-                // Redirect to dashboard
                 window.location.href = 'dashboard.html';
             } else {
-                // Show error message
                 document.getElementById('errorMessage').style.display = 'block';
             }
         });
