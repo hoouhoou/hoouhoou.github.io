@@ -4,14 +4,13 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value.trim();
 
-    // Hardcoded credentials
+    // Hardcoded credentials (for demo only)
     const validEmail = 'RJTV';
     const validPassword = 'admin123';
 
     if (email === validEmail && password === validPassword) {
-        alert('Login successful! Redirecting...');
-        // You can redirect to another page, e.g.:
-        // window.location.href = 'dashboard.html';
+        // Redirect to the dashboard page
+        window.location.href = 'dashboard.html';
     } else {
         alert('Invalid email or password');
     }
