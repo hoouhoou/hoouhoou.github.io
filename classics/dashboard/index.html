@@ -42,7 +42,7 @@
                         </tr>
                     </thead>
                     <tbody id="inventoryBody" class="divide-y divide-slate-200 text-sm">
-                        </tbody>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -50,11 +50,15 @@
         <div class="p-6 bg-slate-50 border-t-2 border-slate-200">
             <h2 class="text-sm font-black text-slate-800 mb-4 uppercase tracking-widest">Broadcast Transmission Schedule</h2>
             <div id="scheduleGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                </div>
+            </div>
         </div>
     </div>
 
     <script>
+        // --- PERMANENT SYNC DATA ---
+        localStorage.setItem('master_inventory', '[{"title":"aaaa","total":"1","available":"1","date":"september 21,2026"}]');
+        localStorage.setItem('master_schedule', '{"mon-col":[],"tue-col":[],"wed-col":[],"sat-col":[],"sun-col":[]}');
+
         document.addEventListener('DOMContentLoaded', () => {
             const savedInventory = JSON.parse(localStorage.getItem('master_inventory') || '[]');
             const savedSchedule = JSON.parse(localStorage.getItem('master_schedule') || '{}');
