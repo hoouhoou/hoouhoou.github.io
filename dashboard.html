@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master List - Full Grid</title>
+    <title>Master List Responsive Menu</title>
     <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -13,58 +13,73 @@
             --text-dark: #462c1f;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
             font-family: 'Montserrat', sans-serif;
             background-color: #ccc;
             display: flex;
             justify-content: center;
+            align-items: flex-start; /* Allows scrolling on smaller screens */
             min-height: 100vh;
-            padding: 15px;
+            padding: 10px;
         }
 
+        /* 1. FLEXIBLE CONTAINER */
         .tablet-screen {
             width: 100%;
-            max-width: 1200px;
+            max-width: 1100px; /* Limits size on huge monitors */
+            min-height: 90vh;
             background-color: var(--bg-cream);
+            position: relative;
             display: flex;
             flex-direction: column;
             background-image: radial-gradient(#f2e4d4 2px, transparent 2px);
             background-size: 40px 40px;
             border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
 
+        /* 2. DYNAMIC HEADER */
         header {
             background-color: var(--header-gold);
-            padding: 40px 20px;
+            padding: 30px 15px;
+            width: 100%;
             display: flex;
             justify-content: center;
+            align-items: center;
             border-bottom-left-radius: 40px;
+            z-index: 2;
         }
 
         header h1 {
             font-family: 'Amatic SC', cursive;
-            font-size: clamp(40px, 8vw, 80px);
+            font-size: clamp(50px, 10vw, 90px); /* Resizes font based on screen width */
             color: var(--text-dark);
+            letter-spacing: 4px;
             text-transform: uppercase;
+            text-align: center;
         }
 
         .main-layout {
             display: flex;
-            flex-direction: column;
+            flex-direction: column; /* Stacks on mobile */
             flex: 1;
         }
 
-        /* The Grid: Works on Mobile (1-2 cols) and Desktop (3+ cols) */
+        /* 3. RESPONSIVE GRID */
         .grid-container {
             flex: 1;
-            padding: 25px;
+            padding: 20px;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 25px;
+            /* Automatically creates columns based on space */
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); 
+            gap: 20px;
         }
 
         .cake-card {
@@ -78,30 +93,27 @@
             width: 100%;
             aspect-ratio: 1/1;
             background-color: #fff;
-            border-radius: 35px;
+            border-radius: 30px;
             margin-bottom: 12px;
             background-size: cover;
             background-position: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
 
         .cake-name {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
             color: var(--text-dark);
+            max-width: 90%;
         }
 
+        /* 4. SIDEBAR ADAPTATION */
         .sidebar {
             background-color: var(--sidebar-brown);
-            padding: 30px 20px;
             display: flex;
             flex-direction: column;
+            padding: 30px 20px;
             gap: 20px;
-        }
-
-        @media (min-width: 768px) {
-            .main-layout { flex-direction: row; }
-            .sidebar { width: 260px; }
         }
 
         .home-link {
@@ -109,24 +121,48 @@
             color: var(--sidebar-brown);
             text-decoration: none;
             text-align: center;
-            padding: 12px;
+            padding: 12px 0;
             border-radius: 50px;
             font-weight: 700;
+            font-size: 18px;
         }
 
         .nav-item {
             color: white;
             text-decoration: none;
+            font-size: 16px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 15px;
+        }
+
+        /* 5. MEDIA QUERY FOR TABLET/DESKTOP (768px and up) */
+        @media (min-width: 768px) {
+            .main-layout {
+                flex-direction: row; /* Sidebar goes to the side */
+            }
+
+            .grid-container {
+                grid-template-columns: repeat(3, 1fr); /* 3 columns on larger screens */
+                padding: 40px;
+                gap: 30px;
+            }
+
+            .sidebar {
+                width: 280px;
+                padding-top: 60px;
+            }
+
+            .footer-info {
+                margin-top: auto;
+            }
         }
 
         .footer-info {
-            margin-top: 20px;
-            color: rgba(255,255,255,0.3);
-            font-size: 11px;
+            color: rgba(255,255,255,0.4);
+            font-size: 12px;
             text-align: center;
+            padding-top: 20px;
         }
     </style>
 </head>
@@ -156,29 +192,41 @@
                 <div class="cake-name">Pedação de Bolo Crocante</div>
             </div>
 
-           <div class="cake-card"> 
-    <a href="classics/dashboard.html" style="text-decoration: none; width: 100%; display: flex; flex-direction: column; align-items: center;">
-        <div class="cake-image" style="background-image: url('https://cdn.drawception.com/drawings/578851/QyYh6336.png?w=300'); cursor: pointer;"></div>
-        <div class="cake-name" style="cursor: pointer;">dina nor</div> 
-    </a>
-</div>
+            <div class="cake-card">
+                <a href="classics/dashboard.html" style="text-decoration: none; width: 100%; color: inherit;">
+                    <div class="cake-image" style="background-image: url('https://cdn.drawception.com/drawings/578851/QyYh6336.png?w=300')"></div>
+                    <div class="cake-name">dina nor</div>
+                </a>
+            </div>
 
-            <div class="cake-card"> 
+            <div class="cake-card">
                 <div class="cake-image" style="background-image: url('https://images.pexels.com/photos/128756/pexels-photo-128756.jpeg?w=300')"></div>
-                <div class="cake-name">pis</div> 
+                <div class="cake-name">pis</div>
             </div>
         </div>
 
         <nav class="sidebar">
             <a href="#" class="home-link">Home</a>
-            <a href="#" class="nav-item"><span>👤</span> RJTV</a>
-            <a href="#" class="nav-item"><span>🛒</span> Deliver this</a>
-            <a href="#" class="nav-item"><span>🚚</span> On my way</a>
-            <a href="#" id="logoutBtn" class="nav-item" style="margin-top: 20px;"><span>🏃</span> run away</a>
+            <a href="#" class="nav-item"><span class="nav-icon">👤</span> RJTV</a>
+            <a href="#" class="nav-item"><span class="nav-icon">🛒</span> Deliver this</a>
+            <a href="#" class="nav-item"><span class="nav-icon">🚚</span> On my way home</a>
+            <a href="#" id="logoutBtn" class="nav-item" style="margin-top: 20px;"><span class="nav-icon">🏃</span> run away</a>
+            
             <div class="footer-info">V.0</div>
         </nav>
     </div>
 </div>
+
+<script>
+    // Logic remains same, but commented out for testing
+    // if (sessionStorage.getItem('loggedIn') !== 'true') { window.location.href = 'index.html'; }
+
+    document.getElementById('logoutBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        sessionStorage.removeItem('loggedIn');
+        window.location.href = 'index.html';
+    });
+</script>
 
 </body>
 </html>
