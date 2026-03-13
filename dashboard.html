@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master List Tablet Menu</title>
+    <title>Master List - Full Grid</title>
     <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -13,69 +13,58 @@
             --text-dark: #462c1f;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Montserrat', sans-serif;
-            background-color: #ccc; /* Environment color */
+            background-color: #ccc;
             display: flex;
             justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
+            min-height: 100vh;
+            padding: 15px;
         }
 
-        /* Tablet Frame Container */
         .tablet-screen {
-            width: 1024px;
-            height: 768px;
+            width: 100%;
+            max-width: 1200px;
             background-color: var(--bg-cream);
-            position: relative;
             display: flex;
             flex-direction: column;
-            /* Subtle organic background pattern as seen in image */
             background-image: radial-gradient(#f2e4d4 2px, transparent 2px);
             background-size: 40px 40px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
 
-        /* Header - Exactly as the orange block in the image */
         header {
             background-color: var(--header-gold);
-            height: 160px;
-            width: 100%;
+            padding: 40px 20px;
             display: flex;
             justify-content: center;
-            align-items: center;
-            border-bottom-left-radius: 40px; /* Slight curve seen in some layouts */
-            z-index: 2;
+            border-bottom-left-radius: 40px;
         }
 
         header h1 {
             font-family: 'Amatic SC', cursive;
-            font-size: 90px;
+            font-size: clamp(40px, 8vw, 80px);
             color: var(--text-dark);
-            letter-spacing: 4px;
             text-transform: uppercase;
         }
 
         .main-layout {
             display: flex;
+            flex-direction: column;
             flex: 1;
-            overflow: hidden;
         }
 
-        /* Cake Grid Section */
+        /* The Grid: Works on Mobile (1-2 cols) and Desktop (3+ cols) */
         .grid-container {
-            flex: 3.2;
-            padding: 40px;
+            flex: 1;
+            padding: 25px;
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(2, 1fr);
-            gap: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 25px;
         }
 
         .cake-card {
@@ -89,82 +78,54 @@
             width: 100%;
             aspect-ratio: 1/1;
             background-color: #fff;
-            border-radius: 40px; /* Highly rounded corners */
+            border-radius: 35px;
             margin-bottom: 12px;
             background-size: cover;
             background-position: center;
-            /* To match the 'cutout' feel */
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
 
         .cake-name {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             color: var(--text-dark);
-            margin-bottom: 10px;
-            max-width: 80%;
         }
 
-        /* The plus/minus stepper shown in the design */
-        .stepper {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .stepper span {
-            color: #d1d1d1;
-            font-size: 24px;
-            cursor: pointer;
-            user-select: none;
-        }
-        .stepper .count {
-            color: #d1d1d1;
-            font-size: 16px;
-        }
-
-        /* Sidebar - Dark Brown Right Side */
         .sidebar {
-            flex: 1;
             background-color: var(--sidebar-brown);
+            padding: 30px 20px;
             display: flex;
             flex-direction: column;
-            padding: 60px 25px 20px 25px;
-            gap: 25px;
+            gap: 20px;
         }
 
-        /* White Rounded Home Button */
+        @media (min-width: 768px) {
+            .main-layout { flex-direction: row; }
+            .sidebar { width: 260px; }
+        }
+
         .home-link {
             background-color: white;
             color: var(--sidebar-brown);
             text-decoration: none;
             text-align: center;
-            padding: 12px 0;
+            padding: 12px;
             border-radius: 50px;
             font-weight: 700;
-            font-size: 18px;
-            margin-bottom: 15px;
         }
 
         .nav-item {
             color: white;
             text-decoration: none;
-            font-size: 17px;
-            font-weight: 400;
             display: flex;
             align-items: center;
-            gap: 15px;
-            padding-left: 10px;
-        }
-
-        .nav-icon {
-            font-size: 20px;
-            width: 25px;
+            gap: 12px;
         }
 
         .footer-info {
-            margin-top: auto;
-            color: rgba(255,255,255,0.4);
-            font-size: 12px;
+            margin-top: 20px;
+            color: rgba(255,255,255,0.3);
+            font-size: 11px;
             text-align: center;
         }
     </style>
@@ -181,61 +142,41 @@
             <div class="cake-card">
                 <div class="cake-image" style="background-image: url('https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=300')"></div>
                 <div class="cake-name">Pedação de Bolo Chocolate</div>
-                
             </div>
             <div class="cake-card">
                 <div class="cake-image" style="background-image: url('https://images.unsplash.com/photo-1616541823729-00fe0aacd32c?w=300')"></div>
                 <div class="cake-name">Pedação de Bolo Red Velvet</div>
-                
             </div>
             <div class="cake-card">
                 <div class="cake-image" style="background-image: url('https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=300')"></div>
                 <div class="cake-name">Pedação de Bolo Morango</div>
-                
             </div>
             <div class="cake-card">
                 <div class="cake-image" style="background-image: url('https://images.unsplash.com/photo-1550617931-e17a7b70dce2?w=300')"></div>
                 <div class="cake-name">Pedação de Bolo Crocante</div>
             </div>
-            <div class="cake-card">
+
+            <div class="cake-card"> 
                 <div class="cake-image" style="background-image: url('https://cdn.drawception.com/drawings/578851/QyYh6336.png?w=300')"></div>
-                <div class="cake-name">dina nor </div>
-            </div>
-            <div class="cake-card">
+                <div class="cake-name">dina nor</div> 
+            </div> 
+
+            <div class="cake-card"> 
                 <div class="cake-image" style="background-image: url('https://images.pexels.com/photos/128756/pexels-photo-128756.jpeg?w=300')"></div>
-                <div class="cake-name">pis</div>
+                <div class="cake-name">pis</div> 
             </div>
         </div>
 
         <nav class="sidebar">
             <a href="#" class="home-link">Home</a>
-            <a href="#" class="nav-item"><span class="nav-icon">👤</span> RJTV</a>
-            <a href="#" class="nav-item"><span class="nav-icon">🛒</span> Deliver this</a>
-            <a href="#" class="nav-item"><span class="nav-icon">🚚</span> On my way home</a>
-            <a href="#" class="nav-item"><span class="nav-icon">💬</span> touch me</a>
-            <a href="#" class="nav-item"><span class="nav-icon">⚙️</span> lost?</a>
-            
-            <!-- Added ID for logout functionality -->
-            <a href="#" class="nav-item" id="logoutBtn" style="margin-top: 40px;"><span class="nav-icon">🏃</span> run away</a>
-            
+            <a href="#" class="nav-item"><span>👤</span> RJTV</a>
+            <a href="#" class="nav-item"><span>🛒</span> Deliver this</a>
+            <a href="#" class="nav-item"><span>🚚</span> On my way</a>
+            <a href="#" id="logoutBtn" class="nav-item" style="margin-top: 20px;"><span>🏃</span> run away</a>
             <div class="footer-info">V.0</div>
         </nav>
     </div>
 </div>
-
-<script>
-    // 1. PROTECT DASHBOARD: Redirect to login if not logged in
-    if (sessionStorage.getItem('loggedIn') !== 'true') {
-        window.location.href = 'index.html';
-    }
-
-    // 2. LOGOUT FUNCTIONALITY
-    document.getElementById('logoutBtn').addEventListener('click', function(e) {
-        e.preventDefault();          // Prevent the link from navigating to "#"
-        sessionStorage.removeItem('loggedIn');
-        window.location.href = 'index.html';
-    });
-</script>
 
 </body>
 </html>
