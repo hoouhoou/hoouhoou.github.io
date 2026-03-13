@@ -3,136 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master Content Dashboard - Responsive</title>
+    <title>Master Content Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .thick-border { border: 2px solid #e2e8f0; }
-        .row-hover:hover { background-color: #f8fafc; transition: 0.2s; }
-        /* Smooth scrolling for the table container */
-        .custom-scrollbar::-webkit-scrollbar { height: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .custom-scroll::-webkit-scrollbar { height: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
-<body class="bg-slate-100 p-2 sm:p-6 font-sans">
+<body class="bg-slate-100 p-4 md:p-6 font-sans">
 
     <div class="max-w-6xl mx-auto bg-white border-2 border-slate-300 rounded-2xl shadow-2xl overflow-hidden">
         
-        <header class="bg-slate-900 p-4 sm:p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center border-b-4 border-blue-600 gap-4">
-            <div>
-                <h1 class="text-xl sm:text-2xl font-black text-white uppercase tracking-tight">Master Content Dashboard</h1>
-                <p class="text-blue-400 font-bold text-[10px] sm:text-xs uppercase tracking-widest mt-1">Status Report: March 13, 2026</p>
+        <header class="bg-slate-900 p-6 flex flex-col md:flex-row justify-between items-start md:items-center border-b-4 border-blue-600 gap-6">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-6">
+                <div>
+                    <h1 class="text-2xl font-black text-white uppercase tracking-tight">Master Content Dashboard</h1>
+                    <p class="text-blue-400 font-bold text-xs uppercase tracking-widest mt-1">Status Report: 2026</p>
+                </div>
+                <a href="/classics/editor.html" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-lg font-black uppercase text-[10px] tracking-widest transition-all shadow-lg active:scale-95 border border-blue-400/30">
+                    <span>⚙️</span> Manage Content
+                </a>
             </div>
-            <div class="text-left sm:text-right border-l-2 sm:border-l-0 border-slate-700 pl-4 sm:pl-0">
-                <span class="text-slate-400 text-[10px] font-black uppercase">Total Series</span>
-                <p class="text-white text-xl sm:text-2xl font-black">08</p>
+            <div class="text-right">
+                <span class="text-slate-400 text-[10px] font-black uppercase">Active Series</span>
+                <p id="seriesCount" class="text-white text-2xl font-black">01</p>
             </div>
         </header>
 
-        <div class="p-4 sm:p-6">
-            <div class="overflow-x-auto custom-scrollbar border-2 border-slate-200 rounded-lg">
-                <table class="w-full min-w-[700px]">
+        <div class="p-4 md:p-6">
+            <div class="overflow-x-auto custom-scroll border-2 border-slate-200 rounded-xl">
+                <table class="w-full min-w-[600px]">
                     <thead>
                         <tr class="bg-slate-50 text-[10px] font-black text-slate-500 uppercase tracking-widest border-b-2 border-slate-200">
-                            <th class="px-4 sm:px-6 py-4 text-left">Series Title</th>
+                            <th class="px-6 py-4 text-left">Series Title</th>
                             <th class="px-4 py-4 text-center">Available</th>
-                            <th class="px-4 sm:px-6 py-4 text-left">Completion Status</th>
-                            <th class="px-4 sm:px-6 py-4 text-right">Inventory Date</th>
+                            <th class="px-6 py-4 text-left">Completion</th>
+                            <th class="px-6 py-4 text-right">Inventory Date</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-200 text-sm font-medium">
-                        <tr class="row-hover">
-                            <td class="px-6 py-4 text-slate-800 tracking-tight font-bold">POPEYE CLASSIC</td>
-                            <td class="px-4 py-4 text-center">25 / 40</td>
-                            <td class="px-6 py-4">
-                                <div class="w-32 sm:w-full bg-slate-100 rounded-full h-2 border border-slate-200">
-                                    <div class="bg-blue-500 h-full rounded-full" style="width: 38%"></div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 text-right text-slate-500">Aug 29, 2026</td>
-                        </tr>
-
-                        <tr class="bg-red-50">
-                            <td class="px-6 py-4 font-black text-red-700 italic underline">WYATT EARP S2</td>
-                            <td class="px-4 py-4 text-center font-black text-red-700">02 / 39</td>
-                            <td class="px-6 py-4">
-                                <div class="w-32 sm:w-full bg-red-200 rounded-full h-2 border border-red-300">
-                                    <div class="bg-red-600 h-full rounded-full" style="width: 95%"></div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 text-right font-black text-red-600">Mar 18, 2026</td>
-                        </tr>
-
-                        <tr class="row-hover">
-                            <td class="px-6 py-4 text-blue-800 tracking-tight uppercase font-bold">THE LONE RANGER</td>
-                            <td class="px-4 py-4 text-center">30 / 50</td>
-                            <td class="px-6 py-4">
-                                <div class="w-32 sm:w-full bg-slate-100 rounded-full h-2 border border-slate-200">
-                                    <div class="bg-indigo-500 h-full rounded-full" style="width: 40%"></div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 text-right text-slate-500">Sept 12, 2026</td>
-                        </tr>
-
-                        <tr class="row-hover">
-                            <td class="px-6 py-4 text-blue-800 tracking-tight uppercase font-bold">THE DICK VAN DYKE SHOW</td>
-                            <td class="px-4 py-4 text-center">08 / 30</td>
-                            <td class="px-6 py-4">
-                                <div class="w-32 sm:w-full bg-slate-100 rounded-full h-2 border border-slate-200">
-                                    <div class="bg-orange-500 h-full rounded-full" style="width: 73%"></div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 text-right text-slate-500">Nov 20, 2026</td>
-                        </tr>
-                    </tbody>
+                    <tbody id="inventoryBody" class="divide-y divide-slate-200 text-sm">
+                        </tbody>
                 </table>
             </div>
         </div>
 
-        <div class="p-4 sm:p-6 bg-slate-50 border-t-2 border-slate-200">
+        <div class="p-6 bg-slate-50 border-t-2 border-slate-200">
             <h2 class="text-sm font-black text-slate-800 mb-4 uppercase tracking-widest">Broadcast Transmission Schedule</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                
-                <div class="bg-white border-2 border-blue-400 p-4 rounded-xl shadow-sm">
-                    <p class="text-[10px] font-black text-blue-600 mb-2 uppercase italic">Mon / Wed</p>
-                    <div class="space-y-3">
-                        <p class="text-xs font-bold leading-tight uppercase">Wyatt Earp S2<br><span class="text-slate-400">01:00 AM</span></p>
-                        <p class="text-xs font-bold leading-tight uppercase">Annie Oakley<br><span class="text-slate-400">01:30 AM</span></p>
-                    </div>
+            <div id="scheduleGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                 </div>
-
-                <div class="bg-white border-2 border-slate-200 p-4 rounded-xl">
-                    <p class="text-[10px] font-black text-slate-400 mb-2 uppercase italic">Tue / Thu</p>
-                    <div class="space-y-3">
-                        <p class="text-xs font-bold leading-tight uppercase">The Lone Ranger<br><span class="text-slate-400">02:00 PM</span></p>
-                        <p class="text-xs font-bold leading-tight uppercase text-indigo-700">Bonanza S1<br><span class="text-slate-400">08:00 PM</span></p>
-                    </div>
-                </div>
-
-                <div class="bg-white border-2 border-slate-200 p-4 rounded-xl">
-                    <p class="text-[10px] font-black text-slate-400 mb-2 uppercase italic">Friday</p>
-                    <p class="text-xs font-bold leading-tight uppercase text-slate-300">No Scheduled Broadcast</p>
-                </div>
-
-                <div class="bg-white border-2 border-slate-800 p-4 rounded-xl shadow-sm">
-                    <p class="text-[10px] font-black text-slate-800 mb-2 uppercase italic">Saturday</p>
-                    <div class="space-y-3">
-                        <p class="text-xs font-bold leading-tight uppercase">Popeye Classic<br><span class="text-slate-400">04:00 PM</span></p>
-                        <p class="text-xs font-bold leading-tight uppercase">Hillbillies S2<br><span class="text-slate-400">04:30 PM</span></p>
-                    </div>
-                </div>
-
-                <div class="bg-slate-900 border-2 border-slate-900 p-4 rounded-xl shadow-xl">
-                    <p class="text-[10px] font-black text-yellow-400 mb-2 uppercase italic tracking-tighter">Sunday Special</p>
-                    <div class="space-y-3">
-                        <p class="text-xs font-bold leading-tight uppercase text-white underline decoration-blue-500">What's My Line<br><span class="text-slate-500">02:00 PM</span></p>
-                        <p class="text-xs font-bold leading-tight uppercase text-white">Dick Van Dyke<br><span class="text-slate-500">08:00 PM</span></p>
-                    </div>
-                </div>
-
-            </div>
         </div>
     </div>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedInventory = JSON.parse(localStorage.getItem('master_inventory') || '[]');
+            const savedSchedule = JSON.parse(localStorage.getItem('master_schedule') || '{}');
+
+            // 1. Update Table
+            const tableBody = document.getElementById('inventoryBody');
+            document.getElementById('seriesCount').innerText = savedInventory.length.toString().padStart(2, '0');
+            
+            if (savedInventory.length > 0) {
+                tableBody.innerHTML = savedInventory.map(item => {
+                    const progress = Math.min(100, Math.round((item.available / item.total) * 100)) || 0;
+                    return `
+                        <tr class="hover:bg-slate-50 transition">
+                            <td class="px-6 py-4 font-bold text-slate-800 uppercase">${item.title}</td>
+                            <td class="px-4 py-4 text-center font-bold">${item.available} / ${item.total}</td>
+                            <td class="px-6 py-4">
+                                <div class="w-full bg-slate-100 rounded-full h-2.5 border border-slate-200">
+                                    <div class="bg-blue-600 h-full rounded-full" style="width: ${progress}%"></div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-right font-bold text-slate-500">${item.date}</td>
+                        </tr>`;
+                }).join('');
+            }
+
+            // 2. Update Schedule
+            const grid = document.getElementById('scheduleGrid');
+            const days = { 'mon-col': 'Mon / Wed', 'tue-col': 'Tue / Thu', 'wed-col': 'Wednesday', 'sat-col': 'Saturday', 'sun-col': 'Sunday Special' };
+            
+            grid.innerHTML = Object.entries(days).map(([id, label]) => {
+                const slots = savedSchedule[id] || [];
+                const isSpecial = id === 'sun-col';
+                return `
+                    <div class="${isSpecial ? 'bg-slate-900 border-slate-900 shadow-xl' : 'bg-white border-slate-200'} border-2 p-4 rounded-xl">
+                        <p class="text-[10px] font-black ${isSpecial ? 'text-yellow-400' : 'text-blue-600'} mb-2 uppercase italic">${label}</p>
+                        <div class="space-y-3">
+                            ${slots.length > 0 ? slots.map(s => `
+                                <p class="text-xs font-bold leading-tight uppercase ${isSpecial ? 'text-white' : 'text-slate-800'}">
+                                    ${s.title}<br><span class="${isSpecial ? 'text-slate-500' : 'text-slate-400'} font-medium">${s.time}</span>
+                                </p>
+                            `).join('') : '<p class="text-xs text-slate-300 italic">No Broadcast</p>'}
+                        </div>
+                    </div>`;
+            }).join('');
+        });
+    </script>
 </body>
 </html>
