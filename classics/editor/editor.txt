@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Editor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .input-box { border: 1px solid #cbd5e1; padding: 6px; border-radius: 4px; font-size: 13px; width: 100%; }
+        .input-box:focus { border-color: #3b82f6; outline: none; background-color: #fff; }
+        .slot-container { border: 1px dashed #cbd5e1; padding: 10px; border-radius: 8px; position: relative; background: #fff; }
+    </style>
+</head>
+<body class="bg-slate-50 p-4 md:p-8">
+
+    <div class="max-w-7xl mx-auto bg-white p-6 shadow-xl border border-slate-200 rounded-xl">
+        <div class="flex justify-between items-center mb-8 border-b pb-4">
+            <div>
+                <a href="/classics/dashboard.html" class="text-blue-600 text-xs font-bold uppercase hover:underline">← Back to Dashboard</a>
+                <h1 class="text-2xl font-black text-slate-800 uppercase mt-2 tracking-tighter">Full Content Editor</h1>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="exportForGithub()" class="bg-amber-500 hover:bg-amber-600 text-white px-5 py-2 rounded-lg font-black shadow-md uppercase text-xs transition-all active:scale-95">
+                    Export for GitHub
+                </button>
+                <button onclick="saveAll()" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-black shadow-lg uppercase text-sm transition-all active:scale-95">
+                    Save All Changes
+                </button>
+            </div>
+        </div>
+
+        <div class="mb-10">
+            <h2 class="text-sm font-black mb-4 uppercase border-l-4 border-blue-600 pl-2">1. Series Inventory</h2>
+            <table class="w-full border-collapse" id="inventoryTable">
+                <thead class="bg-slate-100 text-[10px] uppercase font-bold">
+                    <tr>
+                        <th class="border p-2 text-left">Series Title</th>
+                        <th class="border p-2 w-24">Total</th>
+                        <th class="border p-2 w-24">Avail</th>
+                        <th class="border p-2">Date</th>
+                        <th class="border p-2 w-12 text-center"></th>
+                    </tr>
+                </thead>
+                <tbody class="text-sm">
+                    </tbody>
+            </table>
+            <button onclick="addRow()" class="mt-4 text-blue-600 font-bold text-xs uppercase tracking-widest hover:underline">+ Add Series</button>
+        </div>
+
+        <div>
+            <h2 class="text-sm font-black mb-4 uppercase border-l-4 border-slate-800 pl-2">2. Weekly Schedule</h2>
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4" id="scheduleGrid">
+                <div class="space-y-4" id="mon-col"><p class="font-black text-[10px] uppercase text-center bg-slate-200 p-1">Mon / Wed</p><button onclick="addSlot('mon-col')" class="w-full border-2 border-dashed p-2 text-[10px] font-bold text-slate-400 rounded-lg">+ SLOT</button></div>
+                <div class="space-y-4" id="tue-col"><p class="font-black text-[10px] uppercase text-center bg-slate-200 p-1">Tue / Thu</p><button onclick="addSlot('tue-col')" class="w-full border-2 border-dashed p-2 text-[10px] font-bold text-slate-400 rounded-lg">+ SLOT</button></div>
+                <div class="space-y-4" id="wed-col"><p class="font-black text-[10px] uppercase text-center bg-slate-200 p-1">Wednesday</p><button onclick="addSlot('wed-col')" class="w-full border-2 border-dashed p-2 text-[10px] font-bold text-slate-400 rounded-lg">+ SLOT</button></div>
+                <div class="space-y-4" id="sat-col"><p class="font-black text-[10px] uppercase text-center bg-slate-200 p-1">Saturday</p><button onclick="addSlot('sat-col')" class="w-full border-2 border-dashed p-2 text-[10px] font-bold text-slate-400 rounded-lg">+ SLOT</button></div>
+                <div class="space-y-4" id="sun-col"><p class="font-black text-[10px] uppercase text-center bg-slate-900 text-white p-1 tracking-widest">Sunday</p><button onclick="addSlot('sun-col')" class="w-full border-2 border-dashed p-2 text-[10px] font-bold text-slate-400 rounded-lg">+ SLOT</button></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="hidden fixed bottom-10 left-1/2 -translate-x-1/2 bg-emerald-600 text-white px-8 py-3 rounded-full shadow-2xl font-bold animate-pulse z-50">
+        ✓ DASHBOARD SYNCED
+    </div>
+
+    <script>
+        function addRow(data = {title:'', total:0, available:0, date:''}) {
+            const tbody = document.querySelector("#inventoryTable tbody");
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="border p-1"><input type="text" value="${data.title}" class="input-box uppercase font-bold text-slate-700"></td>
+                <td class="border p-1"><input type="number" value="${data.total}" class="input-box text-center"></td>
+                <td class="border p-1"><input type="number" value="${data.available}" class="input-box text-center font-bold text-blue-600"></td>
+                <td class="border p-1"><input type="text" value="${data.date}" class="input-box text-right italic"></td>
+                <td class="border p-1 text-center"><button onclick="this.parentElement.parentElement.remove()" class="text-red-400 hover:text-red-600 font-bold">✖</button></td>`;
+            tbody.appendChild(row);
+        }
+
+        function addSlot(dayId, data = {title:'', time:''}) {
+            const col = document.getElementById(dayId);
+            const slot = document.createElement('div');
+            slot.className = "slot-container";
+            slot.innerHTML = `
+                <button onclick="this.parentElement.remove()" class="absolute right-2 top-1 text-[8px] text-red-400 font-bold hover:text-red-600">REMOVE</button>
+                <input type="text" value="${data.title}" placeholder="Show" class="input-box font-bold mb-1 uppercase">
+                <input type="text" value="${data.time}" placeholder="Time" class="input-box text-[10px] text-slate-400">`;
+            col.insertBefore(slot, col.lastElementChild);
+        }
+
+        function saveAll() {
+            const inv = Array.from(document.querySelectorAll("#inventoryTable tbody tr")).map(tr => ({
+                title: tr.querySelectorAll('input')[0].value,
+                total: tr.querySelectorAll('input')[1].value,
+                available: tr.querySelectorAll('input')[2].value,
+                date: tr.querySelectorAll('input')[3].value
+            }));
+            const sch = {};
+            ['mon-col','tue-col','wed-col','sat-col','sun-col'].forEach(id => {
+                sch[id] = Array.from(document.querySelectorAll(`#${id} .slot-container`)).map(s => ({
+                    title: s.querySelectorAll('input')[0].value,
+                    time: s.querySelectorAll('input')[1].value
+                }));
+            });
+            localStorage.setItem('master_inventory', JSON.stringify(inv));
+            localStorage.setItem('master_schedule', JSON.stringify(sch));
+            
+            const toast = document.getElementById('toast');
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 2000);
+        }
+
+        function exportForGithub() {
+            saveAll();
+            const inv = localStorage.getItem('master_inventory');
+            const sch = localStorage.getItem('master_schedule');
+            const code = `// COPY AND PASTE THIS INTO THE SCRIPT TAG OF DASHBOARD.HTML\n\nlocalStorage.setItem('master_inventory', '${inv}');\nlocalStorage.setItem('master_schedule', '${sch}');`;
+            
+            const el = document.createElement('textarea');
+            el.value = code;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            alert("Sync Code copied to clipboard! Paste this into your dashboard file on GitHub to make the update permanent.");
+        }
+
+        // LOAD DATA AUTOMATICALLY WHEN PAGE OPENS
+        window.onload = () => {
+            const savedInv = JSON.parse(localStorage.getItem('master_inventory') || '[]');
+            const savedSch = JSON.parse(localStorage.getItem('master_schedule') || '{}');
+            
+            if (savedInv.length > 0) {
+                savedInv.forEach(item => addRow(item));
+            } else {
+                // Default row if empty
+                addRow({title: 'NEW SERIES', total: 0, available: 0, date: '2026'});
+            }
+
+            Object.entries(savedSch).forEach(([id, slots]) => {
+                slots.forEach(s => addSlot(id, s));
+            });
+        };
+    </script>
+</body>
+</html>
