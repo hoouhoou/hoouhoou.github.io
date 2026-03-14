@@ -2,12 +2,31 @@
 (function() {
     const isAuth = sessionStorage.getItem('isAuth');
     const path = window.location.pathname;
-    if (!path.endsWith('index.html') && path !== '/' && isAuth !== 'true') {
+    const isIndex = path.endsWith('index.html') || path === '/' || path.endsWith('');
+    
+    if (!isIndex && isAuth !== 'true') {
         window.location.href = 'index.html';
     }
 })();
 
-// 2. DASHBOARD LOADER
+// 2. LOGIN LOGIC
+function handleLogin(e) {
+    if (e) e.preventDefault();
+    const passwordField = document.getElementById('password');
+    const errorMsg = document.getElementById('errorMessage');
+    
+    if (!passwordField) return;
+
+    if (passwordField.value === "jesus christ superstar") {
+        sessionStorage.setItem('isAuth', 'true');
+        window.location.href = 'dashboard.html';
+    } else {
+        if (errorMsg) errorMsg.style.display = 'block';
+        passwordField.value = '';
+    }
+}
+
+// 3. DASHBOARD LOADER
 async function loadMasterLists() {
     try {
         const res = await fetch('data/list_index.txt');
@@ -15,9 +34,11 @@ async function loadMasterLists() {
         const container = document.getElementById('lists-container');
         if(!container) return;
 
-        const lines = text.trim().split('\n');
+        const lines = text.trim().split('\n').filter(l => l.length > 0);
         container.innerHTML = lines.map(line => {
-            const [id, name, modified] = line.split('|').map(s => s.trim());
+            const parts = line.split('|').map(s => s.trim());
+            if (parts.length < 3) return '';
+            const [id, name, modified] = parts;
             return `
                 <div class="list-card" onclick="location.href='list.html?id=${id}'">
                     <h3>${name}</h3>
@@ -28,7 +49,7 @@ async function loadMasterLists() {
     } catch (e) { console.error("Error loading index:", e); }
 }
 
-// 3. GENERATOR LOGIC
+// 4. GENERATOR LOGIC
 function toggleGenerator() {
     const panel = document.getElementById('generator-section');
     panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
@@ -54,34 +75,28 @@ function processAndDownload() {
     a.click();
 }
 
-// 4. ITEM LOADER (For list.html)
+// 5. ITEM LOADER (For list.html)
 async function loadListItems() {
     const id = new URLSearchParams(window.location.search).get('id');
     const titleEl = document.getElementById('list-title');
     const container = document.getElementById('items-container');
-    if (!id) return;
+    if (!id || !container) return;
 
     try {
         const res = await fetch(`data/${id}.txt`);
         const text = await res.text();
         titleEl.textContent = id.toUpperCase().replace('_', ' ');
-        const lines = text.trim().split('\n');
+        const lines = text.trim().split('\n').filter(l => l.length > 0);
         container.innerHTML = lines.map(line => {
-            const [name, url, date] = line.split('|').map(s => s.trim());
+            const parts = line.split('|').map(s => s.trim());
+            if (parts.length < 3) return '';
+            const [name, url, date] = parts;
             return `<div class="item-card"><a href="${url}" target="_blank">${name}</a><span class="date">${date}</span></div>`;
         }).join('');
     } catch (e) { titleEl.textContent = "List Not Found"; }
 }
 
-// 5. LOGIN/LOGOUT
-function handleLogin(e) {
-    e.preventDefault();
-    if (document.getElementById('password').value === "jesus christ superstar") {
-        sessionStorage.setItem('isAuth', 'true');
-        window.location.href = 'dashboard.html';
-    } else { document.getElementById('errorMessage').style.display = 'block'; }
-}
-
+// 6. LOGOUT
 function logout() {
     sessionStorage.removeItem('isAuth');
     window.location.href = 'index.html';
