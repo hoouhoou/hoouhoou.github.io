@@ -6,10 +6,10 @@
 
 body { font-family: 'Inter', sans-serif; background-color: var(--bg-site); margin: 0; padding: 0; }
 
-header { background: white; border-bottom: 1px solid var(--border); padding: 15px 40px; text-align: left; }
+header { background: white; border-bottom: 1px solid var(--border); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; }
 header h1 { margin: 0; font-size: 1.5rem; color: #555; }
 
-.breadcrumb { padding: 20px 40px; font-size: 1.1rem; color: #333; font-weight: 600; }
+.breadcrumb { padding: 20px 40px; font-size: 1.1rem; color: #333; }
 .breadcrumb span { color: var(--primary); cursor: pointer; text-decoration: underline; }
 
 .archive-grid {
@@ -19,7 +19,15 @@ header h1 { margin: 0; font-size: 1.5rem; color: #555; }
     padding: 0 40px 40px;
 }
 
-/* The Blue Card Button */
+/* Generator Panel */
+#generator-section {
+    background: white;
+    margin: 20px 40px;
+    padding: 20px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+}
+
 .card-button {
     background: var(--primary);
     border-radius: 4px;
@@ -27,7 +35,6 @@ header h1 { margin: 0; font-size: 1.5rem; color: #555; }
     cursor: pointer;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
@@ -44,5 +51,5 @@ header h1 { margin: 0; font-size: 1.5rem; color: #555; }
     justify-content: space-between;
 }
 
-.admin-actions { position: fixed; bottom: 20px; right: 20px; }
-.btn-minimal { background: #555; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 4px; }
+.admin-btn { background: #2ecc71; color: white; border: none; padding: 8px 15px; cursor: pointer; border-radius: 4px; margin-right: 10px; }
+.logout-btn { background: #e74c3c; color: white; border: none; padding: 8px 15px; cursor: pointer; border-radius: 4px; }
