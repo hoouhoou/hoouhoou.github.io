@@ -1,75 +1,51 @@
 :root {
     --primary: #337ab7;
-    --success: #2ecc71;
-    --danger: #e74c3c;
-    --bg: #f4f7f6;
+    --bg-site: #f5f5f5;
+    --border: #dddddd;
 }
 
-body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; }
+body { font-family: 'Inter', sans-serif; background-color: var(--bg-site); margin: 0; padding: 0; }
 
-header { 
-    background: white; 
-    padding: 15px 40px; 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center;
-    border-bottom: 2px solid #ddd;
-}
+header { background: white; border-bottom: 2px solid var(--border); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; }
+header h1 { margin: 0; font-size: 1.4rem; color: #555; font-weight: 800; }
 
-header h1 { color: var(--primary); font-size: 1.4rem; margin: 0; }
-
-.breadcrumb { padding: 20px 40px; background: white; border-bottom: 1px solid #eee; margin-bottom: 20px; }
-.breadcrumb span { color: var(--primary); cursor: pointer; font-weight: bold; }
+.breadcrumb { padding: 20px 40px; font-size: 1.1rem; color: #333; font-weight: 600; }
+.breadcrumb span { color: var(--primary); cursor: pointer; text-decoration: underline; }
 
 .archive-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 20px;
     padding: 0 40px 40px;
 }
 
-/* Playful Database Cards */
-.card {
-    background: white;
-    border-radius: 8px;
-    overflow: hidden;
-    cursor: pointer;
-    border: 1px solid #ddd;
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-}
-
-.card-header {
+/* The Scaleus Card Button */
+.card-button {
     background: var(--primary);
-    padding: 30px 20px;
-    text-align: center;
+    border-radius: 6px;
     color: white;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
 }
 
-.card-header h3 { margin: 0; font-size: 1.1rem; text-transform: uppercase; }
+.card-button:hover { transform: translateY(-5px); }
 
-.card-footer {
-    padding: 10px;
-    text-align: center;
-    font-size: 0.8rem;
-    color: var(--primary);
-    font-weight: bold;
-    background: #fafafa;
-}
+.card-top { padding: 35px 20px; flex-grow: 1; text-align: center; }
+.card-top h3 { margin: 0; font-size: 1.2rem; text-transform: uppercase; }
 
-/* Generator Styling */
-#generator-panel {
+.card-bottom {
     background: white;
-    margin: 20px 40px;
-    padding: 20px;
-    border-radius: 8px;
-    border: 2px dashed var(--primary);
+    color: var(--primary);
+    padding: 10px 15px;
+    font-size: 0.85rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
 }
 
-.btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; color: white; font-weight: bold; }
-.btn-manage { background: var(--success); }
-.btn-logout { background: var(--danger); }
+.btn-manage { background: #2ecc71; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; }
