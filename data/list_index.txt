@@ -1,4 +1,18 @@
-BRAVO LOUNGE | 2025 | JANUARY | jan_07 | Bravo Executive Lounge - Jan 7
-BRAVO LOUNGE | 2025 | JANUARY | jan_21 | Bravo Executive Lounge - Jan 21
+0.ARCHIVED | 2024 | DECEMBER | arch_01 | Old Archive Entry
+ZZZCATEGORIZATION | 2025 | JANUARY | cat_01 | Category Setup
+3.LET'S GROOVE MASTER LIST | 2025 | FEBRUARY | groove_01 | Let's Groove Session
+2.BRAVO EXECUTIVE LOUNGE MASTER LIST | 2025 | JANUARY | jan_07 | Bravo Executive Lounge - Jan 7
+1.TGIRJ MASTER LIST | 2025 | MARCH | tgirj_01 | TGIRJ Session
 RJ ONLINE | 2026 | MARCH | rj_mar_15 | RJ Online Live Session
+GIMME A BREAK | 2025 | APRIL | gab_01 | Gimme A Break Ep 1
+STA ZITA AT SI MARY ROSE | 2025 | MAY | stazita_01 | Sta Zita Session
+RJ SOCIETY OF MUSIC | 2025 | JUNE | rjsom_01 | Society of Music
+HAPI OUR | 2025 | JULY | hapi_01 | Hapi Our Session
+50'S DANCE PARTY | 2025 | AUGUST | dance_50s | 50's Party
+DALE ADRIATICO | 2025 | SEPTEMBER | dale_01 | Dale Adriatico Live
 PINOY WRESTLING | 2024 | DECEMBER | wrestling_dec_12 | Year End Special
+DANCE ZONE | 2025 | OCTOBER | dz_01 | Dance Zone Mix
+RJTV PENTHOUSE | 2025 | NOVEMBER | penthouse_01 | Penthouse Session
+R J AMERICA | 2026 | JANUARY | rja_01 | RJ America Live
+DRIVETIME | 2026 | FEBRUARY | drive_01 | Drivetime Session
+mandarin hotel | 2025 | DECEMBER | man_01 | Mandarin Hotel Set
