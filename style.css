@@ -1,65 +1,48 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
-
 :root {
-    --primary: #337ab7; /* The specific blue from your reference image */
+    --primary: #337ab7;
     --bg-site: #f5f5f5;
-    --card-bg: #ffffff;
     --border: #dddddd;
 }
 
 body { font-family: 'Inter', sans-serif; background-color: var(--bg-site); margin: 0; padding: 0; }
 
-header { background: white; border-bottom: 1px solid var(--border); padding: 15px 40px; }
-header h1 { margin: 0; font-size: 1.2rem; color: #555; font-weight: 400; }
+header { background: white; border-bottom: 1px solid var(--border); padding: 15px 40px; text-align: left; }
+header h1 { margin: 0; font-size: 1.5rem; color: #555; }
 
-.breadcrumb {
-    padding: 20px 40px;
-    font-size: 1.4rem;
-    color: #333;
-}
-
-.breadcrumb span { color: var(--primary); cursor: pointer; }
+.breadcrumb { padding: 20px 40px; font-size: 1.1rem; color: #333; font-weight: 600; }
+.breadcrumb span { color: var(--primary); cursor: pointer; text-decoration: underline; }
 
 .archive-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 20px;
-    padding: 0 40px;
+    padding: 0 40px 40px;
 }
 
-/* Card Button Design */
+/* The Blue Card Button */
 .card-button {
     background: var(--primary);
     border-radius: 4px;
     color: white;
     cursor: pointer;
-    transition: filter 0.2s;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-.card-button:hover { filter: brightness(1.1); }
-
-.card-top {
-    padding: 25px 20px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.card-top h3 { margin: 0; font-size: 1.5rem; font-weight: 400; letter-spacing: 0.5px; }
+.card-top { padding: 30px 20px; flex-grow: 1; }
+.card-top h3 { margin: 0; font-size: 1.3rem; font-weight: 500; }
 
 .card-bottom {
     background: white;
     color: var(--primary);
-    padding: 8px 15px;
+    padding: 10px 15px;
     font-size: 0.85rem;
-    border: 1px solid var(--border);
-    border-top: none;
+    border-top: 1px solid var(--border);
     display: flex;
     justify-content: space-between;
-    align-items: center;
 }
 
 .admin-actions { position: fixed; bottom: 20px; right: 20px; }
-.btn-minimal { background: #555; color: white; border: none; padding: 10px 15px; border-radius: 3px; cursor: pointer; }
+.btn-minimal { background: #555; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 4px; }
