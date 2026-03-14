@@ -3,37 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Master Archive</title>
+    <title>Archive Dashboard</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
         <h1>THE ARCHIVE</h1>
-        <div class="subtitle">A curated collection of lists and sets</div>
     </header>
 
+    <div id="breadcrumb-nav" class="breadcrumb">Main Archive</div>
+
     <div class="container">
-        <div id="generator-section" class="generator-panel" style="display: none;">
-            <h2 style="font-family: 'Playfair Display', serif;">New Data Entry</h2>
-            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                <input type="text" id="globalDate" placeholder="Set Date">
-                <input type="text" id="fileName" placeholder="File Name">
-            </div>
-            <textarea id="rawInput" style="width: 100%; height: 150px; border: 1px solid #eceae0;" placeholder="Paste text here..."></textarea>
-            <button onclick="processAndDownload()" class="btn-minimal" style="width:100%; margin-top:20px;">Generate File</button>
-        </div>
-
-        <div class="search-container">
-            <input type="text" id="searchInput" onkeyup="filterLists()" placeholder="Search archives...">
-        </div>
-
-        <div id="lists-container" class="list-grid">
+        <div id="lists-container" class="archive-grid">
             </div>
     </div>
 
     <div class="admin-actions">
-        <button onclick="toggleGenerator()" class="btn-minimal">Manage Data</button>
-        <button onclick="logout()" class="btn-minimal" style="background:#7f8c8d;">Logout</button>
+        <button onclick="toggleGenerator()" class="btn-minimal">New Entry</button>
+        <button onclick="logout()" class="btn-minimal">Logout</button>
     </div>
 
     <script src="script.js"></script>
