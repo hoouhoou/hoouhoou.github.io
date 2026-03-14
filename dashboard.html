@@ -2,34 +2,26 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | Scaleus Archive</title>
-    <link rel="stylesheet" href="style.css?v=2.0">
+    <title>Dashboard | Fiesta Archive</title>
+    <link rel="stylesheet" href="style.css?v=3.0">
 </head>
 <body>
-    <header>
-        <h1>SCALEUS / <span style="color:var(--primary)">ARCHIVE</span></h1>
-        <div>
-            <button class="btn-manage" onclick="toggleGen()">+ MANAGE DATA</button>
-            <button onclick="location.href='index.html'" style="background:none; border:none; color:#95a5a6; cursor:pointer; margin-left:15px;">Logout</button>
-        </div>
+    <header style="background: white; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 5px solid #f1c40f;">
+        <h1 style="margin: 0; color: #e74c3c; font-weight: 900;">FIESTA // <span style="color:#2980b9;">ARCHIVE</span></h1>
+        <button onclick="toggleGen()" style="background:#27ae60; color:white; border:none; padding:10px 20px; border-radius:50px; cursor:pointer; font-weight:bold;">+ MANAGE DATA</button>
     </header>
 
-    <div id="generator-panel" style="display:none; background:#fff; margin:20px 40px; padding:25px; border-radius:15px; border:3px dashed var(--accent);">
-        <h3 style="color:var(--accent); margin-top:0;">Bulk Data Generator</h3>
-        <div style="display:flex; gap:10px; margin-bottom:10px;">
-            <input type="text" id="globalDate" placeholder="Date (e.g. 7 Jan 2025)" style="flex:1; padding:10px; border-radius:8px; border:1px solid #ddd;">
-            <input type="text" id="fileName" placeholder="File Name (e.g. jan_07)" style="flex:1; padding:10px; border-radius:8px; border:1px solid #ddd;">
-        </div>
-        <textarea id="rawInput" style="width:100%; height:100px; border-radius:8px; border:1px solid #ddd; padding:10px; font-family:monospace;" placeholder="Paste song list here..."></textarea>
-        <button onclick="processAndDownload()" class="btn-manage" style="width:100%; margin-top:10px; background:var(--accent);">GENERATE & DOWNLOAD</button>
+    <div id="generator-panel" style="display:none; background:#fff; margin:20px 40px; padding:25px; border-radius:15px; border:3px dashed #2980b9;">
+        <input type="text" id="globalDate" placeholder="Date (e.g. 7 Jan 2025)" style="padding:10px; margin-right:10px;">
+        <input type="text" id="fileName" placeholder="File Name (e.g. jan_07)" style="padding:10px;">
+        <textarea id="rawInput" style="width:100%; height:80px; margin-top:10px;" placeholder="Paste song list..."></textarea>
+        <button onclick="processAndDownload()" style="width:100%; margin-top:10px; background:#e67e22; color:white; border:none; padding:10px; border-radius:8px; cursor:pointer;">GENERATE .TXT</button>
     </div>
 
-    <div id="breadcrumb-nav" style="padding: 20px 40px; font-weight:bold; color:var(--secondary);">Dashboard</div>
-    
+    <div id="breadcrumb-nav" style="padding: 20px 40px; font-weight:bold; color:#2980b9;">Dashboard</div>
     <div id="lists-container" class="archive-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 25px; padding: 0 40px 40px;"></div>
 
-    <script src="script.js?v=2.0"></script>
+    <script src="script.js?v=3.0"></script>
     <script>loadMasterLists();</script>
 </body>
 </html>
