@@ -3,31 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bravo Master Archive</title>
-    <link rel="stylesheet" href="style.css?v=1.1">
+    <title>Dashboard | Scaleus Archive</title>
+    <link rel="stylesheet" href="style.css?v=2.0">
 </head>
 <body>
     <header>
-        <h1>SCALEUS // ARCHIVE</h1>
+        <h1>SCALEUS / <span style="color:var(--primary)">ARCHIVE</span></h1>
         <div>
-            <button class="btn-manage" onclick="toggleGen()">Manage Data</button>
-            <button class="btn-logout" onclick="location.href='index.html'">Logout</button>
+            <button class="btn-manage" onclick="toggleGen()">+ MANAGE DATA</button>
+            <button onclick="location.href='index.html'" style="background:none; border:none; color:#95a5a6; cursor:pointer; margin-left:15px;">Logout</button>
         </div>
     </header>
 
-    <div id="generator-panel" style="display:none; background:#fff; margin:20px 40px; padding:20px; border-radius:12px; border:2px dashed #337ab7;">
-        <h3>Bulk Setlist Generator</h3>
-        <input type="text" id="globalDate" placeholder="Date (e.g. 7 Jan 2025)" style="padding:10px; margin-bottom:10px;">
-        <input type="text" id="fileName" placeholder="Filename (e.g. jan_07)" style="padding:10px; margin-bottom:10px;">
-        <textarea id="rawInput" style="width:100%; height:80px;" placeholder="Paste song list here..."></textarea>
-        <button onclick="processAndDownload()" class="btn-manage" style="width:100%; margin-top:10px;">Download .txt</button>
+    <div id="generator-panel" style="display:none; background:#fff; margin:20px 40px; padding:25px; border-radius:15px; border:3px dashed var(--accent);">
+        <h3 style="color:var(--accent); margin-top:0;">Bulk Data Generator</h3>
+        <div style="display:flex; gap:10px; margin-bottom:10px;">
+            <input type="text" id="globalDate" placeholder="Date (e.g. 7 Jan 2025)" style="flex:1; padding:10px; border-radius:8px; border:1px solid #ddd;">
+            <input type="text" id="fileName" placeholder="File Name (e.g. jan_07)" style="flex:1; padding:10px; border-radius:8px; border:1px solid #ddd;">
+        </div>
+        <textarea id="rawInput" style="width:100%; height:100px; border-radius:8px; border:1px solid #ddd; padding:10px; font-family:monospace;" placeholder="Paste song list here..."></textarea>
+        <button onclick="processAndDownload()" class="btn-manage" style="width:100%; margin-top:10px; background:var(--accent);">GENERATE & DOWNLOAD</button>
     </div>
 
-    <div id="breadcrumb-nav" class="breadcrumb">Dashboard</div>
+    <div id="breadcrumb-nav" style="padding: 20px 40px; font-weight:bold; color:var(--secondary);">Dashboard</div>
     
-    <div id="lists-container" class="archive-grid"></div>
+    <div id="lists-container" class="archive-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 25px; padding: 0 40px 40px;"></div>
 
-    <script src="script.js?v=1.1"></script>
+    <script src="script.js?v=2.0"></script>
     <script>loadMasterLists();</script>
 </body>
 </html>
