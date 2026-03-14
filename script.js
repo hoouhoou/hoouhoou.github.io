@@ -2,7 +2,7 @@
 (function() {
     const isAuth = sessionStorage.getItem('isAuth');
     const path = window.location.pathname;
-    const isIndex = path.endsWith('index.html') || path === '/' || path.endsWith('');
+    const isIndex = path.endsWith('index.html') || path === '/' || path.endsWith('') || path.includes('index');
     
     if (!isIndex && isAuth !== 'true') {
         window.location.href = 'index.html';
@@ -47,14 +47,25 @@ async function loadMasterLists() {
                 </div>
             `;
         }).join('');
-    } catch (e) { console.error("Error loading index:", e); }
+    } catch (e) { 
+        console.error("Error loading index:", e); 
+        const container = document.getElementById('lists-container');
+        if(container) container.innerHTML = "<p style='color:red'>Error: Make sure data/list_index.txt exists.</p>";
+    }
 }
 
 // 4. GENERATOR LOGIC
 function toggleGenerator() {
     const panel = document.getElementById('generator-section');
     if (panel) {
-        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        // Switches between 'none' and 'block'
+        if (panel.style.display === 'none') {
+            panel.style.display = 'block';
+        } else {
+            panel.style.display = 'none';
+        }
+    } else {
+        console.error("Generator section not found in HTML");
     }
 }
 
@@ -80,7 +91,7 @@ function processAndDownload() {
     document.body.removeChild(a);
 }
 
-// 5. ITEM LOADER
+// 5. ITEM LOADER (For list.html)
 async function loadListItems() {
     const id = new URLSearchParams(window.location.search).get('id');
     const titleEl = document.getElementById('list-title');
@@ -89,6 +100,7 @@ async function loadListItems() {
 
     try {
         const res = await fetch(`data/${id}.txt`);
+        if (!res.ok) throw new Error("File not found");
         const text = await res.text();
         titleEl.textContent = id.toUpperCase().replace('_', ' ');
         const lines = text.trim().split('\n').filter(l => l.length > 0);
@@ -98,7 +110,10 @@ async function loadListItems() {
             const [name, url, date] = parts;
             return `<div class="item-card"><a href="${url}" target="_blank">${name}</a><span class="date">${date}</span></div>`;
         }).join('');
-    } catch (e) { titleEl.textContent = "List Not Found"; }
+    } catch (e) { 
+        titleEl.textContent = "List Not Found"; 
+        container.innerHTML = `<p>File data/${id}.txt not found.</p>`;
+    }
 }
 
 // 6. LOGOUT
