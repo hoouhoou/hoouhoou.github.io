@@ -2,17 +2,29 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Archive Dashboard</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header><h1>SCALEUS / ARCHIVE</h1></header>
+    <header>
+        <h1>SCALEUS / ARCHIVE</h1>
+        <div>
+            <button class="admin-btn" onclick="toggleGenerator()">Manage Data</button>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </header>
+
+    <div id="generator-section" style="display:none;">
+        <h3>Bulk Data Generator</h3>
+        <input type="text" id="globalDate" placeholder="Date (e.g. 7 Jan 2025)" style="padding:8px;">
+        <input type="text" id="fileName" placeholder="File Name (e.g. jan_07)" style="padding:8px;">
+        <textarea id="rawInput" style="width:100%; height:100px; margin:10px 0;" placeholder="Paste song list here..."></textarea>
+        <button onclick="processAndDownload()" class="admin-btn" style="width:100%;">Download Text File</button>
+    </div>
+
     <div id="breadcrumb-nav" class="breadcrumb">Dashboard</div>
     <div id="lists-container" class="archive-grid"></div>
-    <div class="admin-actions">
-        <button onclick="logout()" class="btn-minimal">Logout</button>
-    </div>
+
     <script src="script.js"></script>
     <script>loadMasterLists();</script>
 </body>
