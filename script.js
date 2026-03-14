@@ -7,17 +7,18 @@ async function loadMasterLists() {
         const text = await res.text();
         const lines = text.trim().split('\n').filter(l => l.length > 0);
 
-        // Build the data object
         lines.forEach(line => {
-            const [event, year, month, id, title] = line.split('|').map(s => s.trim());
+            const parts = line.split('|').map(s => s.trim());
+            if (parts.length < 5) return;
+            const [event, year, month, id, title] = parts;
+            
             if (!archiveData[event]) archiveData[event] = {};
             if (!archiveData[event][year]) archiveData[event][year] = {};
             if (!archiveData[event][year][month]) archiveData[event][year][month] = [];
             archiveData[event][year][month].push({ id, title });
         });
-
         renderGrid();
-    } catch (e) { console.error("Archive Load Error", e); }
+    } catch (e) { console.error("Load Error", e); }
 }
 
 function renderGrid() {
@@ -25,54 +26,56 @@ function renderGrid() {
     const breadcrumb = document.getElementById('breadcrumb-nav');
     let html = '';
 
-    // Step 1: Handle Home View (Events)
     if (!currentPath.event) {
-        breadcrumb.innerHTML = "Main Archive";
+        breadcrumb.innerHTML = "Dashboard";
         Object.keys(archiveData).forEach(event => {
-            html += `<div class="dir-button" onclick="navigate('${event}', null, null)">
-                        <h3>${event}</h3><p>Browse Event</p>
-                     </div>`;
+            html += createCard(event, "Explore Category", () => navigate(event, null, null));
         });
     } 
-    // Step 2: Handle Year View
-    else if (currentPath.event && !currentPath.year) {
-        breadcrumb.innerHTML = `<span onclick="resetNav()">Main Archive</span> > ${currentPath.event}`;
+    else if (!currentPath.year) {
+        breadcrumb.innerHTML = `<span onclick="resetNav()">Dashboard</span> / ${currentPath.event}`;
         Object.keys(archiveData[currentPath.event]).forEach(year => {
-            html += `<div class="dir-button" onclick="navigate('${currentPath.event}', '${year}', null)">
-                        <h3>${year}</h3><p>Archive Year</p>
-                     </div>`;
+            html += createCard(year, "Explore Year", () => navigate(currentPath.event, year, null));
         });
     }
-    // Step 3: Handle Month View
-    else if (currentPath.year && !currentPath.month) {
-        breadcrumb.innerHTML = `<span onclick="resetNav()">Main Archive</span> > <span onclick="navigate('${currentPath.event}', null, null)">${currentPath.event}</span> > ${currentPath.year}`;
+    else if (!currentPath.month) {
+        breadcrumb.innerHTML = `<span onclick="resetNav()">Dashboard</span> / <span onclick="navigate('${currentPath.event}', null, null)">${currentPath.event}</span> / ${currentPath.year}`;
         Object.keys(archiveData[currentPath.event][currentPath.year]).forEach(month => {
-            html += `<div class="dir-button" onclick="navigate('${currentPath.event}', '${currentPath.year}', '${month}')">
-                        <h3>${month}</h3><p>Month Archive</p>
-                     </div>`;
+            html += createCard(month, "Explore Month", () => navigate(currentPath.event, currentPath.year, month));
         });
     }
-    // Step 4: Handle Episode View
     else {
-        breadcrumb.innerHTML = `<span onclick="resetNav()">Main Archive</span> > <span onclick="navigate('${currentPath.event}', null, null)">${currentPath.event}</span> > <span onclick="navigate('${currentPath.event}', '${currentPath.year}', null)">${currentPath.year}</span> > ${currentPath.month}`;
+        breadcrumb.innerHTML = `<span onclick="resetNav()">Dashboard</span> / <span onclick="navigate('${currentPath.event}', null, null)">${currentPath.event}</span> / <span onclick="navigate('${currentPath.event}', '${currentPath.year}', null)">${currentPath.year}</span> / ${currentPath.month}`;
         archiveData[currentPath.event][currentPath.year][currentPath.month].forEach(item => {
-            html += `<div class="dir-button" onclick="location.href='list.html?id=${item.id}'">
-                        <h3>${item.title}</h3><p>View Episode</p>
-                     </div>`;
+            html += createCard(item.title, "View Setlist", () => location.href=`list.html?id=${item.id}`);
         });
     }
-
     container.innerHTML = html;
 }
 
-function navigate(ev, yr, mo) {
-    currentPath = { event: ev, year: yr, month: mo };
-    renderGrid();
+function createCard(title, label, action) {
+    // Generate a random ID to attach the click listener to
+    const safeId = 'btn-' + Math.random().toString(36).substr(2, 9);
+    
+    // Using setTimeout to attach listeners after the HTML is injected
+    setTimeout(() => {
+        const el = document.getElementById(safeId);
+        if(el) el.onclick = action;
+    }, 0);
+
+    return `
+        <div class="card-button" id="${safeId}">
+            <div class="card-top">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="white"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
+                <h3>${title}</h3>
+            </div>
+            <div class="card-bottom">
+                <span>${label}</span>
+                <span>→</span>
+            </div>
+        </div>`;
 }
 
-function resetNav() {
-    currentPath = { event: null, year: null, month: null };
-    renderGrid();
-}
-
-// Keep your processAndDownload and handleLogin functions below...
+function navigate(ev, yr, mo) { currentPath = { event: ev, year: yr, month: mo }; renderGrid(); }
+function resetNav() { currentPath = { event: null, year: null, month: null }; renderGrid(); }
+function logout() { sessionStorage.removeItem('isAuth'); window.location.href = 'index.html'; }
