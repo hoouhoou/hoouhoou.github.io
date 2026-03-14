@@ -2,24 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Archive Dashboard</title>
+    <title>BRAVO MASTER</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
-        <h1>SCALEUS / ARCHIVE</h1>
+        <h1>BRAVO MASTER ARCHIVE</h1>
         <div>
-            <button class="admin-btn" onclick="toggleGenerator()">Manage Data</button>
-            <button class="logout-btn" onclick="logout()">Logout</button>
+            <button class="btn btn-manage" onclick="toggleGen()">Manage Data</button>
+            <button class="btn btn-logout" onclick="location.href='index.html'">Logout</button>
         </div>
     </header>
 
-    <div id="generator-section" style="display:none;">
-        <h3>Bulk Data Generator</h3>
-        <input type="text" id="globalDate" placeholder="Date (e.g. 7 Jan 2025)" style="padding:8px;">
-        <input type="text" id="fileName" placeholder="File Name (e.g. jan_07)" style="padding:8px;">
-        <textarea id="rawInput" style="width:100%; height:100px; margin:10px 0;" placeholder="Paste song list here..."></textarea>
-        <button onclick="processAndDownload()" class="admin-btn" style="width:100%;">Download Text File</button>
+    <div id="generator-panel" style="display:none;">
+        <h3>Bulk Setlist Generator</h3>
+        <input type="text" id="globalDate" placeholder="Date (e.g. 7 Jan 2025)" style="padding:10px;">
+        <input type="text" id="fileName" placeholder="Filename (e.g. jan_07)" style="padding:10px;">
+        <textarea id="rawInput" style="width:100%; height:100px; margin-top:10px;" placeholder="Paste song list..."></textarea>
+        <button onclick="processAndDownload()" class="btn btn-manage" style="width:100%; margin-top:10px;">Generate & Download .txt</button>
     </div>
 
     <div id="breadcrumb-nav" class="breadcrumb">Dashboard</div>
