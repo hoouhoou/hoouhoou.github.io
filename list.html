@@ -3,18 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>View List</title>
+    <title>View Episode</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .item-card { background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ddd; display: flex; justify-content: space-between; }
+        .back-link { display: inline-block; margin: 20px; color: #337ab7; text-decoration: none; font-weight: bold; }
+    </style>
 </head>
 <body>
-    <header>
-        <a href="dashboard.html" style="text-decoration:none; color:#1877f2; font-weight:bold;">← Back to Dashboard</a>
-    </header>
-    <h1 id="list-title" style="margin-top:20px;">Loading...</h1>
-    <div id="items-container"></div>
-    <script src="script.js"></script>
+    <a href="dashboard.html" class="back-link">← Back to Dashboard</a>
+    <div id="list-container" style="padding: 20px; max-width: 800px; margin: auto;">
+        <h1 id="list-title" style="font-family: 'Playfair Display', serif;">Loading...</h1>
+        <div id="items-container"></div>
+    </div>
+
     <script>
-        loadListItems();
+        async function loadList() {
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get('id');
+            const container = document.getElementById('items-container');
+            const title = document.getElementById('list-title');
+
+            if (!id) {
+                title.innerText = "No ID Provided";
+                return;
+            }
+
+            try {
+                // IMPORTANT: This looks for the file inside the /data/ folder
+                const res = await fetch(`data/${id}.txt?t=${new Date().getTime()}`);
+                if (!res.ok) throw new Error(`File data/${id}.txt not found.`);
+                
+                const text = await res.text();
+                title.innerText = id.toUpperCase().replace(/_/g, ' ');
+                
+                const lines = text.trim().split('\n').filter(l => l.length > 0);
+                container.innerHTML = lines.map(line => {
+                    const [name, url, date] = line.split('|').map(s => s.trim());
+                    return `
+                        <div class="item-card">
+                            <span style="font-weight:600;">${name}</span>
+                            <span style="color: #7f8c8d; font-size: 0.8rem;">${date || ''}</span>
+                        </div>`;
+                }).join('');
+            } catch (e) {
+                title.innerText = "List Not Found";
+                container.innerHTML = `<p style="color:red;">${e.message}</p>`;
+            }
+        }
+        loadList();
     </script>
 </body>
 </html>
