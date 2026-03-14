@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>Bravo Dashboard</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
         <h1>MASTER LIST</h1>
-        <div>
+        <div class="header-actions">
             <button onclick="toggleGenerator()" class="admin-btn">Manage Data</button>
             <button onclick="logout()" class="logout-btn">Logout</button>
         </div>
@@ -17,14 +17,12 @@
 
     <div id="generator-section" class="generator-panel" style="display: none;">
         <h3>Bulk Data Generator</h3>
-        <input type="text" id="globalDate" placeholder="Date (e.g., 7 Jan 2025)">
-        <input type="text" id="fileName" placeholder="File Name (e.g., jan_07)">
-        <textarea id="rawInput" placeholder="Paste list here...&#10;1. INTRO&#10;2. SONG - ARTIST..."></textarea>
-        <div class="btn-group">
-            <button onclick="processAndDownload()" class="btn-save">Process & Download .txt</button>
-            <button onclick="toggleGenerator()" class="btn-clear">Close</button>
+        <div class="row">
+            <input type="text" id="globalDate" placeholder="Date (e.g., 7 Jan 2025)">
+            <input type="text" id="fileName" placeholder="File Name (e.g., jan_07)">
         </div>
-        <p><small>Save the downloaded file into your <b>/data</b> folder.</small></p>
+        <textarea id="rawInput" placeholder="Paste your list here...&#10;1. INTRO&#10;2. YESTERDAY - THE BRAVO TRIO BAND&#10;3. SPIEL..."></textarea>
+        <button onclick="processAndDownload()" class="btn-save">Process & Download .txt</button>
     </div>
 
     <div id="lists-container" class="list-grid"></div>
