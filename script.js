@@ -7,73 +7,49 @@ async function loadMasterLists() {
         const text = await res.text();
         const lines = text.trim().split('\n').filter(l => l.length > 0);
 
+        archiveData = {}; // Clear old data
         lines.forEach(line => {
             const parts = line.split('|').map(s => s.trim());
             if (parts.length < 5) return;
             const [event, year, month, id, title] = parts;
-            
             if (!archiveData[event]) archiveData[event] = {};
             if (!archiveData[event][year]) archiveData[event][year] = {};
             if (!archiveData[event][year][month]) archiveData[event][year][month] = [];
             archiveData[event][year][month].push({ id, title });
         });
         renderGrid();
-    } catch (e) { console.error("Load Error", e); }
+    } catch (e) { document.getElementById('lists-container').innerHTML = "Error loading index."; }
 }
 
 function renderGrid() {
     const container = document.getElementById('lists-container');
     const breadcrumb = document.getElementById('breadcrumb-nav');
-    let html = '';
+    container.innerHTML = ""; // Clear current view
+
+    let items = [];
+    let label = "";
 
     if (!currentPath.event) {
         breadcrumb.innerHTML = "Dashboard";
-        Object.keys(archiveData).forEach(event => {
-            html += createCard(event, "Explore Category", () => navigate(event, null, null));
-        });
-    } 
-    else if (!currentPath.year) {
+        Object.keys(archiveData).forEach(ev => items.push({ title: ev, sub: "Explore Category", action: () => navigate(ev, null, null) }));
+    } else if (!currentPath.year) {
         breadcrumb.innerHTML = `<span onclick="resetNav()">Dashboard</span> / ${currentPath.event}`;
-        Object.keys(archiveData[currentPath.event]).forEach(year => {
-            html += createCard(year, "Explore Year", () => navigate(currentPath.event, year, null));
-        });
+        Object.keys(archiveData[currentPath.event]).forEach(yr => items.push({ title: yr, sub: "Explore Year", action: () => navigate(currentPath.event, yr, null) }));
+    } else if (!currentPath.month) {
+        breadcrumb.innerHTML = `<span onclick="resetNav()">Dashboard</span> / <span onclick="navigate('${currentPath.event}',null,null)">${currentPath.event}</span> / ${currentPath.year}`;
+        Object.keys(archiveData[currentPath.event][currentPath.year]).forEach(mo => items.push({ title: mo, sub: "Explore Month", action: () => navigate(currentPath.event, currentPath.year, mo) }));
+    } else {
+        breadcrumb.innerHTML = `<span onclick="resetNav()">Dashboard</span> / <span onclick="navigate('${currentPath.event}',null,null)">${currentPath.event}</span> / <span onclick="navigate('${currentPath.event}','${currentPath.year}',null)">${currentPath.year}</span> / ${currentPath.month}`;
+        archiveData[currentPath.event][currentPath.year][currentPath.month].forEach(ep => items.push({ title: ep.title, sub: "View Setlist", action: () => location.href=`list.html?id=${ep.id}` }));
     }
-    else if (!currentPath.month) {
-        breadcrumb.innerHTML = `<span onclick="resetNav()">Dashboard</span> / <span onclick="navigate('${currentPath.event}', null, null)">${currentPath.event}</span> / ${currentPath.year}`;
-        Object.keys(archiveData[currentPath.event][currentPath.year]).forEach(month => {
-            html += createCard(month, "Explore Month", () => navigate(currentPath.event, currentPath.year, month));
-        });
-    }
-    else {
-        breadcrumb.innerHTML = `<span onclick="resetNav()">Dashboard</span> / <span onclick="navigate('${currentPath.event}', null, null)">${currentPath.event}</span> / <span onclick="navigate('${currentPath.event}', '${currentPath.year}', null)">${currentPath.year}</span> / ${currentPath.month}`;
-        archiveData[currentPath.event][currentPath.year][currentPath.month].forEach(item => {
-            html += createCard(item.title, "View Setlist", () => location.href=`list.html?id=${item.id}`);
-        });
-    }
-    container.innerHTML = html;
-}
 
-function createCard(title, label, action) {
-    // Generate a random ID to attach the click listener to
-    const safeId = 'btn-' + Math.random().toString(36).substr(2, 9);
-    
-    // Using setTimeout to attach listeners after the HTML is injected
-    setTimeout(() => {
-        const el = document.getElementById(safeId);
-        if(el) el.onclick = action;
-    }, 0);
-
-    return `
-        <div class="card-button" id="${safeId}">
-            <div class="card-top">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="white"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
-                <h3>${title}</h3>
-            </div>
-            <div class="card-bottom">
-                <span>${label}</span>
-                <span>→</span>
-            </div>
-        </div>`;
+    items.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'card-button';
+        div.onclick = item.action;
+        div.innerHTML = `<div class="card-top"><h3>${item.title}</h3></div><div class="card-bottom"><span>${item.sub}</span><span>→</span></div>`;
+        container.appendChild(div);
+    });
 }
 
 function navigate(ev, yr, mo) { currentPath = { event: ev, year: yr, month: mo }; renderGrid(); }
