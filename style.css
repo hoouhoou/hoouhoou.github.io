@@ -1,31 +1,43 @@
-body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    max-width: 900px;
-    margin: 40px auto;
-    padding: 0 20px;
-    background: #f4f7f6;
-    color: #333;
+/* Admin/Manage Button */
+.admin-btn {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+    font-weight: bold;
 }
 
-/* Login Page Specific */
-.login-body { display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-.login-container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 300px; text-align: center; }
-.login-container input { width: 100%; padding: 12px; margin: 15px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
-.login-container button { width: 100%; padding: 12px; background: #1877f2; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
-.error { color: #d93025; font-size: 14px; margin-top: 10px; display: none; }
+/* Generator Panel */
+.generator-panel {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+    border: 2px solid #1877f2;
+}
 
-/* Dashboard Header */
-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ddd; margin-bottom: 30px; }
-.logout-btn { background: #eee; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; }
+.generator-panel input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
 
-/* Grid and Cards */
-.list-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
-.list-card { background: white; border: 1px solid #ddd; border-radius: 10px; padding: 20px; cursor: pointer; transition: 0.2s; }
-.list-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-.list-card h3 { margin: 0 0 10px 0; color: #1877f2; }
+.generator-panel textarea {
+    width: 100%;
+    height: 200px;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    font-family: monospace;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
 
-/* Item Cards */
-.item-card { background: white; border: 1px solid #eee; border-radius: 8px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-.item-card a { color: #0066cc; text-decoration: none; font-weight: 500; }
-.back-link { display: inline-block; margin-bottom: 20px; color: #666; text-decoration: none; }
-.date { color: #888; font-size: 0.8rem; }
+.btn-save { background: #1877f2; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; }
