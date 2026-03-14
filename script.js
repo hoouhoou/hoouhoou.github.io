@@ -30,6 +30,7 @@ function handleLogin(e) {
 async function loadMasterLists() {
     try {
         const res = await fetch('data/list_index.txt');
+        if (!res.ok) throw new Error("Index not found");
         const text = await res.text();
         const container = document.getElementById('lists-container');
         if(!container) return;
@@ -52,7 +53,9 @@ async function loadMasterLists() {
 // 4. GENERATOR LOGIC
 function toggleGenerator() {
     const panel = document.getElementById('generator-section');
-    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    if (panel) {
+        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    }
 }
 
 function processAndDownload() {
@@ -72,10 +75,12 @@ function processAndDownload() {
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = (name || "new_list") + ".txt";
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
 }
 
-// 5. ITEM LOADER (For list.html)
+// 5. ITEM LOADER
 async function loadListItems() {
     const id = new URLSearchParams(window.location.search).get('id');
     const titleEl = document.getElementById('list-title');
