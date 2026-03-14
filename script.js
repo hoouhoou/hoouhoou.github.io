@@ -2,122 +2,100 @@
 (function() {
     const isAuth = sessionStorage.getItem('isAuth');
     const path = window.location.pathname;
-    const isIndex = path.endsWith('index.html') || path === '/' || path.endsWith('') || path.includes('index');
-    
-    if (!isIndex && isAuth !== 'true') {
-        window.location.href = 'index.html';
-    }
+    const isIndex = path.endsWith('index.html') || path === '/' || path.endsWith('');
+    if (!isIndex && isAuth !== 'true') window.location.href = 'index.html';
 })();
 
-// 2. LOGIN LOGIC
+// 2. LOGIN
 function handleLogin(e) {
     if (e) e.preventDefault();
     const passwordField = document.getElementById('password');
-    const errorMsg = document.getElementById('errorMessage');
-    
-    if (!passwordField) return;
-
-    if (passwordField.value === "jesus christ superstar") {
+    if (passwordField && passwordField.value === "jesus christ superstar") {
         sessionStorage.setItem('isAuth', 'true');
         window.location.href = 'dashboard.html';
     } else {
-        if (errorMsg) errorMsg.style.display = 'block';
-        passwordField.value = '';
+        const err = document.getElementById('errorMessage');
+        if(err) err.style.display = 'block';
     }
 }
 
-// 3. DASHBOARD LOADER
+// 3. DASHBOARD & SEARCH
 async function loadMasterLists() {
+    const container = document.getElementById('lists-container');
+    if(!container) return;
     try {
-        const res = await fetch('data/list_index.txt');
+        const res = await fetch('data/list_index.txt?t=' + new Date().getTime());
         if (!res.ok) throw new Error("Index not found");
         const text = await res.text();
-        const container = document.getElementById('lists-container');
-        if(!container) return;
-
         const lines = text.trim().split('\n').filter(l => l.length > 0);
         container.innerHTML = lines.map(line => {
-            const parts = line.split('|').map(s => s.trim());
-            if (parts.length < 3) return '';
-            const [id, name, modified] = parts;
+            const [id, name, modified] = line.split('|').map(s => s.trim());
             return `
-                <div class="list-card" onclick="location.href='list.html?id=${id}'">
+                <div class="list-card" data-title="${name.toLowerCase()}" onclick="location.href='list.html?id=${id}'">
                     <h3>${name}</h3>
-                    <p>Modified: ${modified}</p>
-                </div>
-            `;
+                    <p>Last Update: ${modified}</p>
+                </div>`;
         }).join('');
-    } catch (e) { 
-        console.error("Error loading index:", e); 
-        const container = document.getElementById('lists-container');
-        if(container) container.innerHTML = "<p style='color:red'>Error: Make sure data/list_index.txt exists.</p>";
-    }
+    } catch (e) { container.innerHTML = `<p style="color:red; text-align:center;">Please ensure data/list_index.txt exists.</p>`; }
 }
 
-// 4. GENERATOR LOGIC
+function filterLists() {
+    const input = document.getElementById('searchInput').value.toLowerCase();
+    const cards = document.querySelectorAll('.list-card');
+    cards.forEach(card => {
+        const title = card.getAttribute('data-title');
+        card.style.display = title.includes(input) ? "block" : "none";
+    });
+}
+
+// 4. GENERATOR
 function toggleGenerator() {
     const panel = document.getElementById('generator-section');
-    if (panel) {
-        // Switches between 'none' and 'block'
-        if (panel.style.display === 'none') {
-            panel.style.display = 'block';
-        } else {
-            panel.style.display = 'none';
-        }
-    } else {
-        console.error("Generator section not found in HTML");
-    }
+    if (panel) panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
 }
 
 function processAndDownload() {
     const raw = document.getElementById('rawInput').value;
     const date = document.getElementById('globalDate').value.trim();
-    let name = document.getElementById('fileName').value.trim();
+    const name = document.getElementById('fileName').value.trim() || "new_list";
+    if (!raw || !date) return alert("Please fill in the date and paste your data.");
 
-    if (!raw || !date) return alert("Please paste data and enter a date.");
+    const formatted = raw.split('\n').map(l => l.trim()).filter(l => l.length > 0)
+        .map(l => `${l.toUpperCase()} | # | ${date}`).join('\n');
 
-    const formattedContent = raw.split('\n')
-        .map(line => line.trim())
-        .filter(line => line.length > 0)
-        .map(line => `${line.toUpperCase()} | # | ${date}`)
-        .join('\n');
-
-    const blob = new Blob([formattedContent], { type: 'text/plain' });
+    const blob = new Blob([formatted], { type: 'text/plain' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = (name || "new_list") + ".txt";
-    document.body.appendChild(a);
+    a.download = name + ".txt";
     a.click();
-    document.body.removeChild(a);
 }
 
-// 5. ITEM LOADER (For list.html)
+// 5. VIEW LIST (list.html)
 async function loadListItems() {
     const id = new URLSearchParams(window.location.search).get('id');
-    const titleEl = document.getElementById('list-title');
     const container = document.getElementById('items-container');
     if (!id || !container) return;
-
     try {
-        const res = await fetch(`data/${id}.txt`);
-        if (!res.ok) throw new Error("File not found");
+        const res = await fetch(`data/${id}.txt?t=` + new Date().getTime());
+        if (!res.ok) throw new Error(`Setlist ${id} not found.`);
         const text = await res.text();
-        titleEl.textContent = id.toUpperCase().replace('_', ' ');
+        document.getElementById('list-title').textContent = id.toUpperCase().replace(/_/g, ' ');
         const lines = text.trim().split('\n').filter(l => l.length > 0);
+        
         container.innerHTML = lines.map(line => {
-            const parts = line.split('|').map(s => s.trim());
-            if (parts.length < 3) return '';
-            const [name, url, date] = parts;
-            return `<div class="item-card"><a href="${url}" target="_blank">${name}</a><span class="date">${date}</span></div>`;
+            const [name, url, date] = line.split('|').map(s => s.trim());
+            const isClickable = (url && url !== '#');
+            const content = isClickable 
+                ? `<a href="${url}" target="_blank">${name}</a>` 
+                : `<span style="font-weight:700; color:#2d3436;">${name}</span>`;
+
+            return `
+                <div class="item-card">
+                    ${content}
+                    <span class="date">${date}</span>
+                </div>`;
         }).join('');
-    } catch (e) { 
-        titleEl.textContent = "List Not Found"; 
-        container.innerHTML = `<p>File data/${id}.txt not found.</p>`;
-    }
+    } catch (e) { container.innerHTML = `<p style="color:red; text-align:center;">${e.message}</p>`; }
 }
 
-// 6. LOGOUT
-function logout() {
-    sessionStorage.removeItem('isAuth');
-    window.location.href = 'index.html';
-}
+function logout() { sessionStorage.removeItem('isAuth'); window.location.href = 'index.html'; }
