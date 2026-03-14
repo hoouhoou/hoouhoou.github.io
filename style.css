@@ -1,67 +1,65 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
 :root {
-    --primary: #1877f2;
-    --text-main: #2c3e50;
-    --bg-site: #f9f7f2;
-    --border: #eceae0;
+    --primary: #337ab7; /* The specific blue from your reference image */
+    --bg-site: #f5f5f5;
+    --card-bg: #ffffff;
+    --border: #dddddd;
 }
 
-body { font-family: 'Inter', sans-serif; background-color: var(--bg-site); margin: 0; padding: 20px; }
+body { font-family: 'Inter', sans-serif; background-color: var(--bg-site); margin: 0; padding: 0; }
 
-header { text-align: center; margin-bottom: 40px; }
-h1 { font-family: 'Playfair Display', serif; color: var(--text-main); font-size: 2.2rem; }
+header { background: white; border-bottom: 1px solid var(--border); padding: 15px 40px; }
+header h1 { margin: 0; font-size: 1.2rem; color: #555; font-weight: 400; }
 
-/* Breadcrumb Navigation */
 .breadcrumb {
-    max-width: 900px;
-    margin: 0 auto 20px;
-    font-size: 0.9rem;
-    color: var(--primary);
-    cursor: pointer;
-    font-weight: 600;
+    padding: 20px 40px;
+    font-size: 1.4rem;
+    color: #333;
 }
 
-/* The Grid System */
+.breadcrumb span { color: var(--primary); cursor: pointer; }
+
 .archive-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 20px;
-    max-width: 900px;
-    margin: 0 auto;
+    padding: 0 40px;
 }
 
-/* Directory Buttons */
-.dir-button {
-    background: white;
-    border: 1px solid var(--border);
-    padding: 30px 20px;
-    text-align: center;
-    border-radius: 12px;
+/* Card Button Design */
+.card-button {
+    background: var(--primary);
+    border-radius: 4px;
+    color: white;
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+    transition: filter 0.2s;
+    display: flex;
+    flex-direction: column;
 }
 
-.dir-button:hover {
-    transform: translateY(-5px);
-    border-color: var(--primary);
-    box-shadow: 0 10px 15px rgba(0,0,0,0.05);
+.card-button:hover { filter: brightness(1.1); }
+
+.card-top {
+    padding: 25px 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
 
-.dir-button h3 {
-    margin: 0;
-    font-family: 'Playfair Display', serif;
-    font-size: 1.2rem;
-    color: var(--text-main);
-}
+.card-top h3 { margin: 0; font-size: 1.5rem; font-weight: 400; letter-spacing: 0.5px; }
 
-.dir-button p {
-    margin: 10px 0 0;
-    font-size: 0.75rem;
-    color: #7f8c8d;
-    text-transform: uppercase;
+.card-bottom {
+    background: white;
+    color: var(--primary);
+    padding: 8px 15px;
+    font-size: 0.85rem;
+    border: 1px solid var(--border);
+    border-top: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .admin-actions { position: fixed; bottom: 20px; right: 20px; }
-.btn-minimal { background: #2c3e50; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+.btn-minimal { background: #555; color: white; border: none; padding: 10px 15px; border-radius: 3px; cursor: pointer; }
