@@ -3,84 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Scaleus Archive</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Login | Fiesta Archive</title>
     <style>
         body {
-            /* Replace 'grab-go-bg.jpg' with your actual image filename */
-            background: url('grab-go-bg.jpg') no-repeat center center fixed;
+            background: url('fiesta-bg.jpg') no-repeat center center fixed;
             background-size: cover;
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0;
+            font-family: 'Inter', sans-serif;
         }
-
-        .login-container {
-            background: rgba(255, 255, 255, 0.9); /* Semi-transparent white */
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        .login-card {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
             text-align: center;
             width: 100%;
-            max-width: 350px;
-            backdrop-filter: blur(5px); /* Blurs the background behind the box */
-            border: 1px solid rgba(255,255,255,0.3);
+            max-width: 380px;
+            backdrop-filter: blur(10px);
+            border: 3px solid #f1c40f;
         }
-
-        .login-container h2 {
-            color: #e67e22; /* Matches the orange theme */
-            margin-bottom: 25px;
-            font-weight: 800;
-            letter-spacing: 1px;
-        }
-
-        .login-container input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-sizing: border-box;
-        }
-
-        .login-btn {
-            width: 100%;
-            padding: 12px;
-            background: #e67e22; /* Playful Orange */
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .login-btn:hover {
-            background: #d35400;
-        }
+        .login-card h2 { color: #e74c3c; font-size: 2rem; margin-bottom: 30px; font-weight: 900; text-transform: uppercase; }
+        input[type="password"] { width: 100%; padding: 15px; margin-bottom: 20px; border: 2px solid #eee; border-radius: 12px; box-sizing: border-box; text-align: center; }
+        .login-btn { width: 100%; padding: 15px; background: #2980b9; color: white; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; transition: 0.3s; }
+        .login-btn:hover { background: #e67e22; transform: scale(1.05); }
     </style>
 </head>
 <body>
-
-    <div class="login-container">
-        <h2>SCALEUS ARCHIVE</h2>
-        <input type="password" id="passInput" placeholder="Enter Access Key">
-        <button class="login-btn" onclick="checkAuth()">ENTER ARCHIVE</button>
-        <p id="errMsg" style="color:red; font-size:0.8rem; margin-top:10px; display:none;">Invalid Key</p>
+    <div class="login-card">
+        <h2>FIESTA ARCHIVE</h2>
+        <input type="password" id="passInput" placeholder="ENTER ACCESS KEY">
+        <button class="login-btn" onclick="checkAuth()">JOIN THE FIESTA</button>
     </div>
-
     <script>
         function checkAuth() {
-            const pass = document.getElementById('passInput').value;
-            // Set your own password here
-            if(pass === 'rj2026') {
+            if(document.getElementById('passInput').value === 'rj2026') {
                 sessionStorage.setItem('isAuth', 'true');
                 window.location.href = 'dashboard.html';
-            } else {
-                document.getElementById('errMsg').style.display = 'block';
-            }
+            } else { alert('Invalid Key'); }
         }
     </script>
 </body>
