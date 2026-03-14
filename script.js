@@ -2,31 +2,26 @@ let archiveData = {};
 let currentPath = { event: null, year: null, month: null };
 
 async function loadMasterLists() {
-    try {
-        const res = await fetch('data/list_index.txt?t=' + new Date().getTime());
-        const text = await res.text();
-        const lines = text.trim().split('\n').filter(l => l.length > 0);
-
-        archiveData = {}; 
-        lines.forEach(line => {
-            const parts = line.split('|').map(s => s.trim());
-            if (parts.length < 5) return;
-            const [event, year, month, id, title] = parts;
-            if (!archiveData[event]) archiveData[event] = {};
-            if (!archiveData[event][year]) archiveData[event][year] = {};
-            if (!archiveData[event][year][month]) archiveData[event][year][month] = [];
-            archiveData[event][year][month].push({ id, title });
-        });
-        renderGrid();
-    } catch (e) { document.getElementById('lists-container').innerHTML = "Check if data/list_index.txt exists."; }
+    const res = await fetch('data/list_index.txt?t=' + new Date().getTime());
+    const text = await res.text();
+    const lines = text.trim().split('\n').filter(l => l.length > 0);
+    archiveData = {}; 
+    lines.forEach(line => {
+        const [event, year, month, id, title] = line.split('|').map(s => s.trim());
+        if (!archiveData[event]) archiveData[event] = {};
+        if (!archiveData[event][year]) archiveData[event][year] = {};
+        if (!archiveData[event][year][month]) archiveData[event][year][month] = [];
+        archiveData[event][year][month].push({ id, title });
+    });
+    renderGrid();
 }
 
 function renderGrid() {
     const container = document.getElementById('lists-container');
     const breadcrumb = document.getElementById('breadcrumb-nav');
     container.innerHTML = ""; 
-
     let items = [];
+
     if (!currentPath.event) {
         breadcrumb.innerHTML = "Dashboard";
         Object.keys(archiveData).forEach(ev => items.push({ title: ev, sub: "PLATFORM", action: () => navigate(ev, null, null) }));
@@ -52,3 +47,17 @@ function renderGrid() {
 
 function navigate(ev, yr, mo) { currentPath = { event: ev, year: yr, month: mo }; renderGrid(); }
 function resetNav() { currentPath = { event: null, year: null, month: null }; renderGrid(); }
+function toggleGen() { const g = document.getElementById('generator-panel'); g.style.display = g.style.display === 'none' ? 'block' : 'none'; }
+
+function processAndDownload() {
+    const raw = document.getElementById('rawInput').value;
+    const date = document.getElementById('globalDate').value.trim();
+    const name = document.getElementById('fileName').value.trim() || "new_list";
+    const formatted = raw.split('\n').map(l => l.trim()).filter(l => l.length > 0)
+        .map(l => `${l.toUpperCase()} | # | ${date}`).join('\n');
+    const blob = new Blob([formatted], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name + ".txt";
+    a.click();
+}
