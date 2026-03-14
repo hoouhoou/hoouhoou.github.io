@@ -6,7 +6,7 @@
     if (!isIndex && isAuth !== 'true') window.location.href = 'index.html';
 })();
 
-// 2. LOGIN
+// 2. LOGIN LOGIC
 function handleLogin(e) {
     if (e) e.preventDefault();
     const passwordField = document.getElementById('password');
@@ -19,36 +19,75 @@ function handleLogin(e) {
     }
 }
 
-// 3. DASHBOARD & SEARCH
+// 3. ARCHIVE DIRECTORY LOADER (Dashboard)
 async function loadMasterLists() {
     const container = document.getElementById('lists-container');
     if(!container) return;
+
     try {
         const res = await fetch('data/list_index.txt?t=' + new Date().getTime());
         if (!res.ok) throw new Error("Index not found");
+        
         const text = await res.text();
         const lines = text.trim().split('\n').filter(l => l.length > 0);
-        container.innerHTML = lines.map(line => {
-            const [id, name, modified] = line.split('|').map(s => s.trim());
-            return `
-                <div class="list-card" data-title="${name.toLowerCase()}" onclick="location.href='list.html?id=${id}'">
-                    <h3>${name}</h3>
-                    <p>Last Update: ${modified}</p>
-                </div>`;
-        }).join('');
-    } catch (e) { container.innerHTML = `<p style="color:red; text-align:center;">Please ensure data/list_index.txt exists.</p>`; }
+
+        // Organize data: Event -> Year -> Month
+        const archive = {};
+
+        lines.forEach(line => {
+            const parts = line.split('|').map(s => s.trim());
+            if (parts.length < 5) return; // Skip lines that don't match the new format
+
+            const [event, year, month, id, title] = parts;
+            
+            if (!archive[event]) archive[event] = {};
+            if (!archive[event][year]) archive[event][year] = {};
+            if (!archive[event][year][month]) archive[event][year][month] = [];
+            
+            archive[event][year][month].push({ id, title });
+        });
+
+        // Build HTML
+        let html = '';
+        for (const event in archive) {
+            html += `<div class="archive-section"><span class="event-header">${event}</span>`;
+            
+            for (const year in archive[event]) {
+                html += `<div class="year-block"><span class="year-label">${year}</span>`;
+                
+                for (const month in archive[event][year]) {
+                    html += `<div class="month-group">`;
+                    archive[event][year][month].forEach(item => {
+                        html += `
+                            <a href="list.html?id=${item.id}" class="directory-item">
+                                <span class="item-name">${item.title}</span>
+                                <span class="item-meta">${month}</span>
+                            </a>`;
+                    });
+                    html += `</div>`;
+                }
+                html += `</div>`;
+            }
+            html += `</div>`;
+        }
+        container.innerHTML = html || "<p>No archives found. Update data/list_index.txt.</p>";
+
+    } catch (e) {
+        container.innerHTML = `<p style="color:red; text-align:center;">Error: ${e.message}. Please check data/list_index.txt format.</p>`;
+    }
 }
 
+// 4. SEARCH FILTER
 function filterLists() {
     const input = document.getElementById('searchInput').value.toLowerCase();
-    const cards = document.querySelectorAll('.list-card');
-    cards.forEach(card => {
-        const title = card.getAttribute('data-title');
-        card.style.display = title.includes(input) ? "block" : "none";
+    const items = document.querySelectorAll('.directory-item');
+    items.forEach(item => {
+        const text = item.textContent.toLowerCase();
+        item.style.display = text.includes(input) ? "flex" : "none";
     });
 }
 
-// 4. GENERATOR
+// 5. DATA GENERATOR
 function toggleGenerator() {
     const panel = document.getElementById('generator-section');
     if (panel) panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
@@ -70,14 +109,14 @@ function processAndDownload() {
     a.click();
 }
 
-// 5. VIEW LIST (list.html)
+// 6. ITEM LOADER (For list.html)
 async function loadListItems() {
     const id = new URLSearchParams(window.location.search).get('id');
     const container = document.getElementById('items-container');
     if (!id || !container) return;
     try {
         const res = await fetch(`data/${id}.txt?t=` + new Date().getTime());
-        if (!res.ok) throw new Error(`Setlist ${id} not found.`);
+        if (!res.ok) throw new Error(`File data/${id}.txt not found.`);
         const text = await res.text();
         document.getElementById('list-title').textContent = id.toUpperCase().replace(/_/g, ' ');
         const lines = text.trim().split('\n').filter(l => l.length > 0);
@@ -89,11 +128,7 @@ async function loadListItems() {
                 ? `<a href="${url}" target="_blank">${name}</a>` 
                 : `<span style="font-weight:700; color:#2d3436;">${name}</span>`;
 
-            return `
-                <div class="item-card">
-                    ${content}
-                    <span class="date">${date}</span>
-                </div>`;
+            return `<div class="item-card">${content}<span class="date">${date}</span></div>`;
         }).join('');
     } catch (e) { container.innerHTML = `<p style="color:red; text-align:center;">${e.message}</p>`; }
 }
