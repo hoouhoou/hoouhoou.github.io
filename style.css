@@ -1,126 +1,125 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Inter:wght@400;500;600&display=swap');
+
 :root {
-    --primary: #1877f2;
-    --success: #00c853;
-    --bg: #f0f2f5;
-    --glass: rgba(255, 255, 255, 0.9);
-    --shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+    --text-main: #2c3e50;
+    --text-muted: #7f8c8d;
+    --accent: #e67e22; /* Warm orange for subtle highlights */
+    --bg-paper: #ffffff;
+    --bg-site: #f9f7f2; /* Soft off-white like high-quality paper */
+    --border: #eceae0;
 }
 
 body {
-    font-family: 'Inter', -apple-system, sans-serif;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-site);
+    color: var(--text-main);
     margin: 0;
-    min-height: 100vh;
-    padding: 40px 20px;
-    color: #1a1a1a;
+    padding: 0;
+    line-height: 1.6;
 }
 
+/* Header & Typography */
 header {
-    max-width: 900px;
-    margin: 0 auto 30px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: var(--glass);
-    padding: 15px 25px;
-    border-radius: 15px;
-    backdrop-filter: blur(10px);
-    box-shadow: var(--shadow);
+    background: var(--bg-paper);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 20px;
+    text-align: center;
 }
 
-h1 { margin: 0; font-size: 1.5rem; letter-spacing: -0.5px; color: var(--primary); }
-
-/* Buttons */
-button {
-    padding: 10px 20px;
-    border-radius: 10px;
-    border: none;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    margin: 0;
+    letter-spacing: -1px;
 }
 
-.admin-btn { background: var(--success); color: white; margin-right: 10px; }
-.admin-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 200, 83, 0.3); }
+.subtitle {
+    color: var(--text-muted);
+    font-style: italic;
+    font-family: 'Playfair Display', serif;
+    margin-top: 10px;
+}
 
-.logout-btn { background: #ff4757; color: white; }
-.logout-btn:hover { background: #ff6b81; }
-
-/* Generator Panel */
+/* Generator Panel (Hidden by default, styled minimally) */
 .generator-panel {
-    max-width: 900px;
-    margin: 0 auto 30px;
-    background: var(--glass);
-    padding: 25px;
-    border-radius: 20px;
-    box-shadow: var(--shadow);
-    border: 1px solid rgba(255,255,255,0.3);
+    max-width: 800px;
+    margin: 20px auto;
+    background: var(--bg-paper);
+    padding: 40px;
+    border: 1px solid var(--border);
 }
 
-.gen-inputs input, .search-container input, textarea {
-    background: white;
-    border: 1px solid #e1e4e8;
-    padding: 12px;
-    border-radius: 12px;
-    font-size: 0.95rem;
-    transition: border 0.3s;
+/* Grid & Organization */
+.container {
+    max-width: 1100px;
+    margin: 60px auto;
+    padding: 0 20px;
 }
 
-.gen-inputs input:focus, .search-container input:focus {
-    border-color: var(--primary);
-    outline: none;
-}
-
-.btn-save { background: var(--primary); color: white; width: 100%; margin-top: 10px; font-size: 1rem; }
-
-/* Dashboard Cards */
 .list-grid {
-    max-width: 900px;
-    margin: 0 auto;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 40px;
 }
 
 .list-card {
-    background: var(--glass);
-    padding: 25px;
-    border-radius: 20px;
-    border: 1px solid rgba(255,255,255,0.5);
-    transition: all 0.4s;
+    background: transparent;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 20px;
     cursor: pointer;
-    box-shadow: var(--shadow);
+    transition: opacity 0.3s;
 }
 
 .list-card:hover {
-    transform: translateY(-10px) scale(1.02);
-    background: white;
-    box-shadow: 0 15px 45px rgba(0,0,0,0.1);
+    opacity: 0.7;
 }
 
-.list-card h3 { margin: 0 0 8px; color: var(--primary); font-size: 1.1rem; }
-.list-card p { margin: 0; color: #7f8c8d; font-size: 0.85rem; font-weight: 500; }
+.list-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    margin: 0 0 10px 0;
+}
 
-/* Item Cards (Setlist View) */
-.item-card {
-    background: var(--glass);
-    padding: 18px;
-    margin-bottom: 12px;
-    border-radius: 15px;
+.list-card p {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* Search & Actions */
+.search-container {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+#searchInput {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    padding: 12px;
+    width: 100%;
+    max-width: 400px;
+    border: 1px solid var(--border);
+    background: var(--bg-paper);
+    outline: none;
+}
+
+.admin-actions {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: var(--shadow);
-    animation: slideUp 0.4s ease-out forwards;
+    gap: 10px;
 }
 
-.item-card a { color: var(--primary); text-decoration: none; font-weight: 600; }
-.item-card a:hover { text-decoration: underline; }
-
-@keyframes slideUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+.btn-minimal {
+    background: var(--text-main);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
 }
-
-.search-container { max-width: 900px; margin: 0 auto 25px; }
-.search-container input { width: 100%; padding: 15px 25px; box-shadow: var(--shadow); }
