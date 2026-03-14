@@ -3,25 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bravo Login</title>
+    <title>Login | Scaleus Archive</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        body { display: flex; justify-content: center; align-items: center; height: 100vh; background: #f4f7f6; margin: 0; }
-        .login-box { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 300px; text-align: center; }
-        input { width: 100%; padding: 12px; margin: 20px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #1877f2; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
-        #errorMessage { color: #d93025; font-size: 14px; margin-top: 10px; display: none; }
+        body {
+            /* Replace 'grab-go-bg.jpg' with your actual image filename */
+            background: url('grab-go-bg.jpg') no-repeat center center fixed;
+            background-size: cover;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.9); /* Semi-transparent white */
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            text-align: center;
+            width: 100%;
+            max-width: 350px;
+            backdrop-filter: blur(5px); /* Blurs the background behind the box */
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .login-container h2 {
+            color: #e67e22; /* Matches the orange theme */
+            margin-bottom: 25px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .login-container input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: #e67e22; /* Playful Orange */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .login-btn:hover {
+            background: #d35400;
+        }
     </style>
 </head>
 <body>
-    <div class="login-box">
-        <h2>Enter Access Code</h2>
-        <form onsubmit="handleLogin(event)">
-            <input type="password" id="password" placeholder="Password" required autofocus>
-            <button type="submit">Unlock</button>
-        </form>
-        <div id="errorMessage">Incorrect Password.</div>
+
+    <div class="login-container">
+        <h2>SCALEUS ARCHIVE</h2>
+        <input type="password" id="passInput" placeholder="Enter Access Key">
+        <button class="login-btn" onclick="checkAuth()">ENTER ARCHIVE</button>
+        <p id="errMsg" style="color:red; font-size:0.8rem; margin-top:10px; display:none;">Invalid Key</p>
     </div>
-    <script src="script.js"></script>
+
+    <script>
+        function checkAuth() {
+            const pass = document.getElementById('passInput').value;
+            // Set your own password here
+            if(pass === 'rj2026') {
+                sessionStorage.setItem('isAuth', 'true');
+                window.location.href = 'dashboard.html';
+            } else {
+                document.getElementById('errMsg').style.display = 'block';
+            }
+        }
+    </script>
 </body>
 </html>
