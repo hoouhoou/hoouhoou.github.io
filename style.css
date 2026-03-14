@@ -1,81 +1,28 @@
-:root {
-    --primary: #e67e22; /* Grab&Go Orange */
-    --secondary: #27ae60; /* Storefront Green */
-    --accent: #1abc9c; /* Teal details */
-    --bg-site: #fdfaf6; /* Warm off-white background */
-    --text-dark: #2c3e50;
-}
+body { font-family: 'Inter', sans-serif; background-color: #fdfaf6; margin: 0; }
 
-body { 
-    font-family: 'Inter', sans-serif; 
-    background-color: var(--bg-site); 
-    margin: 0; 
-}
-
-header { 
-    background: white; 
-    border-bottom: 4px solid var(--primary); 
-    padding: 20px 40px; 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-}
-
-header h1 { 
-    margin: 0; 
-    font-size: 1.6rem; 
-    color: var(--text-dark); 
-    font-weight: 900; 
-}
-
-/* Updated Scaleus Cards to match illustration */
 .card-button {
-    background: var(--primary);
+    background: #2980b9; /* Festival Blue */
     border-radius: 12px;
     color: white;
     cursor: pointer;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    box-shadow: 0 8px 20px rgba(230, 126, 34, 0.2);
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     border: none;
 }
 
-.card-button:hover { 
-    transform: translateY(-8px); 
-    box-shadow: 0 12px 25px rgba(230, 126, 34, 0.3);
-}
+.card-button:hover { transform: translateY(-8px); background: #e74c3c; }
 
-.card-top { 
-    padding: 40px 20px; 
-    text-align: center; 
-    background: linear-gradient(135deg, var(--primary), #d35400);
-}
-
-.card-top h3 { 
-    margin: 0; 
-    font-size: 1.2rem; 
-    letter-spacing: 1px;
-}
+.card-top { padding: 40px 20px; text-align: center; }
+.card-top h3 { margin: 0; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; }
 
 .card-bottom {
     background: white;
-    color: var(--secondary);
+    color: #2980b9;
     padding: 12px 15px;
     font-size: 0.85rem;
     display: flex;
     justify-content: space-between;
     font-weight: 800;
-}
-
-/* Management Buttons */
-.btn-manage { 
-    background: var(--secondary); 
-    color: white; 
-    border: none; 
-    padding: 10px 20px; 
-    border-radius: 50px; 
-    cursor: pointer; 
-    font-weight: bold;
 }
