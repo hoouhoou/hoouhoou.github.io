@@ -1,51 +1,81 @@
 :root {
-    --primary: #337ab7;
-    --bg-site: #f5f5f5;
-    --border: #dddddd;
+    --primary: #e67e22; /* Grab&Go Orange */
+    --secondary: #27ae60; /* Storefront Green */
+    --accent: #1abc9c; /* Teal details */
+    --bg-site: #fdfaf6; /* Warm off-white background */
+    --text-dark: #2c3e50;
 }
 
-body { font-family: 'Inter', sans-serif; background-color: var(--bg-site); margin: 0; padding: 0; }
-
-header { background: white; border-bottom: 2px solid var(--border); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; }
-header h1 { margin: 0; font-size: 1.4rem; color: #555; font-weight: 800; }
-
-.breadcrumb { padding: 20px 40px; font-size: 1.1rem; color: #333; font-weight: 600; }
-.breadcrumb span { color: var(--primary); cursor: pointer; text-decoration: underline; }
-
-.archive-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 20px;
-    padding: 0 40px 40px;
+body { 
+    font-family: 'Inter', sans-serif; 
+    background-color: var(--bg-site); 
+    margin: 0; 
 }
 
-/* The Scaleus Card Button */
+header { 
+    background: white; 
+    border-bottom: 4px solid var(--primary); 
+    padding: 20px 40px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+}
+
+header h1 { 
+    margin: 0; 
+    font-size: 1.6rem; 
+    color: var(--text-dark); 
+    font-weight: 900; 
+}
+
+/* Updated Scaleus Cards to match illustration */
 .card-button {
     background: var(--primary);
-    border-radius: 6px;
+    border-radius: 12px;
     color: white;
     cursor: pointer;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    transition: transform 0.2s;
+    box-shadow: 0 8px 20px rgba(230, 126, 34, 0.2);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: none;
 }
 
-.card-button:hover { transform: translateY(-5px); }
+.card-button:hover { 
+    transform: translateY(-8px); 
+    box-shadow: 0 12px 25px rgba(230, 126, 34, 0.3);
+}
 
-.card-top { padding: 35px 20px; flex-grow: 1; text-align: center; }
-.card-top h3 { margin: 0; font-size: 1.2rem; text-transform: uppercase; }
+.card-top { 
+    padding: 40px 20px; 
+    text-align: center; 
+    background: linear-gradient(135deg, var(--primary), #d35400);
+}
+
+.card-top h3 { 
+    margin: 0; 
+    font-size: 1.2rem; 
+    letter-spacing: 1px;
+}
 
 .card-bottom {
     background: white;
-    color: var(--primary);
-    padding: 10px 15px;
+    color: var(--secondary);
+    padding: 12px 15px;
     font-size: 0.85rem;
-    border-top: 1px solid var(--border);
     display: flex;
     justify-content: space-between;
-    font-weight: bold;
+    font-weight: 800;
 }
 
-.btn-manage { background: #2ecc71; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; }
+/* Management Buttons */
+.btn-manage { 
+    background: var(--secondary); 
+    color: white; 
+    border: none; 
+    padding: 10px 20px; 
+    border-radius: 50px; 
+    cursor: pointer; 
+    font-weight: bold;
+}
