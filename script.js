@@ -9,14 +9,16 @@ async function loadMasterLists() {
 
         archiveData = {}; 
         lines.forEach(line => {
-            const [event, year, month, id, title] = line.split('|').map(s => s.trim());
+            const parts = line.split('|').map(s => s.trim());
+            if (parts.length < 5) return;
+            const [event, year, month, id, title] = parts;
             if (!archiveData[event]) archiveData[event] = {};
             if (!archiveData[event][year]) archiveData[event][year] = {};
             if (!archiveData[event][year][month]) archiveData[event][year][month] = [];
             archiveData[event][year][month].push({ id, title });
         });
         renderGrid();
-    } catch (e) { document.getElementById('lists-container').innerHTML = "Ensure data/list_index.txt exists."; }
+    } catch (e) { document.getElementById('lists-container').innerHTML = "Check if data/list_index.txt exists."; }
 }
 
 function renderGrid() {
@@ -26,7 +28,7 @@ function renderGrid() {
 
     let items = [];
     if (!currentPath.event) {
-        breadcrumb.innerHTML = "Main Dashboard";
+        breadcrumb.innerHTML = "Dashboard";
         Object.keys(archiveData).forEach(ev => items.push({ title: ev, sub: "PLATFORM", action: () => navigate(ev, null, null) }));
     } else if (!currentPath.year) {
         breadcrumb.innerHTML = `<span onclick="resetNav()">Dashboard</span> / ${currentPath.event}`;
@@ -41,27 +43,12 @@ function renderGrid() {
 
     items.forEach(item => {
         const div = document.createElement('div');
-        div.className = 'card';
+        div.className = 'card-button';
         div.onclick = item.action;
-        div.innerHTML = `<div class="card-header"><h3>${item.title}</h3></div><div class="card-footer">EXPLORE ${item.sub} →</div>`;
+        div.innerHTML = `<div class="card-top"><h3>${item.title}</h3></div><div class="card-bottom"><span>${item.sub}</span><span>→</span></div>`;
         container.appendChild(div);
     });
 }
 
 function navigate(ev, yr, mo) { currentPath = { event: ev, year: yr, month: mo }; renderGrid(); }
 function resetNav() { currentPath = { event: null, year: null, month: null }; renderGrid(); }
-function toggleGen() { const p = document.getElementById('generator-panel'); p.style.display = p.style.display === 'none' ? 'block' : 'none'; }
-
-function processAndDownload() {
-    const raw = document.getElementById('rawInput').value;
-    const date = document.getElementById('globalDate').value.trim();
-    const name = document.getElementById('fileName').value.trim() || "new_list";
-    if (!raw || !date) return alert("Missing info!");
-    const formatted = raw.split('\n').map(l => l.trim()).filter(l => l.length > 0)
-        .map(l => `${l.toUpperCase()} | # | ${date}`).join('\n');
-    const blob = new Blob([formatted], { type: 'text/plain' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = name + ".txt";
-    a.click();
-}
