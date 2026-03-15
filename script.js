@@ -2,23 +2,16 @@ let archiveData = {};
 let currentPath = { event: null, year: null, month: null };
 
 async function loadMasterLists() {
-    try {
-        const res = await fetch('data/list_index.txt?t=' + Date.now());
-        const text = await res.text();
-        const lines = text.trim().split('\n').filter(l => l.length > 0);
-        
-        archiveData = {}; 
-        lines.forEach(line => {
-            const parts = line.split('|').map(s => s.trim());
-            if (parts.length < 5) return;
-            const [event, year, month, id, title] = parts;
-            if (!archiveData[event]) archiveData[event] = {};
-            if (!archiveData[event][year]) archiveData[event][year] = {};
-            if (!archiveData[event][year][month]) archiveData[event][year][month] = [];
-            archiveData[event][year][month].push({ id, title });
-        });
-        renderGrid();
-    } catch (e) { console.error("Data Load Error", e); }
+    const res = await fetch('data/list_index.txt?t=' + Date.now());
+    const text = await res.text();
+    text.trim().split('\n').forEach(line => {
+        const [event, year, month, id, title] = line.split('|').map(s => s.trim());
+        if (!archiveData[event]) archiveData[event] = {};
+        if (!archiveData[event][year]) archiveData[event][year] = {};
+        if (!archiveData[event][year][month]) archiveData[event][year][month] = [];
+        archiveData[event][year][month].push({ id, title });
+    });
+    renderGrid();
 }
 
 function renderGrid() {
