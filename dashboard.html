@@ -2,20 +2,22 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>EternaCloud | Media Node</title>
+    <title>Dashboard | EternaCloud</title>
     <link rel="stylesheet" href="style.css?v=final">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div style="position: fixed; top: -10%; right: -10%; width: 600px; height: 600px; background: rgba(139, 92, 246, 0.08); filter: blur(120px); pointer-events: none;"></div>
-
+    
     <header>
         <h1>ETERNA<span style="font-weight:400; color:#64748b;">CLOUD</span></h1>
-        <button onclick="toggleGen()" style="background: linear-gradient(45deg, #8b5cf6, #3b82f6); color:white; border:none; padding:10px 20px; border-radius:12px; cursor:pointer; font-weight:bold;">DATABASE TOOLS</button>
+        <div style="display: flex; gap: 15px;">
+            <button onclick="toggleGen()" style="background: linear-gradient(45deg, #8b5cf6, #3b82f6); color:white; border:none; padding:10px 20px; border-radius:12px; cursor:pointer; font-weight:bold;">DATABASE TOOLS</button>
+            <button onclick="location.href='index.html'" style="background:none; border:none; color:#64748b; cursor:pointer;">Exit</button>
+        </div>
     </header>
 
-    <div id="breadcrumb-nav" style="padding: 30px 40px 0; color: #64748b; font-size: 0.8rem; font-weight:bold;">ROOT / DASHBOARD</div>
-    
+    <div id="breadcrumb-nav" style="padding: 30px 40px 0; color: #64748b; font-size: 0.8rem; font-weight:bold; text-transform: uppercase;">ROOT / DASHBOARD</div>
     <div id="lists-container" class="archive-grid"></div>
 
     <script src="script.js?v=final"></script>
