@@ -2,26 +2,36 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard | Fiesta Archive</title>
-    <link rel="stylesheet" href="style.css?v=3.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eterna Archive | Dashboard</title>
+    <link rel="stylesheet" href="style.css?v=cloud">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header style="background: white; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 5px solid #f1c40f;">
-        <h1 style="margin: 0; color: #e74c3c; font-weight: 900;">FIESTA // <span style="color:#2980b9;">ARCHIVE</span></h1>
-        <button onclick="toggleGen()" style="background:#27ae60; color:white; border:none; padding:10px 20px; border-radius:50px; cursor:pointer; font-weight:bold;">+ MANAGE DATA</button>
+    <header>
+        <h1>ETERNA<span style="font-weight:400; color:#64748b;">CLOUD</span></h1>
+        <div>
+            <button class="btn-manage" onclick="toggleGen()">DATABASE TOOLS</button>
+            <button onclick="location.href='index.html'" style="background:none; border:none; color:#94a3b8; margin-left:20px; cursor:pointer;">Exit</button>
+        </div>
     </header>
 
-    <div id="generator-panel" style="display:none; background:#fff; margin:20px 40px; padding:25px; border-radius:15px; border:3px dashed #2980b9;">
-        <input type="text" id="globalDate" placeholder="Date (e.g. 7 Jan 2025)" style="padding:10px; margin-right:10px;">
-        <input type="text" id="fileName" placeholder="File Name (e.g. jan_07)" style="padding:10px;">
-        <textarea id="rawInput" style="width:100%; height:80px; margin-top:10px;" placeholder="Paste song list..."></textarea>
-        <button onclick="processAndDownload()" style="width:100%; margin-top:10px; background:#e67e22; color:white; border:none; padding:10px; border-radius:8px; cursor:pointer;">GENERATE .TXT</button>
+    <div id="generator-panel" style="display:none; background:white; margin:20px 40px; padding:30px; border-radius:24px; border:1px solid #e2e8f0; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);">
+        <h2 style="margin-top:0; font-size:1.2rem;">Data Entry Node</h2>
+        <div style="display:flex; gap:15px; margin-bottom:15px;">
+            <input type="text" id="globalDate" placeholder="Timestamp (e.g. 7 Jan 2025)" style="flex:1; padding:12px; border:1px solid #e2e8f0; border-radius:10px;">
+            <input type="text" id="fileName" placeholder="File Identifier" style="flex:1; padding:12px; border:1px solid #e2e8f0; border-radius:10px;">
+        </div>
+        <textarea id="rawInput" style="width:100%; height:120px; padding:15px; border:1px solid #e2e8f0; border-radius:10px; font-family:monospace;" placeholder="Insert raw metadata..."></textarea>
+        <button onclick="processAndDownload()" class="btn-manage" style="width:100%; margin-top:15px;">EXECUTE DOWNLOAD</button>
     </div>
 
-    <div id="breadcrumb-nav" style="padding: 20px 40px; font-weight:bold; color:#2980b9;">Dashboard</div>
-    <div id="lists-container" class="archive-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 25px; padding: 0 40px 40px;"></div>
+    <div class="breadcrumb" id="breadcrumb-nav">ROOT / DASHBOARD</div>
+    
+    <div id="lists-container" class="archive-grid">
+        </div>
 
-    <script src="script.js?v=3.0"></script>
+    <script src="script.js?v=cloud"></script>
     <script>loadMasterLists();</script>
 </body>
 </html>
