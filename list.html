@@ -2,41 +2,128 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Setlist | EternaCloud</title>
-    <link rel="stylesheet" href="style.css?v=final">
+    <title>Archive Node | EternaCloud</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        .list-container { padding: 40px; max-width: 900px; margin: 0 auto; }
-        .list-header { margin-bottom: 40px; border-left: 4px solid var(--accent-purple); padding-left: 20px; }
-        .list-header h2 { margin: 0; font-size: 1.8rem; text-transform: uppercase; color: #fff; }
-        .song-row {
-            background: var(--card-bg); border: 1px solid var(--border);
-            border-radius: 16px; padding: 20px; margin-bottom: 12px;
-            display: flex; justify-content: space-between; align-items: center; transition: 0.3s;
+        :root {
+            --bg: #0a0c10;
+            --accent: #8b5cf6;
+            --panel-bg: rgba(15, 17, 26, 0.8);
+            --border: rgba(139, 92, 246, 0.3);
         }
-        .song-row:hover { border-color: var(--accent-purple); background: rgba(139, 92, 246, 0.08); transform: translateX(10px); }
-        .song-title { font-weight: 700; color: #fff; text-transform: uppercase; font-size: 0.95rem; }
-        .song-meta { font-size: 0.75rem; color: var(--accent-blue); margin-top: 4px; font-weight: 600; }
-        .song-date { color: #475569; font-size: 0.8rem; font-weight: 700; }
+
+        body {
+            background-color: var(--bg);
+            background-image: radial-gradient(circle at 0% 0%, rgba(139, 92, 246, 0.1), transparent 40%);
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* The Encasement Panel */
+        .archive-encasement {
+            background: var(--panel-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 32px;
+            width: 100%;
+            max-width: 800px;
+            padding: 50px;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(139, 92, 246, 0.05);
+        }
+
+        .nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .back-btn {
+            color: #64748b;
+            text-decoration: none;
+            font-size: 0.75rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .back-btn:hover { color: var(--accent); }
+
+        .node-title {
+            border-left: 4px solid var(--accent);
+            padding-left: 20px;
+            margin-bottom: 40px;
+        }
+
+        .node-title h2 {
+            margin: 0;
+            font-size: 1.8rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* The Clean Text List */
+        .data-content {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.8;
+            color: #e2e8f0;
+            white-space: pre-wrap; /* Keeps your text file formatting exactly as it is */
+            font-size: 0.95rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 30px;
+        }
+
+        .status-tag {
+            display: inline-block;
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--accent);
+            padding: 4px 12px;
+            border-radius: 100px;
+            font-size: 0.65rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
-    <div class="list-container">
-        <a href="dashboard.html" style="color: var(--accent-purple); text-decoration: none; font-size: 0.8rem; font-weight: bold;">← BACK TO DATABASE</a>
-        <div class="list-header"><h2 id="epTitle">SETLIST NODE</h2></div>
-        <div id="song-list"></div>
+
+    <div class="archive-encasement">
+        <div class="nav-header">
+            <a href="dashboard.html" class="back-btn">← TERMINAL</a>
+            <span style="color:#64748b; font-size: 0.7rem; font-weight: bold;">NODE ACCESS: SECURE</span>
+        </div>
+
+        <div class="node-title">
+            <span class="status-tag">VERIFIED ARCHIVE</span>
+            <h2 id="display-title">JAN 07</h2>
+        </div>
+
+        <div id="text-data" class="data-content">LOADING DATA NODE...</div>
     </div>
+
     <script>
-        async function load() {
+        async function fetchNode() {
             const id = new URLSearchParams(window.location.search).get('id');
-            document.getElementById('epTitle').innerText = id.replace(/_/g, ' ');
-            const res = await fetch(`data/${id}.txt?t=${Date.now()}`);
-            const text = await res.text();
-            document.getElementById('song-list').innerHTML = text.trim().split('\n').map(line => {
-                const [title, artist, date] = line.split('|').map(s => s.trim());
-                return `<div class="song-row"><div><div class="song-title">${title}</div><div class="song-meta">${artist || ''}</div></div><div class="song-date">${date || ''}</div></div>`;
-            }).join('');
+            if(!id) return;
+
+            document.getElementById('display-title').innerText = id.replace(/_/g, ' ').toUpperCase();
+
+            try {
+                const res = await fetch(`data/${id}.txt?t=${Date.now()}`);
+                const text = await res.text();
+                // We display the text exactly as it is in your file
+                document.getElementById('text-data').innerText = text.trim();
+            } catch (e) {
+                document.getElementById('text-data').innerText = "ERROR: Could not retrieve data node.";
+            }
         }
-        load();
+        fetchNode();
     </script>
 </body>
 </html>
