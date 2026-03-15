@@ -5,22 +5,56 @@
     <title>Dashboard | EternaCloud</title>
     <link rel="stylesheet" href="style.css?v=final">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        #generator-panel {
+            display: none; 
+            background: rgba(15, 17, 26, 0.95); 
+            margin: 20px 40px; 
+            padding: 30px; 
+            border-radius: 24px; 
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.1);
+        }
+        .tool-input {
+            width: 100%; padding: 12px; margin-bottom: 15px; 
+            background: #1a1d24; border: 1px solid #333; 
+            color: #fff; border-radius: 10px; outline: none;
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
 </head>
 <body>
     <div style="position: fixed; top: -10%; right: -10%; width: 600px; height: 600px; background: rgba(139, 92, 246, 0.08); filter: blur(120px); pointer-events: none;"></div>
     
     <header>
         <h1>ETERNA<span style="font-weight:400; color:#64748b;">CLOUD</span></h1>
-        <div style="display: flex; gap: 15px;">
+        <div style="display: flex; gap: 15px; align-items: center;">
             <button onclick="toggleGen()" style="background: linear-gradient(45deg, #8b5cf6, #3b82f6); color:white; border:none; padding:10px 20px; border-radius:12px; cursor:pointer; font-weight:bold;">DATABASE TOOLS</button>
-            <button onclick="location.href='index.html'" style="background:none; border:none; color:#64748b; cursor:pointer;">Exit</button>
+            <button onclick="signOut()" style="background:none; border:none; color:#64748b; cursor:pointer; font-weight:bold; font-size: 0.8rem; letter-spacing: 1px;">SIGN OUT</button>
         </div>
     </header>
+
+    <div id="generator-panel">
+        <h2 style="margin-top:0; font-size:1rem; color: #8b5cf6; text-transform: uppercase;">Data Entry Node</h2>
+        <input type="text" id="globalDate" class="tool-input" placeholder="Event Date (e.g., 7 JAN 2025)">
+        <textarea id="rawInput" class="tool-input" style="height: 120px;" placeholder="Paste raw song list here..."></textarea>
+        <button onclick="processAndDownload()" style="width:100%; padding:12px; background: linear-gradient(90deg, #8b5cf6, #3b82f6); color:white; border:none; border-radius:10px; cursor:pointer; font-weight:bold;">GENERATE .TXT FILE</button>
+    </div>
 
     <div id="breadcrumb-nav" style="padding: 30px 40px 0; color: #64748b; font-size: 0.8rem; font-weight:bold; text-transform: uppercase;">ROOT / DASHBOARD</div>
     <div id="lists-container" class="archive-grid"></div>
 
     <script src="script.js?v=final"></script>
-    <script>loadMasterLists();</script>
+    <script>
+        loadMasterLists();
+        function toggleGen() {
+            const panel = document.getElementById('generator-panel');
+            panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+        }
+        function signOut() {
+            sessionStorage.removeItem('isAuth');
+            window.location.href = 'index.html';
+        }
+    </script>
 </body>
 </html>
