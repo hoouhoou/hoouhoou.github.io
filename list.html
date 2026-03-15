@@ -3,55 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>View Episode</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Setlist | EternaCloud</title>
+    <link rel="stylesheet" href="style.css?v=final">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        .item-card { background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ddd; display: flex; justify-content: space-between; }
-        .back-link { display: inline-block; margin: 20px; color: #337ab7; text-decoration: none; font-weight: bold; }
+        .list-container {
+            padding: 40px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .list-header {
+            margin-bottom: 40px;
+            border-left: 4px solid var(--accent-purple);
+            padding-left: 20px;
+        }
+
+        .list-header h2 {
+            margin: 0;
+            font-size: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .song-row {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px 25px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .song-row:hover {
+            border-color: var(--accent-purple);
+            background: rgba(139, 92, 246, 0.08);
+            transform: translateX(10px);
+            box-shadow: -10px 0 20px rgba(139, 92, 246, 0.1);
+        }
+
+        .song-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .song-title {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #fff;
+            text-transform: uppercase;
+        }
+
+        .song-meta {
+            font-size: 0.75rem;
+            color: var(--accent-blue);
+            margin-top: 4px;
+            font-weight: 600;
+        }
+
+        .song-date {
+            color: #475569;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .back-btn {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.8rem;
+            display: inline-block;
+            margin-bottom: 20px;
+            transition: color 0.2s;
+        }
+
+        .back-btn:hover { color: var(--accent-purple); }
     </style>
 </head>
 <body>
-    <a href="dashboard.html" class="back-link">← Back to Dashboard</a>
-    <div id="list-container" style="padding: 20px; max-width: 800px; margin: auto;">
-        <h1 id="list-title" style="font-family: 'Playfair Display', serif;">Loading...</h1>
-        <div id="items-container"></div>
+    <div style="position: fixed; bottom: -10%; left: -10%; width: 500px; height: 500px; background: rgba(59, 130, 246, 0.05); filter: blur(100px); pointer-events: none;"></div>
+
+    <div class="list-container">
+        <a href="dashboard.html" class="back-btn">← BACK TO DATABASE</a>
+        
+        <div class="list-header">
+            <h2 id="episode-title">LOADING NODE...</h2>
+        </div>
+
+        <div id="song-list">
+            </div>
     </div>
 
     <script>
-        async function loadList() {
-            const params = new URLSearchParams(window.location.search);
-            const id = params.get('id');
-            const container = document.getElementById('items-container');
-            const title = document.getElementById('list-title');
-
-            if (!id) {
-                title.innerText = "No ID Provided";
-                return;
-            }
+        async function loadEpisode() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('id');
+            if (!id) return;
 
             try {
-                // IMPORTANT: This looks for the file inside the /data/ folder
-                const res = await fetch(`data/${id}.txt?t=${new Date().getTime()}`);
-                if (!res.ok) throw new Error(`File data/${id}.txt not found.`);
-                
+                const res = await fetch(`data/${id}.txt?t=${Date.now()}`);
                 const text = await res.text();
-                title.innerText = id.toUpperCase().replace(/_/g, ' ');
+                const lines = text.trim().split('\n');
                 
-                const lines = text.trim().split('\n').filter(l => l.length > 0);
-                container.innerHTML = lines.map(line => {
-                    const [name, url, date] = line.split('|').map(s => s.trim());
+                // Set the header from the filename or first line
+                document.getElementById('episode-title').innerText = id.replace(/_/g, ' ');
+
+                const listContainer = document.getElementById('song-list');
+                listContainer.innerHTML = lines.map(line => {
+                    const [title, artist, date] = line.split('|').map(s => s.trim());
                     return `
-                        <div class="item-card">
-                            <span style="font-weight:600;">${name}</span>
-                            <span style="color: #7f8c8d; font-size: 0.8rem;">${date || ''}</span>
-                        </div>`;
+                        <div class="song-row">
+                            <div class="song-info">
+                                <span class="song-title">${title}</span>
+                                <span class="song-meta">${artist || ''}</span>
+                            </div>
+                            <span class="song-date">${date || ''}</span>
+                        </div>
+                    `;
                 }).join('');
             } catch (e) {
-                title.innerText = "List Not Found";
-                container.innerHTML = `<p style="color:red;">${e.message}</p>`;
+                console.error("Error loading episode data", e);
             }
         }
-        loadList();
+        loadEpisode();
     </script>
 </body>
 </html>
