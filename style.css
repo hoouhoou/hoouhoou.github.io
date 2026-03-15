@@ -1,18 +1,17 @@
 :root {
     --bg-dark: #0a0c10;
-    --card-bg: rgba(255, 255, 255, 0.05);
+    --card-bg: rgba(255, 255, 255, 0.03);
     --accent-purple: #8b5cf6;
     --accent-blue: #3b82f6;
     --text-main: #f8fafc;
-    --text-dim: #94a3b8;
+    --border: rgba(255, 255, 255, 0.1);
 }
 
 body {
     background-color: var(--bg-dark);
-    /* Creates the subtle purple/orange glow in the corners */
     background-image: 
-        radial-gradient(circle at 0% 0%, rgba(139, 92, 246, 0.15) 0%, transparent 40%),
-        radial-gradient(circle at 100% 100%, rgba(245, 158, 11, 0.1) 0%, transparent 40%);
+        radial-gradient(circle at 0% 0%, rgba(139, 92, 246, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 100% 100%, rgba(59, 130, 246, 0.1) 0%, transparent 40%);
     color: var(--text-main);
     font-family: 'Inter', sans-serif;
     margin: 0;
@@ -23,17 +22,25 @@ header {
     background: rgba(10, 12, 16, 0.8);
     backdrop-filter: blur(20px);
     padding: 20px 40px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid var(--border);
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-/* Glassmorphism Bento Cards */
+header h1 { font-size: 1.1rem; letter-spacing: 2px; }
+
+.archive-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+    padding: 40px;
+}
+
 .card-button {
     background: var(--card-bg);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
     border-radius: 24px;
     padding: 30px;
     cursor: pointer;
@@ -41,44 +48,34 @@ header {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    min-height: 160px;
+    min-height: 150px;
 }
 
 .card-button:hover {
-    transform: translateY(-10px) scale(1.02);
+    transform: translateY(-10px);
     border-color: var(--accent-purple);
-    background: rgba(139, 92, 246, 0.1);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(139, 92, 246, 0.2);
+    background: rgba(139, 92, 246, 0.05);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(139, 92, 246, 0.1);
 }
 
 .card-top h3 {
     margin: 0;
-    font-size: 1.1rem;
-    font-weight: 600;
-    background: linear-gradient(to right, #fff, #94a3b8);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    font-size: 1rem;
+    color: #fff;
+    text-transform: uppercase;
+}
+
+.card-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .card-bottom span {
     font-size: 0.7rem;
-    font-weight: 700;
     color: var(--accent-purple);
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    font-weight: 800;
     border: 1px solid rgba(139, 92, 246, 0.3);
     padding: 4px 12px;
     border-radius: 100px;
-}
-
-/* Tech Buttons */
-.btn-manage {
-    background: linear-gradient(45deg, var(--accent-purple), var(--accent-blue));
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 12px;
-    font-weight: 700;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
 }
