@@ -28,64 +28,7 @@
         <div id="spinner" class="spinner"></div>
     </div>
 
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyAdD_9LwXRNVas5_OdwmctWRk7cL1vPmUA",
-            authDomain: "hoou-5c10e.firebaseapp.com",
-            projectId: "hoou-5c10e",
-            storageBucket: "hoou-5c10e.firebasestorage.app",
-            messagingSenderId: "455360040037",
-            appId: "1:455360040037:web:701c4a77acb7960940ca8c",
-            measurementId: "G-JZMQZYGEJS"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-
-        async function signIn() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const errorDiv = document.getElementById('errorMsg');
-            const spinner = document.getElementById('spinner');
-            const btn = document.querySelector('.btn-main');
-
-            if (!email || !password) {
-                errorDiv.innerText = "Please enter email and password.";
-                return;
-            }
-
-            errorDiv.innerText = '';
-            spinner.style.display = 'inline-block';
-            btn.disabled = true;
-
-            try {
-                const userCredential = await auth.signInWithEmailAndPassword(email, password);
-                const user = userCredential.user;
-                const idTokenResult = await user.getIdTokenResult();
-                const isAdmin = idTokenResult.claims.admin === true;
-                const role = isAdmin ? 'admin' : 'viewer';
-
-                // Store role in sessionStorage for legacy pages (optional)
-                sessionStorage.setItem('userRole', role);
-
-                // Redirect to hub dashboard
-                window.location.href = "dashboard.html";
-            } catch (error) {
-                console.error(error);
-                errorDiv.innerText = "Invalid email or password.";
-                spinner.style.display = 'none';
-                btn.disabled = false;
-            }
-        }
-
-        // If already logged in, go to dashboard
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                window.location.href = "dashboard.html";
-            }
-        });
+    
     </script>
 </body>
 </html>
