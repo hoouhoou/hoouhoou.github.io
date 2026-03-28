@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | EternaCloud</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #0a0c10; --accent: #8b5cf6; }
+        body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+        .login-card { background: rgba(15, 17, 26, 0.8); backdrop-filter: blur(20px); border: 1px solid rgba(139, 92, 246, 0.2); padding: 40px; border-radius: 32px; width: 90%; max-width: 380px; text-align: center; box-sizing: border-box; }
+        h2 { letter-spacing: 2px; margin-bottom: 30px; }
+        input { width: 100%; padding: 15px; margin-bottom: 20px; border-radius: 12px; border: 1px solid #333; background: #1a1d24; color: #fff; text-align: center; box-sizing: border-box; }
+        .btn-main { background: var(--accent); color: white; border: none; padding: 15px; width: 100%; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-main:hover { opacity: 0.8; }
+        .error { color: #ff6b6b; margin-top: 10px; font-size: 0.8rem; }
+        .spinner { display: none; margin: 10px auto; width: 20px; height: 20px; border: 2px solid #fff; border-top-color: var(--accent); border-radius: 50%; animation: spin 0.6s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <h2>ETERNA<span style="font-weight:400; color:#64748b;">CLOUD</span></h2>
+        <input type="email" id="email" placeholder="EMAIL" required>
+        <input type="password" id="password" placeholder="PASSWORD" required>
+        <button class="btn-main" onclick="signIn()">LOGIN</button>
+        <div id="errorMsg" class="error"></div>
+        <div id="spinner" class="spinner"></div>
+    </div>
+
+    <!-- Firebase SDKs (compatibility version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script>
+        // New Firebase configuration for firefail-404
+        const firebaseConfig = {
+            apiKey: "AIzaSyCix1ZIkpxIqG9l5wgEVZVzGzinwFx6SM",
+            authDomain: "firefail-404.firebaseapp.com",
+            projectId: "firefail-404",
+            storageBucket: "firefail-404.firebasestorage.app",
+            messagingSenderId: "313896700417"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        async function signIn() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('errorMsg');
+            const spinner = document.getElementById('spinner');
+            const btn = document.querySelector('.btn-main');
+
+            if (!email || !password) {
+                errorDiv.innerText = "Please enter email and password.";
+                return;
+            }
+
+            errorDiv.innerText = '';
+            spinner.style.display = 'inline-block';
+            btn.disabled = true;
+
+            try {
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                const idTokenResult = await user.getIdTokenResult();
+                const isAdmin = idTokenResult.claims.admin === true;
+                const role = isAdmin ? 'admin' : 'viewer';
+                sessionStorage.setItem('userRole', role);
+                // Redirect to the archive grid inside ETERNA folder
+                window.location.href = "ETERNA/dashboard.html";
+            } catch (error) {
+                console.error(error);
+                errorDiv.innerText = "Invalid email or password.";
+                spinner.style.display = 'none';
+                btn.disabled = false;
+            }
+        }
+
+        // If already logged in, go to archive grid
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                window.location.href = "ETERNA/dashboard.html";
+            }
+        });
+    </script>
+</body>
+</html>

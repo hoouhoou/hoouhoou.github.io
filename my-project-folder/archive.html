@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EternaCloud – Archive Grid</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Additional inline styles for the grid page */
+        .archive-header {
+            background: rgba(10, 12, 16, 0.8);
+            backdrop-filter: blur(20px);
+            padding: 20px 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .search-container {
+            padding: 20px 40px 0;
+        }
+        .search-container input {
+            width: 100%;
+            max-width: 400px;
+            padding: 12px 20px;
+            border-radius: 40px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.3);
+            color: white;
+            font-size: 0.9rem;
+        }
+        .breadcrumb-nav {
+            padding: 20px 40px 0;
+            font-size: 0.8rem;
+            color: #aaa;
+        }
+        .breadcrumb-nav span {
+            cursor: pointer;
+            color: #8b5cf6;
+        }
+        .home-btn {
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        #generator-panel {
+            background: rgba(15, 17, 26, 0.95);
+            border: 1px solid #8b5cf6;
+            border-radius: 24px;
+            margin: 20px 40px;
+            padding: 20px;
+            display: none;
+        }
+        #generator-panel input, #generator-panel textarea {
+            width: 100%;
+            margin-bottom: 12px;
+            padding: 10px;
+            background: #1a1d24;
+            border: 1px solid #333;
+            color: white;
+            border-radius: 12px;
+        }
+        .gen-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .btn-gen {
+            background: #8b5cf6;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            color: white;
+            cursor: pointer;
+        }
+        #previewArea {
+            background: #111;
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 15px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="archive-header">
+        <div class="logo">ETERNA<span>CLOUD</span></div>
+        <div style="display: flex; gap: 15px; align-items: center;">
+            <span id="roleBadge" class="role-badge">VIEWER</span>
+            <button id="signOutBtn" class="sign-out">SIGN OUT</button>
+            <button id="toggleGenBtn" class="btn-gen" style="display: none;">ADMIN TOOLS</button>
+        </div>
+    </div>
+
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="SEARCH EPISODES...">
+    </div>
+    <div class="breadcrumb-nav" id="breadcrumb-nav"></div>
+
+    <div id="generator-panel">
+        <h3>Create New Episode</h3>
+        <input type="text" id="newEvent" placeholder="Event (e.g., 'Techno Fest')">
+        <input type="text" id="newYear" placeholder="Year (e.g., 2024)">
+        <input type="text" id="newMonth" placeholder="Month (e.g., March)">
+        <input type="text" id="fileName" placeholder="Episode Title (no spaces, use underscores)">
+        <textarea id="rawInput" rows="5" placeholder="Paste your setlist / notes here. One line per track."></textarea>
+        <label><input type="checkbox" id="autoNumberCheckbox" checked> Auto-number lines</label>
+        <div class="gen-buttons">
+            <button id="generateBtn" class="btn-gen">SAVE TO FIRESTORE</button>
+        </div>
+        <div id="previewArea"></div>
+    </div>
+
+    <div id="lists-container" class="archive-grid"></div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <!-- Your grid logic script -->
+    <script src="script.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCix1ZIkpxIqG9l5wgEVZVzGzinwFx6SM",
+            authDomain: "firefail-404.firebaseapp.com",
+            projectId: "firefail-404",
+            storageBucket: "firefail-404.firebasestorage.app",
+            messagingSenderId: "313896700417"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        window.db = db;   // make db globally available for script.js
+        window.auth = auth;
+
+        // Sign out button
+        document.getElementById('signOutBtn').addEventListener('click', async () => {
+            await auth.signOut();
+            window.location.href = 'index.html';
+        });
+
+        // Authentication check
+        auth.onAuthStateChanged(async (user) => {
+            if (!user) {
+                window.location.href = 'index.html';
+                return;
+            }
+            try {
+                const idTokenResult = await user.getIdTokenResult();
+                const isAdmin = idTokenResult.claims.admin === true;
+                const role = isAdmin ? 'admin' : 'viewer';
+                sessionStorage.setItem('userRole', role);
+                document.getElementById('roleBadge').innerText = role.toUpperCase();
+
+                // Show admin tools if applicable
+                if (isAdmin) {
+                    document.getElementById('toggleGenBtn').style.display = 'inline-block';
+                }
+
+                // Pass role to script.js initializer
+                if (window.initAfterAuth) {
+                    window.initAfterAuth(role);
+                } else {
+                    console.error("initAfterAuth not found in script.js");
+                }
+            } catch (error) {
+                console.error(error);
+                document.getElementById('roleBadge').innerText = 'VIEWER';
+                if (window.initAfterAuth) window.initAfterAuth('viewer');
+            }
+        });
+    </script>
+</body>
+</html>

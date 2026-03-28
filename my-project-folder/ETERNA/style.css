@@ -1,0 +1,101 @@
+:root {
+    --bg-dark: #0a0c10;
+    --card-bg: rgba(255, 255, 255, 0.03);
+    --accent-purple: #8b5cf6;
+    --accent-blue: #3b82f6;
+    --text-main: #f8fafc;
+    --border: rgba(255, 255, 255, 0.1);
+}
+
+body {
+    background-color: var(--bg-dark);
+    background-image: radial-gradient(circle at 0% 0%, rgba(139, 92, 246, 0.12) 0%, transparent 40%);
+    color: var(--text-main);
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    min-height: 100vh;
+}
+
+header {
+    background: rgba(10, 12, 16, 0.8);
+    backdrop-filter: blur(20px);
+    padding: 20px 40px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.archive-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+    padding: 40px;
+}
+
+.card-button {
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 30px;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 150px;
+}
+
+.card-button:hover {
+    transform: translateY(-6px);
+    border-color: var(--accent-purple);
+    background: rgba(139, 92, 246, 0.05);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(139, 92, 246, 0.1);
+}
+
+.card-top h3 {
+    margin: 0;
+    font-size: 1rem;
+    color: #fff;
+    text-transform: uppercase;
+}
+
+.card-bottom span {
+    font-size: 0.7rem;
+    color: var(--accent-purple);
+    font-weight: 800;
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    padding: 4px 12px;
+    border-radius: 100px;
+}
+
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        text-align: center;
+        padding: 15px 20px;
+    }
+    .archive-grid {
+        grid-template-columns: 1fr;
+        padding: 20px;
+        gap: 15px;
+    }
+    .card-button {
+        padding: 20px;
+        min-height: auto;
+    }
+    .search-container {
+        padding: 15px 20px 0;
+    }
+    #generator-panel {
+        margin: 15px;
+        padding: 20px;
+    }
+    .breadcrumb-nav {
+        padding: 15px 20px 0;
+        font-size: 0.7rem;
+    }
+}

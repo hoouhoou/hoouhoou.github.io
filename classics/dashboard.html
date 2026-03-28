@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | EternaCloud</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        #generator-panel {
+            display: none;
+            background: rgba(15, 17, 26, 0.95);
+            margin: 20px 40px;
+            padding: 30px;
+            border-radius: 24px;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.1);
+        }
+        .tool-input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            background: #1a1d24;
+            border: 1px solid #333;
+            color: #fff;
+            border-radius: 10px;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+            box-sizing: border-box;
+        }
+        .preview-area {
+            margin-top: 20px;
+            background: #1a1d24;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            white-space: pre-wrap;
+            word-break: break-word;
+            display: none;
+        }
+        .search-container {
+            padding: 20px 40px 0;
+        }
+        .search-input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            background: #1a1d24;
+            border: 1px solid #333;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            box-sizing: border-box;
+        }
+        .breadcrumb-nav {
+            padding: 30px 40px 0;
+            color: #64748b;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .breadcrumb-link {
+            cursor: pointer;
+            color: #8b5cf6;
+        }
+        .breadcrumb-link:hover {
+            text-decoration: underline;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #8b5cf6;
+        }
+    </style>
+</head>
+<body>
+    <div style="position: fixed; top: -10%; right: -10%; width: 600px; height: 600px; background: rgba(139, 92, 246, 0.08); filter: blur(120px); pointer-events: none;"></div>
+
+    <header>
+        <h1>ETERNA<span style="font-weight:400; color:#64748b;">CLOUD</span></h1>
+        <div style="display: flex; gap: 15px; align-items: center;">
+            <span id="roleBadge" style="color:#8b5cf6; font-size:0.7rem; background:rgba(139,92,246,0.2); padding:4px 10px; border-radius:20px;"></span>
+            <button id="toggleGenBtn" style="background: linear-gradient(45deg, #8b5cf6, #3b82f6); color:white; border:none; padding:10px 20px; border-radius:12px; cursor:pointer; font-weight:bold;">DATABASE TOOLS</button>
+            <button id="exitBtn" style="background:none; border:none; color:#64748b; cursor:pointer;">Exit</button>
+            <button id="signOutBtn" style="background:none; border:none; color:#64748b; cursor:pointer; font-weight:bold; font-size: 0.8rem; letter-spacing: 1px;">SIGN OUT</button>
+        </div>
+    </header>
+
+    <div id="generator-panel">
+        <h2 style="margin-top:0; font-size:1rem; color: #8b5cf6; text-transform: uppercase;">Data Entry Node</h2>
+        <textarea id="rawInput" class="tool-input" rows="4" placeholder="Paste raw song list here... (one line per item)"></textarea>
+        <input type="text" id="fileName" class="tool-input" placeholder="Output file name (without extension)" value="archive_node">
+        <input type="text" id="newEvent" class="tool-input" placeholder="Event (e.g., BRAVO EXECUTIVE LOUNGE)">
+        <input type="text" id="newYear" class="tool-input" placeholder="Year (e.g., 2019)">
+        <input type="text" id="newMonth" class="tool-input" placeholder="Month (e.g., FEBRUARY)">
+        <button id="generateBtn" style="width:100%; padding:12px; background: linear-gradient(90deg, #8b5cf6, #3b82f6); color:white; border:none; border-radius:10px; cursor:pointer; font-weight:bold;">SAVE TO FIRESTORE</button>
+        <div id="previewArea" class="preview-area"></div>
+    </div>
+
+    <div class="search-container">
+        <input type="text" id="searchInput" class="search-input" placeholder="🔍 Search episodes...">
+    </div>
+    <div id="breadcrumb-nav" class="breadcrumb-nav">ROOT / DASHBOARD</div>
+    <div id="lists-container" class="archive-grid"></div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        // Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyAdD_9LwXRNVas5_OdwmctWRk7cL1vPmUA",
+            authDomain: "hoou-5c10e.firebaseapp.com",
+            projectId: "hoou-5c10e",
+            storageBucket: "hoou-5c10e.firebasestorage.app",
+            messagingSenderId: "455360040037",
+            appId: "1:455360040037:web:701c4a77acb7960940ca8c",
+            measurementId: "G-JZMQZYGEJS"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+    </script>
+
+    <script src="script.js"></script>
+    <script>
+        // Auth check
+        if (!sessionStorage.getItem('isAuth')) window.location.href = 'index.html';
+
+        // Role check
+        const userRole = sessionStorage.getItem('userRole') || 'viewer';
+        const roleBadge = document.getElementById('roleBadge');
+        roleBadge.innerText = userRole === 'admin' ? 'ADMIN' : 'VIEWER';
+
+        // Hide admin tools for viewers
+        const toggleBtn = document.getElementById('toggleGenBtn');
+        const generatorPanel = document.getElementById('generator-panel');
+        if (userRole !== 'admin') {
+            toggleBtn.style.display = 'none';
+            generatorPanel.style.display = 'none';
+        } else {
+            // Admin: set up toggle functionality
+            toggleBtn.addEventListener('click', () => {
+                generatorPanel.style.display = generatorPanel.style.display === 'block' ? 'none' : 'block';
+            });
+        }
+
+        // Common event listeners
+        document.getElementById('exitBtn').addEventListener('click', () => window.location.href = 'index.html');
+        document.getElementById('signOutBtn').addEventListener('click', () => {
+            sessionStorage.removeItem('isAuth');
+            sessionStorage.removeItem('userRole');
+            window.location.href = 'index.html';
+        });
+        if (userRole === 'admin') {
+            document.getElementById('generateBtn').addEventListener('click', processAndDownload);
+        }
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            if (window.searchHandler) window.searchHandler(e.target.value.trim().toLowerCase());
+        });
+
+        loadMasterLists();
+    </script>
+</body>
+</html>

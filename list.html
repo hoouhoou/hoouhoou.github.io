@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archive Node | EternaCloud</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #0a0c10; --accent: #8b5cf6; --panel: rgba(15, 17, 26, 0.95); }
+        body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 15px; box-sizing: border-box; }
+        .archive-encasement { background: var(--panel); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 24px; width: 100%; max-width: 800px; padding: 30px; box-sizing: border-box; overflow: hidden; }
+        .back-btn { color: #64748b; background: none; border: none; cursor: pointer; font-weight: bold; font-size: 0.7rem; text-transform: uppercase; }
+        .node-title { border-left: 4px solid var(--accent); padding-left: 15px; margin: 20px 0; }
+        .node-title h2 { margin: 0; font-size: 1.5rem; text-transform: uppercase; }
+        .data-content { font-family: 'Arial', sans-serif; font-size: 11px; line-height: 1.5; white-space: pre-wrap; word-wrap: break-word; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; color: #e2e8f0; }
+        .data-content h1, .data-content h2, .data-content h3, .data-content h4, .data-content h5, .data-content h6 { font-family: 'Arial', sans-serif; font-weight: bold; font-size: 13px; margin: 0.5em 0; }
+        .action-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .copy-btn, .edit-btn, .delete-btn { background: #8b5cf6; border: none; padding: 6px 12px; border-radius: 8px; color: white; cursor: pointer; font-size: 0.8rem; }
+        .edit-btn { background: #3b82f6; }
+        .delete-btn { background: #ef4444; }
+        .dashboard-link { color: #8b5cf6; text-decoration: none; font-size: 0.8rem; }
+        .dashboard-link:hover { text-decoration: underline; }
+        .role-badge { color:#8b5cf6; font-size:0.7rem; background:rgba(139,92,246,0.2); padding:4px 10px; border-radius:20px; margin-left:auto; }
+        @media (max-width: 600px) { .archive-encasement { padding: 20px; } .node-title h2 { font-size: 1.2rem; } }
+    </style>
+</head>
+<body>
+    <div class="archive-encasement">
+        <div class="action-bar">
+            <button onclick="history.back()" class="back-btn">← RETURN</button>
+            <div style="display: flex; gap: 10px;">
+                <button id="copyBtn" class="copy-btn">📋 COPY TEXT</button>
+                <button id="editBtn" class="edit-btn" style="display: none;">✏️ EDIT</button>
+                <button id="deleteBtn" class="delete-btn" style="display: none;">🗑️ DELETE</button>
+            </div>
+        </div>
+        <div style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+            <a href="ETERNA/dashboard.html" class="dashboard-link">← Back to Dashboard</a>
+            <span id="roleBadge" class="role-badge"></span>
+        </div>
+        <div class="node-title">
+            <h2 id="display-title">LOADING...</h2>
+        </div>
+        <div id="text-data" class="data-content">INITIALIZING...</div>
+        <div id="editorContainer" style="display:none; margin-top:20px;">
+            <textarea id="editor" rows="15" style="width:100%; background:#1a1d24; color:#fff; border:1px solid #333; border-radius:8px; padding:10px; font-family: monospace;"></textarea>
+            <button id="saveBtn" style="margin-top:10px; background:#10b981; border:none; padding:8px 16px; border-radius:8px; color:white; cursor:pointer;">💾 SAVE TO FIRESTORE</button>
+            <button id="cancelEditBtn" style="margin-top:10px; margin-left:10px; background:#6b7280; border:none; padding:8px 16px; border-radius:8px; color:white; cursor:pointer;">CANCEL</button>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAdD_9LwXRNVas5_OdwmctWRk7cL1vPmUA",
+            authDomain: "hoou-5c10e.firebaseapp.com",
+            projectId: "hoou-5c10e",
+            storageBucket: "hoou-5c10e.firebasestorage.app",
+            messagingSenderId: "455360040037",
+            appId: "1:455360040037:web:701c4a77acb7960940ca8c",
+            measurementId: "G-JZMQZYGEJS"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        let currentDocId = "";
+        let currentUserRole = "viewer";
+
+        // Authentication check
+        auth.onAuthStateChanged(async (user) => {
+            if (!user) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            try {
+                const idTokenResult = await user.getIdTokenResult();
+                currentUserRole = idTokenResult.claims.admin === true ? 'admin' : 'viewer';
+                sessionStorage.setItem('userRole', currentUserRole);
+                document.getElementById('roleBadge').innerText = currentUserRole === 'admin' ? 'ADMIN' : 'VIEWER';
+
+                // Show/hide admin buttons
+                const editBtn = document.getElementById('editBtn');
+                const deleteBtn = document.getElementById('deleteBtn');
+                if (currentUserRole === 'admin') {
+                    editBtn.style.display = 'block';
+                    deleteBtn.style.display = 'block';
+                    setupAdminControls();
+                }
+
+                // Load the node data
+                fetchNode();
+            } catch (error) {
+                console.error(error);
+                document.getElementById('roleBadge').innerText = 'VIEWER';
+            }
+        });
+
+        async function fetchNode() {
+            const id = new URLSearchParams(window.location.search).get('id');
+            if (!id) {
+                document.getElementById('display-title').innerText = 'INVALID NODE';
+                document.getElementById('text-data').innerHTML = 'No node ID provided.';
+                return;
+            }
+            const name = id.split('/').pop().replace(/_/g, ' ');
+            document.getElementById('display-title').innerText = name.toUpperCase();
+            currentDocId = id.replace(/\//g, '_');
+
+            try {
+                const doc = await db.collection('episodes').doc(currentDocId).get();
+                if (!doc.exists) throw new Error('Document not found');
+                const data = doc.data();
+                document.getElementById('text-data').innerHTML = data.content || '(empty)';
+            } catch (e) {
+                document.getElementById('text-data').innerHTML = "ERROR: Failed to fetch episode.";
+                console.error(e);
+            }
+        }
+
+        function setupAdminControls() {
+            const editBtn = document.getElementById('editBtn');
+            const editorContainer = document.getElementById('editorContainer');
+            const editor = document.getElementById('editor');
+            const saveBtn = document.getElementById('saveBtn');
+            const cancelBtn = document.getElementById('cancelEditBtn');
+            const contentDiv = document.getElementById('text-data');
+
+            editBtn.addEventListener('click', () => {
+                editor.value = contentDiv.innerHTML;
+                contentDiv.style.display = 'none';
+                editorContainer.style.display = 'block';
+            });
+            cancelBtn.addEventListener('click', () => {
+                contentDiv.style.display = 'block';
+                editorContainer.style.display = 'none';
+            });
+            saveBtn.addEventListener('click', async () => {
+                const newContent = editor.value;
+                try {
+                    await db.collection('episodes').doc(currentDocId).update({
+                        content: newContent
+                    });
+                    alert('Saved successfully!');
+                    contentDiv.innerHTML = newContent;
+                    contentDiv.style.display = 'block';
+                    editorContainer.style.display = 'none';
+                } catch (err) {
+                    console.error(err);
+                    alert('Save failed.');
+                }
+            });
+
+            const deleteBtn = document.getElementById('deleteBtn');
+            deleteBtn.addEventListener('click', async () => {
+                if (confirm('Permanently delete this episode? This cannot be undone.')) {
+                    try {
+                        await db.collection('episodes').doc(currentDocId).delete();
+                        alert('Deleted.');
+                        window.location.href = 'ETERNA/dashboard.html';
+                    } catch (err) {
+                        console.error(err);
+                        alert('Delete failed.');
+                    }
+                }
+            });
+        }
+
+        // Copy button for all users
+        document.getElementById('copyBtn').addEventListener('click', async () => {
+            const textDiv = document.getElementById('text-data');
+            const text = textDiv.innerText;
+            if (text && text !== 'INITIALIZING...' && !text.startsWith('ERROR')) {
+                try {
+                    await navigator.clipboard.writeText(text);
+                    alert('Copied to clipboard!');
+                } catch (err) { alert('Could not copy.'); }
+            } else {
+                alert('No content to copy.');
+            }
+        });
+    </script>
+</body>
+</html>
