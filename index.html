@@ -98,9 +98,8 @@
     // Database access initialization vectors
     const SUPABASE_URL = "https://lmggzgvvtzeuukcuxlma.supabase.co";
     
-    // NOTE: Replace this placeholder string with your project's true "anon public" service key 
-    // found under Project Settings -> API inside the Supabase control panel.
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtZ2d6Z3Z2dHpldXVrY3V4bG1hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTcwMDAwMDAsImV4cCI6MjAyNjg1MDAwMH0.placeholder_string";
+    // Paste your complete anon public key string here from your Supabase Dashboard API tab
+    const SUPABASE_ANON_KEY = "sb_publishable_qKRhgtfA3v0euD5-XsDs3g_6ZcAas5Phere";
     
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     let mobileMenuOpen = false;
@@ -231,7 +230,7 @@
         .insert([
           { 
             title: userTitle, 
-            creator: "MILKMAN",
+            creator: "RJ",
             media_type: userType === "audio" ? "audio" : "video",
             venue: userVenue,
             original_broadcast_date: userDate,
