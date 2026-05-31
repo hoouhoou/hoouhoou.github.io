@@ -118,11 +118,9 @@
   </div>
 
   <script>
-    // Database access initialization vectors
     const SUPABASE_URL = "https://lmggzgvvtzeuukcuxlma.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtZ2d6Z3Z2dHpldXVrY3V4bG1hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTI1ODAsImV4cCI6MjA5NTc4ODU4MH0.OgvoFHe6efoZIjaVR7BojTPsTUJ1oICU-5KY3EBhmcQ";
     
-    // Solves the global conflict bug by declaring a distinct client application binding identifier
     const appSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     let mobileMenuOpen = false;
 
@@ -208,7 +206,6 @@
           return;
         }
 
-        // Generating asset display cards (with click actions added)
         grid.innerHTML = data.map(item => {
           const escapedTitle = item.title.replace(/'/g, "\\'");
           const escapedVenue = (item.venue || 'Unknown Location').replace(/'/g, "\\'");
@@ -272,19 +269,51 @@
           return;
         }
 
-        // Cleaned up layouts: removed 'truncate' classes so full text blocks wrap comfortably onto multiple rows
-        listContainer.innerHTML = data.map((perf, index) => `
-          <div class="bg-[#1a1a1a] border border-[#282828] rounded-md px-4 py-3 flex items-start justify-between gap-4 font-mono text-xs w-full">
-            <div class="flex items-start gap-3 flex-1 min-w-0">
-              <span class="text-zinc-600 font-bold mt-0.5 select-none shrink-0">${perf.performance_order || (index + 1)}.</span>
-              <span class="text-zinc-200 font-semibold break-words whitespace-normal block flex-1">${perf.song_title}</span>
+        listContainer.innerHTML = data.map((perf, index) => {
+          const escapedSong = perf.song_title.replace(/'/g, "\\'");
+          return `
+            <div class="bg-[#1a1a1a] border border-[#282828] rounded-md px-4 py-3 flex items-start justify-between gap-4 font-mono text-xs w-full group">
+              <div class="flex items-start gap-3 flex-1 min-w-0">
+                <span class="text-zinc-600 font-bold mt-0.5 select-none shrink-0">${perf.performance_order || (index + 1)}.</span>
+                <span class="text-zinc-200 font-semibold break-words whitespace-normal block flex-1">${perf.song_title}</span>
+              </div>
+              <div class="flex items-center gap-2 shrink-0">
+                ${perf.duration ? `<span class="text-zinc-500 bg-zinc-900 px-1.5 py-0.5 border border-[#242424] rounded text-[10px] font-mono">${perf.duration}</span>` : ''}
+                <button onclick="handleEditPerformance('${perf.id}', '${escapedSong}', '${id}')" class="text-[11px] text-zinc-500 hover:text-[#3ecf8e] transition-colors px-1 py-0.5 rounded hover:bg-zinc-800 cursor-pointer" title="Edit Performance text">
+                  ✏️ Edit
+                </button>
+              </div>
             </div>
-            ${perf.duration ? `<span class="text-zinc-500 bg-zinc-900 px-1.5 py-0.5 border border-[#242424] rounded text-[10px] shrink-0 font-mono">${perf.duration}</span>` : ''}
-          </div>
-        `).join('');
+          `;
+        }).join('');
 
       } catch (err) {
         listContainer.innerHTML = `<div class="text-xs font-mono text-red-400 p-4">System runtime failure.</div>`;
+      }
+    }
+
+    // Performance Data Modification Engine
+    async function handleEditPerformance(perfId, currentText, itemId) {
+      const updatedText = prompt("Edit track / performance details:", currentText);
+      
+      // If user clicks cancel or leaves empty text, don't execute
+      if (updatedText === null || updatedText.trim() === "") return;
+
+      const { error } = await appSupabase
+        .from('archive_performances')
+        .update({ song_title: updatedText.trim() })
+        .eq('id', perfId);
+
+      if (error) {
+        showToast("Update Failed", error.message);
+      } else {
+        showToast("Updated", "Track listing data rewritten successfully.", false);
+        
+        // Refresh modal seamlessly
+        const currentTitle = document.getElementById('modal-project-title').innerText;
+        const currentMeta = document.getElementById('modal-project-meta').innerText;
+        const parts = currentMeta.split(' | ');
+        openProjectDetails(itemId, currentTitle, parts[0], parts[1] || '');
       }
     }
 
@@ -358,7 +387,6 @@
       }
     }
 
-    // Close modal on background overlay clicks
     window.onclick = function(event) {
       const modal = document.getElementById('modal-container');
       if (event.target === modal) {
@@ -366,7 +394,6 @@
       }
     }
 
-    // Initial sequence startup call
     window.addEventListener('DOMContentLoaded', fetchItems);
   </script>
 </body>
