@@ -35,7 +35,7 @@
       </div>
     </div>
     <div class="w-full px-4 md:px-0 flex items-center justify-start md:justify-center gap-3">
-      <div class="w-7 h-7 bg-zinc-800 rounded-full flex items-center justify-center text-[10px] font-bold text-zinc-300 border border-[#2e2e2e] shrink-0">RJ</div>
+      <div class="w-7 h-7 bg-zinc-800 rounded-full flex items-center justify-center text-[10px] font-bold text-zinc-300 border border-[#2e2e2e] shrink-0">MILKMAN</div>
       <span class="md:hidden text-xs font-medium text-zinc-400">Archivist Portal</span>
     </div>
   </nav>
@@ -99,7 +99,8 @@
     const SUPABASE_URL = "https://lmggzgvvtzeuukcuxlma.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_qKRhgtfA3v0euD5-XsDs3g_6ZcAas5Phere";
     
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // Changed variable token from 'supabase' to 'supabaseClient' to fix global namespace clash
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     let mobileMenuOpen = false;
 
     // Toast alert handlers
@@ -122,7 +123,7 @@
       document.getElementById('toast-container').classList.add('hidden');
     }
 
-    // Fixed Responsive Sidebar Engine
+    // Responsive Sidebar Engine
     function toggleMobileMenu() {
       mobileMenuOpen = !mobileMenuOpen;
       const sidebar = document.getElementById('sidebar');
@@ -151,7 +152,7 @@
         const venueVal = document.getElementById('venue-filter').value;
         const mediaVal = document.getElementById('media-filter').value;
 
-        let query = supabase.from('archive_items').select('*');
+        let query = supabaseClient.from('archive_items').select('*');
 
         if (searchVal) {
           query = query.ilike('title', `%${searchVal}%`);
@@ -223,12 +224,12 @@
         return;
       }
 
-      const { error } = await supabase
+      const { error } = await supabaseClient
         .from('archive_items')
         .insert([
           { 
             title: userTitle, 
-            creator: "RJ",
+            creator: "MILKMAN",
             media_type: userType === "audio" ? "audio" : "video",
             venue: userVenue,
             original_broadcast_date: userDate,
