@@ -31,7 +31,7 @@
         <button onclick="closeModal()" class="text-zinc-400 hover:text-white cursor-pointer text-sm p-1">✕</button>
       </div>
       
-      <div id="modal-performance-list" class="p-6 overflow-y-auto flex flex-col gap-2 flex-1">
+      <div id="modal-performance-list" class="p-6 overflow-y-auto flex flex-col gap-3 flex-1">
         </div>
 
       <div class="p-4 bg-[#111] border-t border-[#242424] flex items-center justify-between gap-3 rounded-b-xl">
@@ -122,7 +122,8 @@
     const SUPABASE_URL = "https://lmggzgvvtzeuukcuxlma.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtZ2d6Z3Z2dHpldXVrY3V4bG1hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTI1ODAsImV4cCI6MjA5NTc4ODU4MH0.OgvoFHe6efoZIjaVR7BojTPsTUJ1oICU-5KY3EBhmcQ";
     
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // Solves the global conflict bug by declaring a distinct client application binding identifier
+    const appSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     let mobileMenuOpen = false;
 
     // Toast alert handlers
@@ -174,7 +175,7 @@
         const venueVal = document.getElementById('venue-filter').value;
         const mediaVal = document.getElementById('media-filter').value;
 
-        let query = supabaseClient.from('archive_items').select('*');
+        let query = appSupabase.from('archive_items').select('*');
 
         if (searchVal) {
           query = query.ilike('title', `%${searchVal}%`);
@@ -209,7 +210,6 @@
 
         // Generating asset display cards (with click actions added)
         grid.innerHTML = data.map(item => {
-          // Serialize configuration safely to pass via onclick parameters
           const escapedTitle = item.title.replace(/'/g, "\\'");
           const escapedVenue = (item.venue || 'Unknown Location').replace(/'/g, "\\'");
           
@@ -244,7 +244,6 @@
       document.getElementById('modal-project-meta').innerText = `${venue} | ${date}`;
       document.getElementById('modal-item-id-tag').innerText = `item_id: ${id}`;
       
-      // Bind the ID directly to the insert trigger action button
       document.getElementById('modal-add-perf-btn').onclick = () => handleAddPerformance(id);
 
       const listContainer = document.getElementById('modal-performance-list');
@@ -253,7 +252,7 @@
       document.getElementById('modal-container').classList.remove('hidden');
 
       try {
-        const { data, error } = await supabaseClient
+        const { data, error } = await appSupabase
           .from('archive_performances')
           .select('*')
           .eq('item_id', id)
@@ -273,13 +272,14 @@
           return;
         }
 
+        // Cleaned up layouts: removed 'truncate' classes so full text blocks wrap comfortably onto multiple rows
         listContainer.innerHTML = data.map((perf, index) => `
-          <div class="bg-[#1a1a1a] border border-[#282828] rounded-md px-4 py-3 flex items-center justify-between font-mono text-xs">
-            <div class="flex items-center gap-3 truncate">
-              <span class="text-zinc-600 font-bold w-4">${perf.performance_order || (index + 1)}.</span>
-              <span class="text-zinc-200 font-semibold truncate">${perf.song_title}</span>
+          <div class="bg-[#1a1a1a] border border-[#282828] rounded-md px-4 py-3 flex items-start justify-between gap-4 font-mono text-xs w-full">
+            <div class="flex items-start gap-3 flex-1 min-w-0">
+              <span class="text-zinc-600 font-bold mt-0.5 select-none shrink-0">${perf.performance_order || (index + 1)}.</span>
+              <span class="text-zinc-200 font-semibold break-words whitespace-normal block flex-1">${perf.song_title}</span>
             </div>
-            ${perf.duration ? `<span class="text-zinc-500 bg-zinc-900 px-1.5 py-0.5 border border-[#242424] rounded text-[10px]">${perf.duration}</span>` : ''}
+            ${perf.duration ? `<span class="text-zinc-500 bg-zinc-900 px-1.5 py-0.5 border border-[#242424] rounded text-[10px] shrink-0 font-mono">${perf.duration}</span>` : ''}
           </div>
         `).join('');
 
@@ -300,7 +300,7 @@
       const trackOrder = prompt("Enter track sequence order number:", "1");
       const trackDuration = prompt("Enter performance running length (e.g. 03:15, or leave blank):", "");
 
-      const { error } = await supabaseClient
+      const { error } = await appSupabase
         .from('archive_performances')
         .insert([
           {
@@ -315,7 +315,6 @@
         showToast("Track Addition Failed", error.message);
       } else {
         showToast("Success", "Performance track successfully added.", false);
-        // Refresh the list immediately inside the modal view
         const currentTitle = document.getElementById('modal-project-title').innerText;
         const currentMeta = document.getElementById('modal-project-meta').innerText;
         const parts = currentMeta.split(' | ');
@@ -338,7 +337,7 @@
         return;
       }
 
-      const { error } = await supabaseClient
+      const { error } = await appSupabase
         .from('archive_items')
         .insert([
           { 
