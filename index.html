@@ -35,7 +35,7 @@
       </div>
     </div>
     <div class="w-full px-4 md:px-0 flex items-center justify-start md:justify-center gap-3">
-      <div class="w-7 h-7 bg-zinc-800 rounded-full flex items-center justify-center text-[10px] font-bold text-zinc-300 border border-[#2e2e2e] shrink-0">MILKMAN</div>
+      <div class="w-7 h-7 bg-zinc-800 rounded-full flex items-center justify-center text-[10px] font-bold text-zinc-300 border border-[#2e2e2e] shrink-0">RJ</div>
       <span class="md:hidden text-xs font-medium text-zinc-400">Archivist Portal</span>
     </div>
   </nav>
@@ -97,9 +97,11 @@
   <script>
     // Database access initialization vectors
     const SUPABASE_URL = "https://lmggzgvvtzeuukcuxlma.supabase.co";
-    const SUPABASE_ANON_KEY = "sb_publishable_qKRhgtfA3v0euD5-XsDs3g_6ZcAas5Phere";
     
-    // Changed variable token from 'supabase' to 'supabaseClient' to fix global namespace clash
+    // NOTE: Replace this placeholder string with your project's true "anon public" service key 
+    // found under Project Settings -> API inside the Supabase control panel.
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtZ2d6Z3Z2dHpldXVrY3V4bG1hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTcwMDAwMDAsImV4cCI6MjAyNjg1MDAwMH0.placeholder_string";
+    
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     let mobileMenuOpen = false;
 
@@ -170,7 +172,7 @@
           showToast(`Database Error [${error.code || 'PGRST'}]`, error.message);
           grid.innerHTML = `
             <div class="col-span-full border border-dashed border-[#f87171]/20 rounded-lg p-12 bg-[#181111] text-center text-xs font-mono text-red-400">
-              Failed to pull records. Check table layout definitions.
+              Failed to pull records. Check table layout definitions or API keys.
             </div>
           `;
           return;
@@ -185,7 +187,7 @@
           return;
         }
 
-        // Generating asset row displays
+        // Generating asset display cards
         grid.innerHTML = data.map(item => `
           <div class="bg-[#141414] border border-[#242424] hover:border-[#2e2e2e] rounded-lg p-5 flex flex-col justify-between h-40 transition-all group cursor-pointer">
             <div class="min-w-0">
