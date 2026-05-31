@@ -20,14 +20,27 @@
     </div>
   </div>
 
-  <nav id="sidebar" class="fixed inset-y-0 left-0 w-14 bg-[#141414] border-r border-[#242424] flex flex-col items-center py-3 justify-between z-40 -translate-x-full md:translate-x-0 transition-transform duration-200 shrink-0">
+  <nav id="sidebar" class="fixed inset-y-0 left-0 w-64 md:w-14 bg-[#141414] border-r border-[#242424] flex flex-col items-center py-3 justify-between z-50 -translate-x-full md:translate-x-0 transition-transform duration-200 shrink-0">
     <div class="flex flex-col items-center gap-5 w-full">
-      <div class="w-7 h-7 bg-[#242424] rounded-md flex items-center justify-center text-emerald-500 font-bold text-sm border border-[#2e2e2e]">⚡</div>
+      <div class="w-full flex items-center justify-between md:justify-center px-4 md:px-0">
+        <div class="w-7 h-7 bg-[#242424] rounded-md flex items-center justify-center text-emerald-500 font-bold text-sm border border-[#2e2e2e]">⚡</div>
+        <button onclick="toggleMobileMenu()" class="md:hidden text-zinc-400 hover:text-zinc-200 text-lg cursor-pointer">✕</button>
+      </div>
       <div class="w-full h-[1px] bg-[#242424] px-2"></div>
-      <button class="w-9 h-9 rounded-md flex items-center justify-center text-emerald-400 bg-[#242424] border border-[#2e2e2e] text-base cursor-pointer">📁</button>
+      <div class="w-full px-3 md:px-0 flex flex-col items-center gap-2">
+        <button class="w-full md:w-9 h-9 rounded-md flex items-center justify-start md:justify-center gap-3 px-3 md:px-0 text-emerald-400 bg-[#242424] border border-[#2e2e2e] text-base cursor-pointer">
+          <span>📁</span>
+          <span class="md:hidden text-xs font-medium text-zinc-300">Archive Files</span>
+        </button>
+      </div>
     </div>
-    <div class="w-7 h-7 bg-zinc-800 rounded-full flex items-center justify-center text-[10px] font-bold text-zinc-300 border border-[#2e2e2e]">RJ</div>
+    <div class="w-full px-4 md:px-0 flex items-center justify-start md:justify-center gap-3">
+      <div class="w-7 h-7 bg-zinc-800 rounded-full flex items-center justify-center text-[10px] font-bold text-zinc-300 border border-[#2e2e2e] shrink-0">RJ</div>
+      <span class="md:hidden text-xs font-medium text-zinc-400">Archivist Portal</span>
+    </div>
   </nav>
+
+  <div id="sidebar-overlay" onclick="toggleMobileMenu()" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden transition-opacity"></div>
 
   <div class="flex-1 flex flex-col min-w-0 md:ml-14">
     <header class="h-12 bg-[#141414] border-b border-[#242424] px-4 md:px-6 flex items-center justify-between text-xs font-medium text-zinc-400 shrink-0">
@@ -109,13 +122,18 @@
       document.getElementById('toast-container').classList.add('hidden');
     }
 
+    // Fixed Responsive Sidebar Engine
     function toggleMobileMenu() {
       mobileMenuOpen = !mobileMenuOpen;
       const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebar-overlay');
+      
       if (mobileMenuOpen) {
         sidebar.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
       } else {
         sidebar.classList.add('-translate-x-full');
+        overlay.classList.add('hidden');
       }
     }
 
