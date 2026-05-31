@@ -1,34 +1,233 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | EternaCloud</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        :root { --bg: #0a0c10; --accent: #8b5cf6; }
-        body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
-        .login-card { background: rgba(15, 17, 26, 0.8); backdrop-filter: blur(20px); border: 1px solid rgba(139, 92, 246, 0.2); padding: 40px; border-radius: 32px; width: 90%; max-width: 380px; text-align: center; box-sizing: border-box; }
-        h2 { letter-spacing: 2px; margin-bottom: 30px; }
-        input { width: 100%; padding: 15px; margin-bottom: 20px; border-radius: 12px; border: 1px solid #333; background: #1a1d24; color: #fff; text-align: center; box-sizing: border-box; }
-        .btn-main { background: var(--accent); color: white; border: none; padding: 15px; width: 100%; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn-main:hover { opacity: 0.8; }
-        .error { color: #ff6b6b; margin-top: 10px; font-size: 0.8rem; }
-        .spinner { display: none; margin: 10px auto; width: 20px; height: 20px; border: 2px solid #fff; border-top-color: var(--accent); border-radius: 50%; animation: spin 0.6s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Projects Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body>
-    <div class="login-card">
-        <h2>ETERNA<span style="font-weight:400; color:#64748b;">CLOUD</span></h2>
-        <input type="email" id="email" placeholder="EMAIL" required>
-        <input type="password" id="password" placeholder="PASSWORD" required>
-        <button class="btn-main" onclick="signIn()">LOGIN</button>
-        <div id="errorMsg" class="error"></div>
-        <div id="spinner" class="spinner"></div>
-    </div>
+<body class="bg-[#1c1c1c] text-[#ededed] min-h-screen flex antialiased font-sans relative w-full overflow-x-hidden">
 
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 max-w-md hidden">
+    <div id="toast-card" class="border rounded-lg p-4 shadow-2xl flex gap-3 text-sm">
+      <span id="toast-icon">🚨</span>
+      <div class="flex flex-col gap-1">
+        <div id="toast-title" class="font-semibold text-zinc-200 font-mono text-xs">Title</div>
+        <div id="toast-msg" class="text-zinc-400 font-mono text-[11px] leading-relaxed">Message detail...</div>
+      </div>
+      <button onclick="hideToast()" class="text-zinc-500 hover:text-zinc-300 ml-auto text-xs font-bold cursor-pointer px-1">✕</button>
+    </div>
+  </div>
+
+  <nav id="sidebar" class="fixed inset-y-0 left-0 w-14 bg-[#141414] border-r border-[#242424] flex flex-col items-center py-3 justify-between z-40 -translate-x-full md:translate-x-0 transition-transform duration-200 shrink-0">
+    <div class="flex flex-col items-center gap-5 w-full">
+      <div class="w-7 h-7 bg-[#242424] rounded-md flex items-center justify-center text-emerald-500 font-bold text-sm border border-[#2e2e2e]">⚡</div>
+      <div class="w-full h-[1px] bg-[#242424] px-2"></div>
+      <button class="w-9 h-9 rounded-md flex items-center justify-center text-emerald-400 bg-[#242424] border border-[#2e2e2e] text-base cursor-pointer">📁</button>
+    </div>
+    <div class="w-7 h-7 bg-zinc-800 rounded-full flex items-center justify-center text-[10px] font-bold text-zinc-300 border border-[#2e2e2e]">RJ</div>
+  </nav>
+
+  <div class="flex-1 flex flex-col min-w-0 md:ml-14">
+    <header class="h-12 bg-[#141414] border-b border-[#242424] px-4 md:px-6 flex items-center justify-between text-xs font-medium text-zinc-400 shrink-0">
+      <div class="flex items-center gap-2">
+        <button onclick="toggleMobileMenu()" class="md:hidden p-1.5 rounded-md hover:bg-zinc-800 text-zinc-300 mr-1 cursor-pointer">☰</button>
+        <span>⚡ HoU</span>
+        <span>/</span>
+        <span class="text-zinc-200 font-semibold">Projects</span>
+      </div>
+    </header>
+
+    <main class="flex-1 p-6 md:p-10 overflow-y-auto">
+      <div class="max-w-6xl mx-auto flex flex-col gap-6 md:gap-8">
+        <h1 class="text-xl md:text-2xl font-semibold tracking-tight text-white">Projects</h1>
+
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 flex-1 max-w-3xl">
+            <input 
+              type="text" 
+              id="search-input"
+              placeholder="Search for a project" 
+              oninput="fetchItems()"
+              class="bg-[#141414] border border-[#242424] text-xs rounded-md px-3 py-1.5 w-full sm:w-64 text-zinc-200 focus:outline-none focus:border-emerald-500 placeholder-zinc-600"
+            />
+            
+            <div class="grid grid-cols-2 gap-2 sm:flex sm:items-center">
+              <select id="venue-filter" onchange="fetchItems()" class="bg-[#141414] border border-[#242424] text-xs rounded-md px-3 py-1.5 text-zinc-300 focus:outline-none focus:border-emerald-500 cursor-pointer w-full">
+                <option value="">All Venues</option>
+                <option value="RJ Bistro Dusit Hotel">RJ Bistro Dusit Hotel</option>
+                <option value="Mandarin Hotel">Mandarin Hotel</option>
+                <option value="One Shangri-La">One Shangri-La</option>
+              </select>
+
+              <select id="media-filter" onchange="fetchItems()" class="bg-[#141414] border border-[#242424] text-xs rounded-md px-3 py-1.5 text-zinc-300 focus:outline-none focus:border-emerald-500 cursor-pointer w-full">
+                <option value="">All Formats</option>
+                <option value="video">📺 Video Tracks</option>
+                <option value="audio">🎵 Audio Recordings</option>
+              </select>
+            </div>
+          </div>
+
+          <button onclick="handleAddRecord()" class="bg-[#3ecf8e] hover:bg-[#34b279] text-[#121212] font-semibold text-xs px-3 py-1.5 rounded-md flex items-center gap-1 transition-colors whitespace-nowrap self-start lg:self-auto cursor-pointer">
+            <span class="text-sm font-bold">+</span> Add Record
+          </button>
+        </div>
+
+        <div id="grid-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Database access initialization vectors
+    const SUPABASE_URL = "https://lmggzgvvtzeuukcuxlma.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_qKRhgtfA3v0euD5-XsDs3g_6ZcAas5Phere";
     
-    </script>
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    let mobileMenuOpen = false;
+
+    // Toast alert handlers
+    function showToast(title, msg, isError = true) {
+      const container = document.getElementById('toast-container');
+      const card = document.getElementById('toast-card');
+      document.getElementById('toast-icon').innerText = isError ? '🚨' : '⚡';
+      document.getElementById('toast-title').innerText = title;
+      document.getElementById('toast-msg').innerText = msg;
+
+      if (isError) {
+        card.className = "bg-[#181111] border-[#f87171]/30 border rounded-lg p-4 shadow-2xl flex gap-3 text-sm";
+      } else {
+        card.className = "bg-[#111813] border-[#3ecf8e]/30 border rounded-lg p-4 shadow-2xl flex gap-3 text-sm";
+      }
+      container.classList.remove('hidden');
+    }
+
+    function hideToast() {
+      document.getElementById('toast-container').classList.add('hidden');
+    }
+
+    function toggleMobileMenu() {
+      mobileMenuOpen = !mobileMenuOpen;
+      const sidebar = document.getElementById('sidebar');
+      if (mobileMenuOpen) {
+        sidebar.classList.remove('-translate-x-full');
+      } else {
+        sidebar.classList.add('-translate-x-full');
+      }
+    }
+
+    // Dynamic database querying engine
+    async function fetchItems() {
+      const grid = document.getElementById('grid-container');
+      grid.innerHTML = `
+        <div class="col-span-full border border-dashed border-[#2e2e2e] rounded-lg p-12 bg-[#141414] text-center text-xs text-zinc-500 font-mono animate-pulse">
+          Querying archive metadata server vectors...
+        </div>
+      `;
+
+      try {
+        const searchVal = document.getElementById('search-input').value.trim();
+        const venueVal = document.getElementById('venue-filter').value;
+        const mediaVal = document.getElementById('media-filter').value;
+
+        let query = supabase.from('archive_items').select('*');
+
+        if (searchVal) {
+          query = query.ilike('title', `%${searchVal}%`);
+        }
+        if (venueVal) {
+          query = query.eq('venue', venueVal);
+        }
+        if (mediaVal) {
+          query = query.eq('media_type', mediaVal);
+        }
+
+        const { data, error } = await query.order('created_at', { ascending: false });
+
+        if (error) {
+          showToast(`Database Error [${error.code || 'PGRST'}]`, error.message);
+          grid.innerHTML = `
+            <div class="col-span-full border border-dashed border-[#f87171]/20 rounded-lg p-12 bg-[#181111] text-center text-xs font-mono text-red-400">
+              Failed to pull records. Check table layout definitions.
+            </div>
+          `;
+          return;
+        }
+
+        if (!data || data.length === 0) {
+          grid.innerHTML = `
+            <div class="col-span-full border border-dashed border-[#2e2e2e] rounded-lg p-12 bg-[#141414] text-center text-xs font-mono text-zinc-500">
+              No matching archive segments found.
+            </div>
+          `;
+          return;
+        }
+
+        // Generating asset row displays
+        grid.innerHTML = data.map(item => `
+          <div class="bg-[#141414] border border-[#242424] hover:border-[#2e2e2e] rounded-lg p-5 flex flex-col justify-between h-40 transition-all group cursor-pointer">
+            <div class="min-w-0">
+              <div class="flex items-start justify-between gap-4 w-full">
+                <h3 class="font-semibold text-white text-sm md:text-base group-hover:text-[#3ecf8e] transition-colors truncate max-w-[85%] font-mono">${item.title}</h3>
+                <span class="text-zinc-600 text-sm">${item.media_type === 'video' ? '📺' : '🎵'}</span>
+              </div>
+              <p class="text-xs text-zinc-500 font-medium mt-1 truncate font-mono">
+                ${item.venue || 'Unknown Location'} &nbsp;|&nbsp; ${item.original_broadcast_date || 'Undated'}
+              </p>
+            </div>
+            <div class="flex items-center justify-between mt-4">
+              <span class="bg-zinc-800 text-[10px] text-zinc-400 border border-[#2e2e2e] font-mono uppercase font-bold tracking-wider px-1.5 py-0.5 rounded">${item.media_type}</span>
+              <span class="text-[11px] text-zinc-600 font-mono group-hover:text-zinc-400">id: ${item.id.substring(0, 8)}...</span>
+            </div>
+          </div>
+        `).join('');
+
+      } catch (err) {
+        showToast("System Crash", err.message || "Failed to initialize request loop vectors.");
+      }
+    }
+
+    // Handle database record insertions
+    async function handleAddRecord() {
+      const userTitle = prompt("Enter asset title:");
+      if (!userTitle) return;
+
+      const userVenue = prompt("Enter venue (e.g., RJ Bistro Dusit Hotel, Mandarin Hotel, One Shangri-La):", "RJ Bistro Dusit Hotel");
+      const userType = prompt("Enter media format ('video' or 'audio'):", "video");
+      const userDate = prompt("Enter recorded tracking date (MM-DD-YY):", "05-31-26");
+      const filePath = prompt("Enter target file system storage path:", `archives/${userType}/${Date.now()}.mp4`);
+
+      if (!filePath) {
+        showToast("Constraint Violation", 'The "storage_file_path" string field cannot be blank.');
+        return;
+      }
+
+      const { error } = await supabase
+        .from('archive_items')
+        .insert([
+          { 
+            title: userTitle, 
+            creator: "RJ",
+            media_type: userType === "audio" ? "audio" : "video",
+            venue: userVenue,
+            original_broadcast_date: userDate,
+            storage_file_path: filePath
+          }
+        ]);
+
+      if (error) {
+        showToast(`Insertion Failed: ERROR ${error.code}`, error.message);
+      } else {
+        showToast("Success", "Asset descriptor successfully written to active tables.", false);
+        fetchItems();
+      }
+    }
+
+    // Initial sequence startup call
+    window.addEventListener('DOMContentLoaded', fetchItems);
+  </script>
 </body>
 </html>
