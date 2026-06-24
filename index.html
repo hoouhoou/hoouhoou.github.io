@@ -191,7 +191,8 @@
     // ==================== SUPABASE (HARDCODED) ====================
     const SUPABASE_URL = "https://zbqsrfurmoowilpyxrfo.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpicXNyZnVybW9vd2lscHl4cmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyODU3NjcsImV4cCI6MjA5Nzg2MTc2N30.Q58fAB5-KliFKo7v0g3e48I6ttgnYzyOom1FVsUOrFM";
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // Use a unique variable name to avoid redeclaration
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // ==================== DOM REFS ====================
     const searchInput = document.getElementById('search-input');
@@ -275,7 +276,7 @@
 
     // ==================== LOAD BOOKS ====================
     async function loadBooks(query = '', category = '') {
-      let supabaseQuery = supabase.from('books').select('*', { count: 'exact' });
+      let supabaseQuery = supabaseClient.from('books').select('*', { count: 'exact' });
       if (query.trim()) {
         supabaseQuery = supabaseQuery.textSearch('search_vector', query, { config: 'english', type: 'websearch' });
       }
@@ -324,7 +325,7 @@
 
     // ==================== CATEGORIES ====================
     async function loadCategories() {
-      const { data, error } = await supabase.from('books').select('category');
+      const { data, error } = await supabaseClient.from('books').select('category');
       if (error || !data) return;
       const cats = [...new Set(data.map(b => b.category).filter(Boolean))].sort();
       renderCategories(cats);
@@ -360,17 +361,17 @@
       adminMsg.textContent = '';
     }
 
-    supabase.auth.onAuthStateChange((event, session) => {
+    supabaseClient.auth.onAuthStateChange((event, session) => {
       updateAdminUI(session?.user || null);
     });
-    supabase.auth.getSession().then(({ data }) => {
+    supabaseClient.auth.getSession().then(({ data }) => {
       updateAdminUI(data.session?.user || null);
     });
 
     adminLoginBtn.addEventListener('click', async () => {
       const email = adminEmail.value.trim();
       const pass = adminPass.value;
-      const { error } = await supabase.auth.signInWithPassword({ email, password: pass });
+      const { error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
       if (error) {
         adminMsg.textContent = '❌ ' + error.message;
         adminMsg.className = 'text-red-400 text-xs';
@@ -381,12 +382,12 @@
     });
 
     logoutBtn.addEventListener('click', () => {
-      supabase.auth.signOut();
+      supabaseClient.auth.signOut();
     });
 
     // ==================== UPLOAD BOOK ====================
     uploadBtn.addEventListener('click', async () => {
-      const user = (await supabase.auth.getUser()).data.user;
+      const user = (await supabaseClient.auth.getUser()).data.user;
       if (!user) {
         adminMsg.textContent = '❌ Please login first.';
         adminMsg.className = 'text-red-400 text-xs';
@@ -410,7 +411,7 @@
         mirror_urls: mirror_urls.length ? mirror_urls : null,
         description: document.getElementById('book-desc').value.trim() || null,
       };
-      const { error } = await supabase.from('books').insert(payload);
+      const { error } = await supabaseClient.from('books').insert(payload);
       if (error) {
         adminMsg.textContent = '❌ ' + error.message;
         adminMsg.className = 'text-red-400 text-xs';
