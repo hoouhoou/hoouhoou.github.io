@@ -1,712 +1,251 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full bg-[#121212]">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Supabase Dashboard Clone</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-    }
-
-    body {
-      display: flex;
-      min-height: 100vh;
-      background: #f1f5f9;
-    }
-
-    /* ===== SIDEBAR ===== */
-    .sidebar {
-      width: 260px;
-      background: #0b0e11;
-      color: #d1d5db;
-      padding: 1.5rem 1rem;
-      display: flex;
-      flex-direction: column;
-      flex-shrink: 0;
-      height: 100vh;
-      position: sticky;
-      top: 0;
-      overflow-y: auto;
-    }
-
-    .sidebar .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 2rem;
-      padding: 0 0.5rem;
-    }
-    .sidebar .logo svg {
-      width: 28px;
-      height: 28px;
-    }
-    .sidebar .logo span {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: white;
-    }
-    .sidebar .logo .badge {
-      background: #1e293b;
-      color: #94a3b8;
-      font-size: 0.55rem;
-      font-weight: 600;
-      padding: 2px 8px;
-      border-radius: 40px;
-      text-transform: uppercase;
-      letter-spacing: 0.3px;
-    }
-
-    .sidebar .section-label {
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: #6b7280;
-      padding: 0 0.5rem;
-      margin: 1.5rem 0 0.5rem;
-    }
-    .sidebar .section-label:first-of-type {
-      margin-top: 0;
-    }
-
-    .sidebar .nav-item {
-      padding: 7px 12px;
-      border-radius: 6px;
-      cursor: default;
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: #d1d5db;
-      transition: 0.1s;
-    }
-    .sidebar .nav-item:hover {
-      background: #1e293b;
-      color: white;
-    }
-    .sidebar .nav-item .icon {
-      font-size: 1rem;
-      width: 20px;
-      text-align: center;
-      opacity: 0.6;
-    }
-    .sidebar .nav-item.active {
-      background: #1e293b;
-      color: white;
-      font-weight: 500;
-    }
-    .sidebar .nav-item.active .icon {
-      opacity: 1;
-    }
-
-    .sidebar .spacer {
-      flex: 1;
-    }
-
-    .sidebar .footer-item {
-      padding: 7px 12px;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      color: #6b7280;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 0.5rem;
-      cursor: default;
-    }
-    .sidebar .footer-item:hover {
-      background: #1e293b;
-      color: #d1d5db;
-    }
-
-    /* ===== MAIN WRAPPER ===== */
-    .main-wrapper {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      max-width: calc(100% - 260px);
-    }
-
-    /* ===== TOP BAR ===== */
-    .topbar {
-      background: #0b0e11;
-      padding: 0.6rem 2rem;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      border-bottom: 1px solid #1e293b;
-      flex-shrink: 0;
-      flex-wrap: wrap;
-    }
-    .topbar .left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .topbar .left .hou {
-      font-weight: 700;
-      font-size: 1.1rem;
-      color: white;
-      letter-spacing: -0.3px;
-    }
-    .topbar .left .free-badge {
-      background: #1e293b;
-      color: #22c55e;
-      font-size: 0.6rem;
-      font-weight: 700;
-      padding: 2px 10px;
-      border-radius: 40px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      border: 1px solid #22c55e33;
-    }
-    .topbar .left .project-selector {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: #1e293b;
-      padding: 4px 14px 4px 16px;
-      border-radius: 40px;
-      color: #d1d5db;
-      font-size: 0.85rem;
-      font-weight: 500;
-      cursor: default;
-    }
-    .topbar .left .project-selector .env {
-      background: #22c55e;
-      color: #0b0e11;
-      font-size: 0.55rem;
-      font-weight: 700;
-      padding: 1px 8px;
-      border-radius: 40px;
-      text-transform: uppercase;
-    }
-    .topbar .left .project-selector .arrow {
-      color: #6b7280;
-      font-size: 0.7rem;
-    }
-
-    .topbar .center {
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      min-width: 180px;
-    }
-    .topbar .center .search-wrap {
-      position: relative;
-      width: 100%;
-      max-width: 480px;
-    }
-    .topbar .center .search-wrap input {
-      width: 100%;
-      padding: 7px 18px 7px 38px;
-      border-radius: 40px;
-      border: 1px solid #2d3748;
-      background: #1a1f26;
-      color: #e2e8f0;
-      font-size: 0.9rem;
-      transition: 0.2s;
-    }
-    .topbar .center .search-wrap input::placeholder {
-      color: #6b7280;
-    }
-    .topbar .center .search-wrap input:focus {
-      outline: none;
-      border-color: #22c55e;
-      background: #0f141a;
-    }
-    .topbar .center .search-wrap .search-icon {
-      position: absolute;
-      left: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #6b7280;
-      font-size: 0.9rem;
-    }
-    .topbar .center .search-wrap .kbd-hint {
-      position: absolute;
-      right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #6b7280;
-      font-size: 0.65rem;
-      background: #1e293b;
-      padding: 1px 8px;
-      border-radius: 4px;
-      font-family: monospace;
-      border: 1px solid #2d3748;
-    }
-
-    .topbar .right {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .topbar .right .ai-btn {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: transparent;
-      border: none;
-      color: #d1d5db;
-      font-size: 0.85rem;
-      font-weight: 500;
-      padding: 6px 14px;
-      border-radius: 40px;
-      cursor: default;
-      transition: 0.15s;
-    }
-    .topbar .right .ai-btn:hover {
-      background: #1e293b;
-    }
-    .topbar .right .ai-btn .ai-icon {
-      font-size: 1.1rem;
-    }
-    .topbar .right .ai-btn .deepseek-label {
-      color: #6b7280;
-      font-weight: 400;
-      font-size: 0.7rem;
-      background: #1e293b;
-      padding: 1px 8px;
-      border-radius: 40px;
-    }
-    .topbar .right .avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: #1e293b;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #d1d5db;
-      font-weight: 600;
-      font-size: 0.8rem;
-      cursor: default;
-      border: 2px solid transparent;
-      transition: 0.15s;
-    }
-    .topbar .right .avatar:hover {
-      border-color: #22c55e;
-    }
-    .topbar .right .settings-icon {
-      color: #6b7280;
-      font-size: 1.2rem;
-      cursor: default;
-      padding: 4px;
-      border-radius: 40px;
-      transition: 0.15s;
-    }
-    .topbar .right .settings-icon:hover {
-      color: #d1d5db;
-      background: #1e293b;
-    }
-
-    /* ===== MAIN CONTENT ===== */
-    .main-content {
-      padding: 2rem 2.5rem;
-      flex: 1;
-      overflow-y: auto;
-    }
-
-    .main-content .page-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 2rem;
-    }
-    .main-content .page-header h1 {
-      font-size: 1.5rem;
-      font-weight: 600;
-      color: #0f172a;
-    }
-    .main-content .page-header .copy-section {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 0.95rem;
-      color: #475569;
-    }
-    .main-content .page-header .copy-section .project-name {
-      background: white;
-      padding: 6px 16px;
-      border-radius: 40px;
-      border: 1px solid #e2e8f0;
-      font-weight: 500;
-      color: #0f172a;
-      font-size: 0.9rem;
-    }
-    .main-content .page-header .copy-section .copy-btn {
-      background: white;
-      border: 1px solid #e2e8f0;
-      border-radius: 40px;
-      padding: 6px 16px;
-      font-size: 0.8rem;
-      color: #475569;
-      cursor: default;
-      font-weight: 500;
-      transition: 0.1s;
-    }
-    .main-content .page-header .copy-section .copy-btn:hover {
-      background: #f1f5f9;
-    }
-
-    .overview-card {
-      background: white;
-      border-radius: 12px;
-      padding: 1.5rem 2rem;
-      border: 1px solid #e2e8f0;
-      margin-bottom: 1.5rem;
-    }
-    .overview-card .card-title {
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: #64748b;
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-      margin-bottom: 1rem;
-    }
-    .overview-card .region-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 1.25rem;
-      flex-wrap: wrap;
-    }
-    .overview-card .region-row .region-icon {
-      font-size: 1.2rem;
-    }
-    .overview-card .region-row .region-name {
-      font-weight: 600;
-      color: #0f172a;
-      font-size: 1.05rem;
-    }
-    .overview-card .region-row .region-detail {
-      color: #64748b;
-      font-size: 0.9rem;
-    }
-    .overview-card .region-row .compute-badge {
-      background: #f1f5f9;
-      padding: 2px 14px;
-      border-radius: 40px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: #475569;
-      font-family: monospace;
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr 1fr;
-      gap: 1.5rem;
-      margin-top: 0.5rem;
-    }
-    .stat-item {
-      display: flex;
-      flex-direction: column;
-    }
-    .stat-item .stat-label {
-      font-size: 0.75rem;
-      color: #94a3b8;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.3px;
-    }
-    .stat-item .stat-value {
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: #0f172a;
-      margin-top: 2px;
-    }
-    .stat-item .stat-value .sub {
-      font-weight: 400;
-      color: #64748b;
-      font-size: 0.9rem;
-    }
-    .stat-item .stat-bar {
-      width: 100%;
-      height: 4px;
-      background: #e2e8f0;
-      border-radius: 40px;
-      margin-top: 6px;
-      overflow: hidden;
-    }
-    .stat-item .stat-bar .fill {
-      height: 100%;
-      border-radius: 40px;
-      background: #22c55e;
-    }
-    .stat-item .stat-bar .fill.warning {
-      background: #f59e0b;
-    }
-
-    .info-rows {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 1.5rem;
-      margin-top: 0.5rem;
-    }
-    .info-row-item {
-      display: flex;
-      flex-direction: column;
-      padding: 0.5rem 0;
-    }
-    .info-row-item .label {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-      color: #94a3b8;
-      font-weight: 600;
-    }
-    .info-row-item .value {
-      font-size: 0.95rem;
-      color: #0f172a;
-      font-weight: 500;
-      margin-top: 2px;
-    }
-    .info-row-item .value .muted {
-      color: #94a3b8;
-      font-weight: 400;
-    }
-
-    .divider {
-      border: none;
-      border-top: 1px solid #f1f5f9;
-      margin: 1rem 0;
-    }
-
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 900px) {
-      .stats-grid {
-        grid-template-columns: 1fr 1fr;
-      }
-      .info-rows {
-        grid-template-columns: 1fr;
-      }
-      .topbar {
-        padding: 0.6rem 1rem;
-        gap: 10px;
-      }
-      .topbar .center {
-        order: 10;
-        flex-basis: 100%;
-      }
-      .topbar .center .search-wrap {
-        max-width: 100%;
-      }
-    }
-    @media (max-width: 768px) {
-      body {
-        flex-direction: column;
-      }
-      .sidebar {
-        width: 100%;
-        height: auto;
-        position: static;
-        flex-direction: row;
-        flex-wrap: wrap;
-        padding: 1rem;
-        gap: 4px;
-      }
-      .sidebar .logo {
-        margin-bottom: 0;
-        width: 100%;
-      }
-      .sidebar .section-label {
-        display: none;
-      }
-      .sidebar .nav-item {
-        padding: 5px 10px;
-        font-size: 0.8rem;
-      }
-      .sidebar .spacer {
-        display: none;
-      }
-      .sidebar .footer-item {
-        display: none;
-      }
-      .main-wrapper {
-        max-width: 100%;
-      }
-      .main-content {
-        padding: 1rem;
-      }
-      .main-content .page-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-      }
-      .main-content .page-header .copy-section {
-        flex-wrap: wrap;
-      }
-      .stats-grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 1rem;
-      }
-      .topbar .left .project-selector .env {
-        display: none;
-      }
-    }
-    @media (max-width: 480px) {
-      .stats-grid {
-        grid-template-columns: 1fr;
-      }
-      .overview-card {
-        padding: 1rem;
-      }
-      .overview-card .region-row {
-        flex-wrap: wrap;
-      }
-      .topbar .left .project-selector {
-        padding: 4px 10px;
-        font-size: 0.75rem;
-      }
-      .topbar .right .ai-btn .deepseek-label {
-        display: none;
-      }
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Settings</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
+<body class="h-full text-zinc-200 font-sans flex flex-col antialiased selection:bg-emerald-500/30 selection:text-emerald-400">
 
-  <!-- ===== SIDEBAR ===== -->
-  <aside class="sidebar">
-    <div class="logo">
-      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M13.5 2L3 14H12L10.5 22L21 10H12L13.5 2Z" fill="#22c55e" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      <span>Project Overview</span>
-      <span class="badge">NANO</span>
+  <!-- Top Navbar -->
+  <header class="h-12 bg-[#171717] border-b border-zinc-800 flex items-center justify-between px-4 shrink-0 text-xs z-20">
+    <div class="flex items-center space-x-3">
+      <!-- Logo -->
+      <div class="text-emerald-500 text-lg font-bold mr-1">
+        <i class="fa-solid fa-bolt-lightning"></i>
+      </div>
+      
+      <!-- Organization Selector -->
+      <div class="flex items-center space-x-1.5 cursor-pointer hover:text-white transition">
+        <span class="w-4 h-4 rounded bg-zinc-700 flex items-center justify-center text-[10px] text-zinc-300">Ho</span>
+        <span class="font-medium">HoU</span>
+        <span class="text-[10px] px-1 bg-zinc-800 text-zinc-400 border border-zinc-700 rounded font-semibold uppercase tracking-wider">Free</span>
+        <i class="fa-solid fa-code-compare text-[10px] text-zinc-500 rotate-90 ml-0.5"></i>
+      </div>
+      
+      <span class="text-zinc-700">/</span>
+      
+      <!-- Project Selector -->
+      <div class="flex items-center space-x-1.5 cursor-pointer hover:text-white transition">
+        <i class="fa-solid fa-cube text-zinc-400"></i>
+        <span class="font-medium">le fou</span>
+        <i class="fa-solid fa-code-compare text-[10px] text-zinc-500 rotate-90 ml-0.5"></i>
+      </div>
+      
+      <span class="text-zinc-700">/</span>
+      
+      <!-- Branch Selector -->
+      <div class="flex items-center space-x-1.5 cursor-pointer hover:text-white transition">
+        <span class="font-medium">main</span>
+        <span class="text-[10px] px-1.5 py-0.5 bg-amber-500/10 text-amber-500 border border-amber-500/20 rounded font-semibold uppercase tracking-wider scale-95">Production</span>
+        <i class="fa-solid fa-code-compare text-[10px] text-zinc-500 rotate-90 ml-0.5"></i>
+      </div>
+
+      <!-- Connect Button -->
+      <button class="ml-4 bg-[#0d2d24] text-emerald-400 border border-emerald-900/50 hover:border-emerald-700 px-2.5 py-1 rounded-md font-medium flex items-center space-x-1.5 transition">
+        <i class="fa-solid fa-plug text-[10px]"></i>
+        <span>Connect</span>
+      </button>
     </div>
 
-    <div class="section-label">Project Overview</div>
-    <div class="nav-item active"><span class="icon">📊</span> Table Editor</div>
-    <div class="nav-item"><span class="icon">📝</span> SQL Editor</div>
-    <div class="nav-item"><span class="icon">🗄️</span> Database</div>
-    <div class="nav-item"><span class="icon">🔐</span> Authentication</div>
-    <div class="nav-item"><span class="icon">📦</span> Storage</div>
-    <div class="nav-item"><span class="icon">⚡</span> Edge Functions</div>
-    <div class="nav-item"><span class="icon">🔄</span> Realtime</div>
-
-    <div class="section-label">Advisors</div>
-    <div class="nav-item"><span class="icon">👁️</span> Observability</div>
-    <div class="nav-item"><span class="icon">📋</span> Logs</div>
-    <div class="nav-item"><span class="icon">🔌</span> Integrations</div>
-
-    <div class="section-label">Project Settings</div>
-    <div class="nav-item"><span class="icon">⚙️</span> Settings</div>
-
-    <div class="spacer"></div>
-
-    <div class="footer-item"><span class="icon">💬</span> Feedback</div>
-    <div class="footer-item"><span class="icon">❓</span> Help</div>
-  </aside>
-
-  <!-- ===== MAIN WRAPPER ===== -->
-  <div class="main-wrapper">
-
-    <!-- ===== TOP BAR ===== -->
-    <header class="topbar">
-      <!-- Left: logo + project -->
-      <div class="left">
-        <span class="hou">HoU</span>
-        <span class="free-badge">FREE</span>
-        <div class="project-selector">
-          <span>le fou</span>
-          <span class="env">main</span>
-          <span class="env" style="background:#22c55e;color:#0b0e11;font-weight:700;">PRODUCTION</span>
-          <span class="arrow">▾</span>
+    <!-- Right Controls -->
+    <div class="flex items-center space-x-4 text-zinc-400">
+      <span class="hover:text-white cursor-pointer transition">Feedback</span>
+      
+      <!-- Search Bar Simulation -->
+      <div class="bg-[#1e1e1e] border border-zinc-800 rounded-md px-2.5 py-1 flex items-center justify-between w-44 cursor-pointer hover:border-zinc-700 transition">
+        <div class="flex items-center space-x-1.5 text-zinc-500">
+          <i class="fa-solid fa-magnifying-glass text-[10px]"></i>
+          <span>Search...</span>
         </div>
+        <span class="text-[10px] bg-zinc-800 px-1 rounded text-zinc-500">Ctrl K</span>
       </div>
 
-      <!-- Center: Search -->
-      <div class="center">
-        <div class="search-wrap">
-          <span class="search-icon">🔍</span>
-          <input type="text" placeholder="Search for a project, table, or documentation..." />
-          <span class="kbd-hint">⌘ K</span>
-        </div>
+      <!-- Icons -->
+      <div class="flex items-center space-x-3 text-sm">
+        <i class="fa-regular fa-circle-question hover:text-white cursor-pointer transition"></i>
+        <i class="fa-regular fa-lightbulb hover:text-white cursor-pointer transition"></i>
+        <i class="fa-regular fa-bell hover:text-white cursor-pointer transition"></i>
       </div>
 
-      <!-- Right: AI Assistant + Account -->
-      <div class="right">
-        <button class="ai-btn" title="DeepSeek AI Assistant">
-          <span class="ai-icon">🧠</span>
-          <span>AI</span>
-          <span class="deepseek-label">DeepSeek</span>
+      <!-- User Avatar -->
+      <div class="w-6 h-6 rounded-full bg-emerald-700 border border-emerald-600 flex items-center justify-center text-white text-[10px] font-bold overflow-hidden cursor-pointer">
+        <div class="grid grid-cols-2 w-full h-full opacity-80">
+          <div class="bg-zinc-800"></div><div class="bg-emerald-600"></div>
+          <div class="bg-emerald-500"></div><div class="bg-zinc-700"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Shell Body -->
+  <div class="flex flex-1 overflow-hidden">
+    
+    <!-- Left Icon Sidebar (Global) -->
+    <aside class="w-12 bg-[#171717] border-r border-zinc-800 flex flex-col justify-between py-2 items-center shrink-0">
+      <div class="w-full flex flex-col items-center space-y-1">
+        <a href="#" class="w-8 h-8 rounded-md flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-800 transition"><i class="fa-solid fa-house-chimney text-xs"></i></a>
+        <a href="#" class="w-8 h-8 rounded-md flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-800 transition"><i class="fa-solid fa-table text-xs"></i></a>
+        <a href="#" class="w-8 h-8 rounded-md flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-800 transition"><i class="fa-solid fa-terminal text-xs"></i></a>
+        <div class="w-6 border-b border-zinc-800/60 my-1"></div>
+        <a href="#" class="w-8 h-8 rounded-md flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-800 transition"><i class="fa-solid fa-database text-xs"></i></a>
+        <a href="#" class="w-8 h-8 rounded-md flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-800 transition"><i class="fa-solid fa-user-shield text-xs"></i></a>
+        <a href="#" class="w-8 h-8 rounded-md flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-800 transition"><i class="fa-solid fa-folder text-xs"></i></a>
+        <a href="#" class="w-8 h-8 rounded-md flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-800 transition"><i class="fa-solid fa-circle-nodes text-xs"></i></a>
+        <a href="#" class="w-8 h-8 rounded-md flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-800 transition"><i class="fa-solid fa-chart-line text-xs"></i></a>
+      </div>
+      <div class="w-full flex flex-col items-center space-y-1">
+        <a href="#" class="w-8 h-8 rounded-md flex items-center justify-center text-emerald-400 bg-zinc-800/80 border border-zinc-700/50"><i class="fa-solid fa-gear text-xs"></i></a>
+        <a href="#" class="w-8 h-8 rounded-md flex items-center justify-center text-zinc-500 hover:text-white transition"><i class="fa-solid fa-bars-staggered text-xs"></i></a>
+      </div>
+    </aside>
+
+    <!-- Context/Sub Sidebar (Settings Layout) -->
+    <aside class="w-48 bg-[#141414] border-r border-zinc-800/60 flex flex-col p-3 shrink-0 text-xs">
+      <div class="font-semibold text-zinc-200 mb-4 px-2 text-sm tracking-wide">Settings</div>
+      
+      <div class="space-y-4 overflow-y-auto flex-1 pr-1">
+        <!-- Section: Configuration -->
+        <div>
+          <div class="text-[10px] font-bold text-zinc-500 tracking-wider uppercase px-2 mb-1.5">Configuration</div>
+          <nav class="space-y-0.5">
+            <a href="#" class="block px-2 py-1.5 rounded bg-zinc-800 text-white font-medium">General</a>
+            <a href="#" class="block px-2 py-1.5 rounded text-zinc-400 hover:text-zinc-200 transition">Compute and Disk</a>
+            <a href="#" class="block px-2 py-1.5 rounded text-zinc-400 hover:text-zinc-200 transition">Infrastructure</a>
+            <a href="#" class="block px-2 py-1.5 rounded text-zinc-400 hover:text-zinc-200 transition">Integrations</a>
+            <a href="#" class="block px-2 py-1.5 rounded text-zinc-400 hover:text-zinc-200 transition">API Keys</a>
+            <a href="#" class="block px-2 py-1.5 rounded text-zinc-400 hover:text-zinc-200 transition">JWT Keys</a>
+            <a href="#" class="block px-2 py-1.5 rounded text-zinc-400 hover:text-zinc-200 transition">Log Drains</a>
+            <a href="#" class="block px-2 py-1.5 rounded text-zinc-400 hover:text-zinc-200 transition">Add-ons</a>
+          </nav>
+        </div>
+
+        <!-- Section: Integrations -->
+        <div>
+          <div class="text-[10px] font-bold text-zinc-500 tracking-wider uppercase px-2 mb-1.5">Integrations</div>
+          <nav class="space-y-0.5">
+            <a href="#" class="flex items-center justify-between px-2 py-1.5 rounded text-zinc-400 hover:text-zinc-200 transition">
+              <span>Data API</span><i class="fa-solid fa-arrow-up-right-from-square text-[9px] opacity-60"></i>
+            </a>
+            <a href="#" class="flex items-center justify-between px-2 py-1.5 rounded text-zinc-400 hover:text-zinc-200 transition">
+              <div class="flex items-center space-x-1.5">
+                <span>Vault</span>
+                <span class="text-[8px] bg-amber-500/10 text-amber-500 border border-amber-500/20 px-1 rounded font-bold uppercase tracking-tight scale-90">Beta</span>
+              </div>
+              <i class="fa-solid fa-arrow-up-right-from-square text-[9px] opacity-60"></i>
+            </a>
+          </nav>
+        </div>
+
+        <!-- Section: Billing -->
+        <div>
+          <div class="text-[10px] font-bold text-zinc-500 tracking-wider uppercase px-2 mb-1.5">Billing</div>
+          <nav class="space-y-0.5">
+            <a href="#" class="flex items-center justify-between px-2 py-1.5 rounded text-zinc-400 hover:text-zinc-200 transition">
+              <span>Subscription</span><i class="fa-solid fa-arrow-up-right-from-square text-[9px] opacity-60"></i>
+            </a>
+            <a href="#" class="flex items-center justify-between px-2 py-1.5 rounded text-zinc-400 hover:text-zinc-200 transition">
+              <span>Usage</span><i class="fa-solid fa-arrow-up-right-from-square text-[9px] opacity-60"></i>
+            </a>
+          </nav>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Content Workspace -->
+    <main class="flex-1 bg-[#121212] overflow-y-auto p-6 md:p-8 max-w-4xl">
+      
+      <!-- Sticky Save Banner Frame Simulation -->
+      <div class="flex justify-end mb-6">
+        <button class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-1.5 rounded font-medium shadow-sm transition">
+          Save changes
         </button>
-        <span class="settings-icon">⚙️</span>
-        <div class="avatar" title="Account settings">JD</div>
-      </div>
-    </header>
-
-    <!-- ===== MAIN CONTENT ===== -->
-    <main class="main-content">
-      <!-- Page Header -->
-      <div class="page-header">
-        <h1>Project Overview</h1>
-        <div class="copy-section">
-          <span class="project-name">100willypxrfo.supabase.co</span>
-          <span class="copy-btn">📋 Copy</span>
-        </div>
       </div>
 
-      <!-- Primary Database Card -->
-      <div class="overview-card">
-        <div class="card-title">Primary Database</div>
-
-        <div class="region-row">
-          <span class="region-icon">🌏</span>
-          <span class="region-name">Northeast Asia (Tokyo)</span>
-          <span class="region-detail">·</span>
-          <span class="compute-badge">ap-northeast-1 · t4g.nano</span>
-        </div>
-
-        <hr class="divider" />
-
-        <div class="stats-grid">
-          <div class="stat-item">
-            <span class="stat-label">CPU</span>
-            <span class="stat-value">0%</span>
-            <div class="stat-bar"><div class="fill" style="width:0%;"></div></div>
+      <!-- SECTION: Project Access -->
+      <section class="mb-10">
+        <h2 class="text-xl font-semibold text-white mb-4">Project access</h2>
+        
+        <div class="bg-[#171717] border border-zinc-800 rounded-lg overflow-hidden text-xs">
+          <!-- Card Header Description -->
+          <div class="p-4 border-b border-zinc-800/80 flex justify-between items-start">
+            <div>
+              <h3 class="font-medium text-sm text-zinc-200 mb-1">Organization-wide access</h3>
+              <p class="text-zinc-400">All 1 organization members can access this project.</p>
+            </div>
+            <button class="bg-[#242424] hover:bg-zinc-700 text-zinc-200 border border-zinc-700 px-3 py-1.5 rounded font-medium transition">
+              Manage members
+            </button>
           </div>
-          <div class="stat-item">
-            <span class="stat-label">Disk</span>
-            <span class="stat-value">13%</span>
-            <div class="stat-bar"><div class="fill" style="width:13%;"></div></div>
+          
+          <!-- Table Header -->
+          <div class="bg-[#1a1a1a]/40 px-4 py-2 text-[10px] uppercase font-bold tracking-wider text-zinc-500 flex justify-between">
+            <span class="w-2/3">Member</span>
+            <span class="w-1/3 text-left">Role</span>
           </div>
-          <div class="stat-item">
-            <span class="stat-label">RAM</span>
-            <span class="stat-value">48%</span>
-            <div class="stat-bar"><div class="fill warning" style="width:48%;"></div></div>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">Connections</span>
-            <span class="stat-value">6 <span class="sub">/ 60</span></span>
-            <div class="stat-bar"><div class="fill" style="width:10%;"></div></div>
+
+          <!-- Table Row -->
+          <div class="px-4 py-3 flex justify-between items-center bg-[#171717]">
+            <div class="w-2/3 flex items-center space-x-2">
+              <span class="text-zinc-300 font-medium">tanamorcarlos28@gmail.com</span>
+              <span class="text-[9px] bg-zinc-800 text-zinc-400 border border-zinc-700 px-1 py-0.5 rounded font-bold uppercase tracking-wide">You</span>
+            </div>
+            <div class="w-1/3 text-zinc-400">
+              Owner
+            </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      <!-- Bottom Info Rows -->
-      <div class="overview-card" style="margin-bottom:0;">
-        <div class="info-rows">
-          <div class="info-row-item">
-            <span class="label">Recent Branch</span>
-            <span class="value">No branches <span class="muted">—</span></span>
+      <!-- SECTION: Project Availability -->
+      <section class="mb-10">
+        <div class="mb-4">
+          <h2 class="text-xl font-semibold text-white mb-1">Project availability</h2>
+          <p class="text-xs text-zinc-400">Restart or pause your project when performing maintenance</p>
+        </div>
+
+        <div class="bg-[#171717] border border-zinc-800 rounded-lg divide-y divide-zinc-800/80 text-xs">
+          <!-- Option 1: Restart -->
+          <div class="p-4 flex justify-between items-center">
+            <div>
+              <h3 class="font-medium text-zinc-200 mb-1">Restart project</h3>
+              <p class="text-zinc-400">Your project will not be available for a few minutes.</p>
+            </div>
+            <div class="flex items-center">
+              <button class="bg-[#242424] hover:bg-zinc-700 text-zinc-200 border border-zinc-700 px-3 py-1.5 rounded-l font-medium transition border-r-0">
+                Restart project
+              </button>
+              <button class="bg-[#242424] hover:bg-zinc-700 text-zinc-400 border border-zinc-700 p-1.5 rounded-r font-medium transition">
+                <i class="fa-solid fa-chevron-down text-[10px] px-1"></i>
+              </button>
+            </div>
           </div>
-          <div class="info-row-item">
-            <span class="label">Migration</span>
-            <span class="value">Migrations <span class="muted">—</span></span>
-          </div>
-          <div class="info-row-item">
-            <span class="label">Last Backup</span>
-            <span class="value">No backups <span class="muted">—</span></span>
+
+          <!-- Option 2: Pause -->
+          <div class="p-4 flex justify-between items-center">
+            <div>
+              <h3 class="font-medium text-zinc-200 mb-1">Pause project</h3>
+              <p class="text-zinc-400">Your project will not be accessible while it is paused.</p>
+            </div>
+            <button class="bg-[#242424] hover:bg-zinc-700 text-zinc-200 border border-zinc-700 px-3 py-1.5 rounded font-medium transition flex items-center space-x-2">
+              <i class="fa-regular fa-circle-pause text-zinc-400 text-sm"></i>
+              <span>Pause project</span>
+            </button>
           </div>
         </div>
-      </div>
+      </section>
+
+      <!-- SECTION: Custom Domains -->
+      <section class="mb-10">
+        <h2 class="text-xl font-semibold text-white mb-1">Custom domains</h2>
+        <p class="text-xs text-zinc-400 mb-4">Present a branded experience to your users</p>
+        <div class="bg-[#171717] border border-zinc-800 rounded-lg p-6 text-center text-xs border-dashed border-zinc-700/60">
+          <p class="text-zinc-500">No custom domains configured.</p>
+        </div>
+      </section>
+
     </main>
   </div>
 
