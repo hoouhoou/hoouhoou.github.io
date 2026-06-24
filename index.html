@@ -224,6 +224,7 @@
               <input type="hidden" id="edit-file-id" value="" />
               <button id="upload-btn" class="btn-primary">➕ Add File</button>
               <button id="update-btn" class="btn-primary" style="display:none;">💾 Update File</button>
+              <button id="logout-btn" class="btn-danger">Logout</button>
               <div id="dropdown-upload-msg" class="msg"></div>
             </div>
           </div>
@@ -420,7 +421,6 @@
         dropdownTitle.textContent = 'Admin';
         switchTab('upload');
         if (showUpload) {
-          // reset form
           resetUploadForm();
         }
       } else {
@@ -437,12 +437,12 @@
       toggleDropdown(false);
     }
 
-    dropdownClose.addEventListener('click', closeDropdown);
+    if (dropdownClose) dropdownClose.addEventListener('click', closeDropdown);
 
     document.addEventListener('click', (e) => {
       if (isDropdownOpen) {
         const wrapper = document.querySelector('.connect-wrapper');
-        if (!wrapper.contains(e.target)) {
+        if (wrapper && !wrapper.contains(e.target)) {
           closeDropdown();
         }
       }
@@ -452,12 +452,14 @@
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.tab-row button').forEach(el => el.classList.remove('active'));
       if (tab === 'upload') {
-        tabUpload.classList.add('active');
-        document.querySelector('[data-tab="upload"]').classList.add('active');
+        if (tabUpload) tabUpload.classList.add('active');
+        const btn = document.querySelector('[data-tab="upload"]');
+        if (btn) btn.classList.add('active');
         resetUploadForm();
       } else if (tab === 'categories') {
-        tabCategories.classList.add('active');
-        document.querySelector('[data-tab="categories"]').classList.add('active');
+        if (tabCategories) tabCategories.classList.add('active');
+        const btn = document.querySelector('[data-tab="categories"]');
+        if (btn) btn.classList.add('active');
         loadCategoriesAdmin();
       }
     }
@@ -467,17 +469,16 @@
     });
 
     function resetUploadForm() {
-      fileTitle.value = '';
-      fileAuthor.value = '';
-      fileFormat.value = '';
-      fileSize.value = '';
-      fileUrls.value = '';
-      fileDesc.value = '';
-      editFileId.value = '';
-      uploadBtn.style.display = 'block';
-      updateBtn.style.display = 'none';
-      dropdownUploadMsg.textContent = '';
-      // Keep category selected
+      if (fileTitle) fileTitle.value = '';
+      if (fileAuthor) fileAuthor.value = '';
+      if (fileFormat) fileFormat.value = '';
+      if (fileSize) fileSize.value = '';
+      if (fileUrls) fileUrls.value = '';
+      if (fileDesc) fileDesc.value = '';
+      if (editFileId) editFileId.value = '';
+      if (uploadBtn) uploadBtn.style.display = 'block';
+      if (updateBtn) updateBtn.style.display = 'none';
+      if (dropdownUploadMsg) dropdownUploadMsg.textContent = '';
     }
 
     // ==================== SIDEBAR ====================
@@ -486,16 +487,18 @@
     const toggleIcon = document.getElementById('toggle-icon');
     let isCollapsed = true;
     
-    toggleBtn.addEventListener('click', () => {
-      isCollapsed = !isCollapsed;
-      navShell.style.width = isCollapsed ? '56px' : '240px';
-      const subSidebar = document.getElementById('sub-sidebar');
-      if (isCollapsed) {
-        subSidebar.classList.add('hidden');
-      } else {
-        subSidebar.classList.remove('hidden');
-      }
-    });
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', () => {
+        isCollapsed = !isCollapsed;
+        navShell.style.width = isCollapsed ? '56px' : '240px';
+        const subSidebar = document.getElementById('sub-sidebar');
+        if (isCollapsed) {
+          subSidebar.classList.add('hidden');
+        } else {
+          subSidebar.classList.remove('hidden');
+        }
+      });
+    }
 
     function switchView(view) {
       const overview = document.getElementById('menu-overview');
@@ -507,37 +510,37 @@
       icons.forEach(btn => btn.classList.remove('text-emerald-400', 'bg-zinc-800/80', 'border', 'border-zinc-700/40'));
       icons.forEach(btn => btn.classList.add('text-zinc-400', 'hover:text-zinc-200', 'hover:bg-zinc-800/40'));
 
-      overview.classList.add('hidden');
-      categories.classList.add('hidden');
-      settings.classList.add('hidden');
+      if (overview) overview.classList.add('hidden');
+      if (categories) categories.classList.add('hidden');
+      if (settings) settings.classList.add('hidden');
 
       if (view === 'overview') {
-        overview.classList.remove('hidden');
-        icons[0].classList.add('text-emerald-400', 'bg-zinc-800/80', 'border', 'border-zinc-700/40');
+        if (overview) overview.classList.remove('hidden');
+        if (icons[0]) icons[0].classList.add('text-emerald-400', 'bg-zinc-800/80', 'border', 'border-zinc-700/40');
       } else if (view === 'categories') {
-        categories.classList.remove('hidden');
-        icons[1].classList.add('text-emerald-400', 'bg-zinc-800/80', 'border', 'border-zinc-700/40');
+        if (categories) categories.classList.remove('hidden');
+        if (icons[1]) icons[1].classList.add('text-emerald-400', 'bg-zinc-800/80', 'border', 'border-zinc-700/40');
         loadCategoriesAdmin();
       } else if (view === 'settings') {
-        settings.classList.remove('hidden');
-        icons[icons.length-2].classList.add('text-emerald-400', 'bg-zinc-800/80', 'border', 'border-zinc-700/40');
+        if (settings) settings.classList.remove('hidden');
+        if (icons[icons.length-2]) icons[icons.length-2].classList.add('text-emerald-400', 'bg-zinc-800/80', 'border', 'border-zinc-700/40');
       }
       
       isCollapsed = false;
       navShell.style.width = '240px';
-      subSidebar.classList.remove('hidden');
-      toggleIcon.className = 'fa-solid fa-bars-staggered';
+      if (subSidebar) subSidebar.classList.remove('hidden');
+      if (toggleIcon) toggleIcon.className = 'fa-solid fa-bars-staggered';
     }
 
     function setCategory(cat) {
       currentCategory = cat;
-      categoryLabel.textContent = cat ? cat : 'All categories';
+      if (categoryLabel) categoryLabel.textContent = cat ? cat : 'All categories';
       document.querySelectorAll('#category-nav .category-item, #category-list .category-item').forEach(el => {
         el.classList.toggle('bg-zinc-800/80', el.dataset.category === cat);
         el.classList.toggle('text-white', el.dataset.category === cat);
         el.classList.toggle('text-zinc-400', el.dataset.category !== cat);
       });
-      loadFiles(searchInput.value, cat);
+      loadFiles(searchInput ? searchInput.value : '', cat);
       switchView('overview');
     }
 
@@ -548,25 +551,23 @@
         supabaseQuery = supabaseQuery.textSearch('search_vector', query, { config: 'english', type: 'websearch' });
       }
       if (category) {
-        // Find category ID by name
         const cat = allCategories.find(c => c.name === category);
         if (cat) {
           supabaseQuery = supabaseQuery.eq('category_id', cat.id);
         } else {
-          // Try direct match on category column for backward compatibility
           supabaseQuery = supabaseQuery.eq('category', category);
         }
       }
       const { data, error, count } = await supabaseQuery.order('created_at', { ascending: false }).limit(100);
 
       if (error) {
-        fileList.innerHTML = `<div class="text-zinc-500 text-center py-8 text-xs">⚠️ Error loading files</div>`;
+        if (fileList) fileList.innerHTML = `<div class="text-zinc-500 text-center py-8 text-xs">⚠️ Error loading files</div>`;
         return;
       }
-      totalCount.textContent = count || 0;
+      if (totalCount) totalCount.textContent = count || 0;
 
       if (!data || data.length === 0) {
-        fileList.innerHTML = `<div class="text-zinc-500 text-center py-8 text-xs">No files found. Add your first one using "New File".</div>`;
+        if (fileList) fileList.innerHTML = `<div class="text-zinc-500 text-center py-8 text-xs">No files found. Add your first one using "New File".</div>`;
         return;
       }
 
@@ -601,14 +602,13 @@
           </div>
         `;
       });
-      fileList.innerHTML = html;
+      if (fileList) fileList.innerHTML = html;
     }
 
     // ==================== CATEGORIES ====================
     async function loadCategories() {
       const { data, error } = await supabaseClient.from('categories').select('*').order('name');
       if (error || !data) {
-        // Fallback: get categories from books table
         const { data: books, error: booksError } = await supabaseClient.from('books').select('category');
         if (!booksError && books) {
           const cats = [...new Set(books.map(b => b.category).filter(Boolean))];
@@ -620,12 +620,13 @@
       allCategories = data;
       renderCategories(data);
 
-      // Populate category dropdown in upload form
-      const select = fileCategory;
-      select.innerHTML = '<option value="">Select Category</option>';
-      data.forEach(c => {
-        select.innerHTML += `<option value="${c.id}">${c.name}</option>`;
-      });
+      if (fileCategory) {
+        const select = fileCategory;
+        select.innerHTML = '<option value="">Select Category</option>';
+        data.forEach(c => {
+          select.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+        });
+      }
     }
 
     function renderCategories(cats) {
@@ -636,19 +637,19 @@
           <i class="fa-solid fa-tag text-zinc-500 w-4 text-center"></i><span>${c.name}</span>
         </a>
       `).join('');
-      list.innerHTML = html;
-      nav.innerHTML = `<div class="font-normal text-zinc-200 px-1 text-sm h-6 flex items-center">Filter by</div>` + html;
+      if (list) list.innerHTML = html;
+      if (nav) nav.innerHTML = `<div class="font-normal text-zinc-200 px-1 text-sm h-6 flex items-center">Filter by</div>` + html;
     }
 
     // ==================== CATEGORIES ADMIN ====================
     async function loadCategoriesAdmin() {
       const { data, error } = await supabaseClient.from('categories').select('*').order('name');
       if (error || !data) {
-        categoryListAdmin.innerHTML = '<div class="text-zinc-500 text-xs">No categories</div>';
+        if (categoryListAdmin) categoryListAdmin.innerHTML = '<div class="text-zinc-500 text-xs">No categories</div>';
         return;
       }
       if (data.length === 0) {
-        categoryListAdmin.innerHTML = '<div class="text-zinc-500 text-xs">No categories yet</div>';
+        if (categoryListAdmin) categoryListAdmin.innerHTML = '<div class="text-zinc-500 text-xs">No categories yet</div>';
         return;
       }
       let html = '';
@@ -660,27 +661,33 @@
           </div>
         `;
       });
-      categoryListAdmin.innerHTML = html;
+      if (categoryListAdmin) categoryListAdmin.innerHTML = html;
     }
 
     async function addCategory() {
-      const name = newCategoryInput.value.trim();
+      const name = newCategoryInput ? newCategoryInput.value.trim() : '';
       if (!name) {
-        categoryMsg.textContent = '❌ Please enter a category name.';
-        categoryMsg.className = 'msg error';
+        if (categoryMsg) {
+          categoryMsg.textContent = '❌ Please enter a category name.';
+          categoryMsg.className = 'msg error';
+        }
         return;
       }
       const { error } = await supabaseClient.from('categories').insert({ name });
       if (error) {
-        categoryMsg.textContent = '❌ ' + error.message;
-        categoryMsg.className = 'msg error';
+        if (categoryMsg) {
+          categoryMsg.textContent = '❌ ' + error.message;
+          categoryMsg.className = 'msg error';
+        }
       } else {
-        categoryMsg.textContent = '✅ Category added!';
-        categoryMsg.className = 'msg success';
-        newCategoryInput.value = '';
+        if (categoryMsg) {
+          categoryMsg.textContent = '✅ Category added!';
+          categoryMsg.className = 'msg success';
+        }
+        if (newCategoryInput) newCategoryInput.value = '';
         loadCategoriesAdmin();
         loadCategories();
-        loadFiles(searchInput.value, currentCategory);
+        loadFiles(searchInput ? searchInput.value : '', currentCategory);
       }
     }
 
@@ -688,140 +695,164 @@
       if (!confirm('Delete this category? Files in this category will become uncategorized.')) return;
       const { error } = await supabaseClient.from('categories').delete().eq('id', id);
       if (error) {
-        categoryMsg.textContent = '❌ ' + error.message;
-        categoryMsg.className = 'msg error';
+        if (categoryMsg) {
+          categoryMsg.textContent = '❌ ' + error.message;
+          categoryMsg.className = 'msg error';
+        }
       } else {
-        categoryMsg.textContent = '✅ Category deleted.';
-        categoryMsg.className = 'msg success';
+        if (categoryMsg) {
+          categoryMsg.textContent = '✅ Category deleted.';
+          categoryMsg.className = 'msg success';
+        }
         loadCategoriesAdmin();
         loadCategories();
-        loadFiles(searchInput.value, currentCategory);
+        loadFiles(searchInput ? searchInput.value : '', currentCategory);
       }
     }
 
-    addCategoryBtn.addEventListener('click', addCategory);
-    newCategoryInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') addCategory(); });
+    if (addCategoryBtn) addCategoryBtn.addEventListener('click', addCategory);
+    if (newCategoryInput) {
+      newCategoryInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') addCategory(); });
+    }
 
     // ==================== EDIT FILE ====================
-    async function editFile(id) {
-      // Open dropdown if not open
+    window.editFile = async function(id) {
       if (!isDropdownOpen) {
         openDropdown(true);
       } else {
-        // Switch to upload tab
         switchTab('upload');
       }
-      // Load file data
       const { data, error } = await supabaseClient.from('books').select('*').eq('id', id).single();
       if (error || !data) {
-        dropdownUploadMsg.textContent = '❌ Error loading file data.';
-        dropdownUploadMsg.className = 'msg error';
+        if (dropdownUploadMsg) {
+          dropdownUploadMsg.textContent = '❌ Error loading file data.';
+          dropdownUploadMsg.className = 'msg error';
+        }
         return;
       }
-      fileTitle.value = data.title || '';
-      fileAuthor.value = data.author || '';
-      fileCategory.value = data.category_id || '';
-      fileFormat.value = data.file_format || '';
-      fileSize.value = data.file_size_mb || '';
-      fileUrls.value = data.mirror_urls ? JSON.stringify(data.mirror_urls).replace(/[\[\]"]/g, '') : '';
-      fileDesc.value = data.description || '';
-      editFileId.value = id;
-      uploadBtn.style.display = 'none';
-      updateBtn.style.display = 'block';
-      dropdownUploadMsg.textContent = '';
-    }
+      if (fileTitle) fileTitle.value = data.title || '';
+      if (fileAuthor) fileAuthor.value = data.author || '';
+      if (fileCategory) fileCategory.value = data.category_id || '';
+      if (fileFormat) fileFormat.value = data.file_format || '';
+      if (fileSize) fileSize.value = data.file_size_mb || '';
+      if (fileUrls) fileUrls.value = data.mirror_urls ? JSON.stringify(data.mirror_urls).replace(/[\[\]"]/g, '') : '';
+      if (fileDesc) fileDesc.value = data.description || '';
+      if (editFileId) editFileId.value = id;
+      if (uploadBtn) uploadBtn.style.display = 'none';
+      if (updateBtn) updateBtn.style.display = 'block';
+      if (dropdownUploadMsg) dropdownUploadMsg.textContent = '';
+    };
 
     // ==================== UPDATE FILE ====================
-    updateBtn.addEventListener('click', async () => {
-      const id = editFileId.value;
-      if (!id) {
-        dropdownUploadMsg.textContent = '❌ No file selected for update.';
-        dropdownUploadMsg.className = 'msg error';
-        return;
-      }
-      const title = fileTitle.value.trim();
-      if (!title) {
-        dropdownUploadMsg.textContent = '❌ Title is required.';
-        dropdownUploadMsg.className = 'msg error';
-        return;
-      }
-      const urlsRaw = fileUrls.value.trim();
-      const mirror_urls = urlsRaw ? urlsRaw.split(',').map(s => s.trim()).filter(s => s) : [];
-      const payload = {
-        title,
-        author: fileAuthor.value.trim() || null,
-        category_id: fileCategory.value || null,
-        file_format: fileFormat.value.trim() || null,
-        file_size_mb: parseFloat(fileSize.value) || null,
-        mirror_urls: mirror_urls.length ? mirror_urls : null,
-        description: fileDesc.value.trim() || null,
-        updated_at: new Date().toISOString(),
-      };
-      const { error } = await supabaseClient.from('books').update(payload).eq('id', id);
-      if (error) {
-        dropdownUploadMsg.textContent = '❌ ' + error.message;
-        dropdownUploadMsg.className = 'msg error';
-      } else {
-        dropdownUploadMsg.textContent = '✅ File updated successfully!';
-        dropdownUploadMsg.className = 'msg success';
-        resetUploadForm();
-        loadFiles(searchInput.value, currentCategory);
-        setTimeout(() => closeDropdown(), 1500);
-      }
-    });
-
-    // ==================== DELETE FILE ====================
-    function confirmDelete(id, name) {
-      deleteTargetId = id;
-      deleteFileName.textContent = `"${name}" – this action cannot be undone.`;
-      deleteModal.classList.add('active');
+    if (updateBtn) {
+      updateBtn.addEventListener('click', async () => {
+        const id = editFileId ? editFileId.value : '';
+        if (!id) {
+          if (dropdownUploadMsg) {
+            dropdownUploadMsg.textContent = '❌ No file selected for update.';
+            dropdownUploadMsg.className = 'msg error';
+          }
+          return;
+        }
+        const title = fileTitle ? fileTitle.value.trim() : '';
+        if (!title) {
+          if (dropdownUploadMsg) {
+            dropdownUploadMsg.textContent = '❌ Title is required.';
+            dropdownUploadMsg.className = 'msg error';
+          }
+          return;
+        }
+        const urlsRaw = fileUrls ? fileUrls.value.trim() : '';
+        const mirror_urls = urlsRaw ? urlsRaw.split(',').map(s => s.trim()).filter(s => s) : [];
+        const payload = {
+          title,
+          author: fileAuthor ? fileAuthor.value.trim() || null : null,
+          category_id: fileCategory ? fileCategory.value || null : null,
+          file_format: fileFormat ? fileFormat.value.trim() || null : null,
+          file_size_mb: fileSize ? parseFloat(fileSize.value) || null : null,
+          mirror_urls: mirror_urls.length ? mirror_urls : null,
+          description: fileDesc ? fileDesc.value.trim() || null : null,
+          updated_at: new Date().toISOString(),
+        };
+        const { error } = await supabaseClient.from('books').update(payload).eq('id', id);
+        if (error) {
+          if (dropdownUploadMsg) {
+            dropdownUploadMsg.textContent = '❌ ' + error.message;
+            dropdownUploadMsg.className = 'msg error';
+          }
+        } else {
+          if (dropdownUploadMsg) {
+            dropdownUploadMsg.textContent = '✅ File updated successfully!';
+            dropdownUploadMsg.className = 'msg success';
+          }
+          resetUploadForm();
+          loadFiles(searchInput ? searchInput.value : '', currentCategory);
+          setTimeout(() => closeDropdown(), 1500);
+        }
+      });
     }
 
-    deleteCancel.addEventListener('click', () => {
-      deleteModal.classList.remove('active');
-      deleteTargetId = null;
-    });
+    // ==================== DELETE FILE ====================
+    window.confirmDelete = function(id, name) {
+      deleteTargetId = id;
+      if (deleteFileName) deleteFileName.textContent = `"${name}" – this action cannot be undone.`;
+      if (deleteModal) deleteModal.classList.add('active');
+    };
 
-    deleteConfirm.addEventListener('click', async () => {
-      if (!deleteTargetId) return;
-      const { error } = await supabaseClient.from('books').delete().eq('id', deleteTargetId);
-      deleteModal.classList.remove('active');
-      if (error) {
-        alert('Error deleting: ' + error.message);
-      } else {
-        loadFiles(searchInput.value, currentCategory);
-      }
-      deleteTargetId = null;
-    });
-
-    // Close modal on overlay click
-    deleteModal.addEventListener('click', (e) => {
-      if (e.target === deleteModal) {
-        deleteModal.classList.remove('active');
+    if (deleteCancel) {
+      deleteCancel.addEventListener('click', () => {
+        if (deleteModal) deleteModal.classList.remove('active');
         deleteTargetId = null;
-      }
-    });
+      });
+    }
+
+    if (deleteConfirm) {
+      deleteConfirm.addEventListener('click', async () => {
+        if (!deleteTargetId) return;
+        const { error } = await supabaseClient.from('books').delete().eq('id', deleteTargetId);
+        if (deleteModal) deleteModal.classList.remove('active');
+        if (error) {
+          alert('Error deleting: ' + error.message);
+        } else {
+          loadFiles(searchInput ? searchInput.value : '', currentCategory);
+        }
+        deleteTargetId = null;
+      });
+    }
+
+    if (deleteModal) {
+      deleteModal.addEventListener('click', (e) => {
+        if (e.target === deleteModal) {
+          deleteModal.classList.remove('active');
+          deleteTargetId = null;
+        }
+      });
+    }
 
     // ==================== ADMIN AUTH ====================
     function updateAdminUI(user) {
       if (user) {
-        adminStatusLabel.textContent = 'Sign Out';
-        adminToggleBtn.classList.add('bg-zinc-800', 'text-red-400', 'border-zinc-700');
+        if (adminStatusLabel) adminStatusLabel.textContent = 'Sign Out';
+        if (adminToggleBtn) {
+          adminToggleBtn.classList.add('bg-zinc-800', 'text-red-400', 'border-zinc-700');
+        }
         isAdminLoggedIn = true;
-        tabRow.style.display = 'flex';
-        dropdownLogin.style.display = 'none';
-        dropdownUpload.style.display = 'block';
-        dropdownTitle.textContent = 'Admin';
+        if (tabRow) tabRow.style.display = 'flex';
+        if (dropdownLogin) dropdownLogin.style.display = 'none';
+        if (dropdownUpload) dropdownUpload.style.display = 'block';
+        if (dropdownTitle) dropdownTitle.textContent = 'Admin';
         resetUploadForm();
       } else {
-        adminStatusLabel.textContent = 'Connect';
-        adminToggleBtn.classList.remove('bg-zinc-800', 'text-red-400', 'border-zinc-700');
+        if (adminStatusLabel) adminStatusLabel.textContent = 'Connect';
+        if (adminToggleBtn) {
+          adminToggleBtn.classList.remove('bg-zinc-800', 'text-red-400', 'border-zinc-700');
+        }
         isAdminLoggedIn = false;
-        tabRow.style.display = 'none';
-        dropdownLogin.style.display = 'block';
-        dropdownUpload.style.display = 'none';
-        dropdownTitle.textContent = 'Admin Login';
-        dropdownMsg.textContent = '';
+        if (tabRow) tabRow.style.display = 'none';
+        if (dropdownLogin) dropdownLogin.style.display = 'block';
+        if (dropdownUpload) dropdownUpload.style.display = 'none';
+        if (dropdownTitle) dropdownTitle.textContent = 'Admin Login';
+        if (dropdownMsg) dropdownMsg.textContent = '';
         closeDropdown();
       }
     }
@@ -834,110 +865,132 @@
     });
 
     // LOGIN
-    adminLoginBtn.addEventListener('click', async () => {
-      const email = adminEmail.value.trim();
-      const pass = adminPass.value;
-      const { error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
-      if (error) {
-        dropdownMsg.textContent = '❌ ' + error.message;
-        dropdownMsg.className = 'msg error';
-      } else {
-        dropdownMsg.textContent = '✅ Login successful';
-        dropdownMsg.className = 'msg success';
-      }
-    });
+    if (adminLoginBtn) {
+      adminLoginBtn.addEventListener('click', async () => {
+        const email = adminEmail ? adminEmail.value.trim() : '';
+        const pass = adminPass ? adminPass.value : '';
+        const { error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
+        if (error) {
+          if (dropdownMsg) {
+            dropdownMsg.textContent = '❌ ' + error.message;
+            dropdownMsg.className = 'msg error';
+          }
+        } else {
+          if (dropdownMsg) {
+            dropdownMsg.textContent = '✅ Login successful';
+            dropdownMsg.className = 'msg success';
+          }
+        }
+      });
+    }
 
-    // LOGOUT
-    logoutBtn.addEventListener('click', () => {
-      supabaseClient.auth.signOut();
-      closeDropdown();
-    });
-
-    // TOP BAR BUTTON
-    adminToggleBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      if (isAdminLoggedIn) {
+    // LOGOUT (from dropdown)
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', () => {
         supabaseClient.auth.signOut();
         closeDropdown();
-      } else {
-        dropdownLogin.style.display = 'block';
-        dropdownUpload.style.display = 'none';
-        dropdownTitle.textContent = 'Admin Login';
-        dropdownMsg.textContent = '';
-        openDropdown(false);
-      }
-    });
+      });
+    }
+
+    // TOP BAR BUTTON
+    if (adminToggleBtn) {
+      adminToggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (isAdminLoggedIn) {
+          supabaseClient.auth.signOut();
+          closeDropdown();
+        } else {
+          if (dropdownLogin) dropdownLogin.style.display = 'block';
+          if (dropdownUpload) dropdownUpload.style.display = 'none';
+          if (dropdownTitle) dropdownTitle.textContent = 'Admin Login';
+          if (dropdownMsg) dropdownMsg.textContent = '';
+          openDropdown(false);
+        }
+      });
+    }
 
     // ==================== UPLOAD FILE ====================
-    uploadBtn.addEventListener('click', async () => {
-      const user = (await supabaseClient.auth.getUser()).data.user;
-      if (!user) {
-        dropdownUploadMsg.textContent = '❌ Please login first.';
-        dropdownUploadMsg.className = 'msg error';
-        return;
-      }
-      const title = fileTitle.value.trim();
-      if (!title) {
-        dropdownUploadMsg.textContent = '❌ Title is required.';
-        dropdownUploadMsg.className = 'msg error';
-        return;
-      }
-      const urlsRaw = fileUrls.value.trim();
-      const mirror_urls = urlsRaw ? urlsRaw.split(',').map(s => s.trim()).filter(s => s) : [];
-      const payload = {
-        title,
-        author: fileAuthor.value.trim() || null,
-        category_id: fileCategory.value || null,
-        file_format: fileFormat.value.trim() || null,
-        file_size_mb: parseFloat(fileSize.value) || null,
-        mirror_urls: mirror_urls.length ? mirror_urls : null,
-        description: fileDesc.value.trim() || null,
-        user_id: user.id,
-      };
-      const { error } = await supabaseClient.from('books').insert(payload);
-      if (error) {
-        dropdownUploadMsg.textContent = '❌ ' + error.message;
-        dropdownUploadMsg.className = 'msg error';
-      } else {
-        dropdownUploadMsg.textContent = '✅ File added successfully!';
-        dropdownUploadMsg.className = 'msg success';
-        resetUploadForm();
-        loadFiles(searchInput.value, currentCategory);
-        loadCategories();
-        setTimeout(() => closeDropdown(), 1500);
-      }
-    });
+    if (uploadBtn) {
+      uploadBtn.addEventListener('click', async () => {
+        const user = (await supabaseClient.auth.getUser()).data.user;
+        if (!user) {
+          if (dropdownUploadMsg) {
+            dropdownUploadMsg.textContent = '❌ Please login first.';
+            dropdownUploadMsg.className = 'msg error';
+          }
+          return;
+        }
+        const title = fileTitle ? fileTitle.value.trim() : '';
+        if (!title) {
+          if (dropdownUploadMsg) {
+            dropdownUploadMsg.textContent = '❌ Title is required.';
+            dropdownUploadMsg.className = 'msg error';
+          }
+          return;
+        }
+        const urlsRaw = fileUrls ? fileUrls.value.trim() : '';
+        const mirror_urls = urlsRaw ? urlsRaw.split(',').map(s => s.trim()).filter(s => s) : [];
+        const payload = {
+          title,
+          author: fileAuthor ? fileAuthor.value.trim() || null : null,
+          category_id: fileCategory ? fileCategory.value || null : null,
+          file_format: fileFormat ? fileFormat.value.trim() || null : null,
+          file_size_mb: fileSize ? parseFloat(fileSize.value) || null : null,
+          mirror_urls: mirror_urls.length ? mirror_urls : null,
+          description: fileDesc ? fileDesc.value.trim() || null : null,
+          user_id: user.id,
+        };
+        const { error } = await supabaseClient.from('books').insert(payload);
+        if (error) {
+          if (dropdownUploadMsg) {
+            dropdownUploadMsg.textContent = '❌ ' + error.message;
+            dropdownUploadMsg.className = 'msg error';
+          }
+        } else {
+          if (dropdownUploadMsg) {
+            dropdownUploadMsg.textContent = '✅ File added successfully!';
+            dropdownUploadMsg.className = 'msg success';
+          }
+          resetUploadForm();
+          loadFiles(searchInput ? searchInput.value : '', currentCategory);
+          loadCategories();
+          setTimeout(() => closeDropdown(), 1500);
+        }
+      });
+    }
 
     // ==================== EVENTS ====================
     function openAdminDropdown() {
       if (isAdminLoggedIn) {
-        tabRow.style.display = 'flex';
-        dropdownLogin.style.display = 'none';
-        dropdownUpload.style.display = 'block';
-        dropdownTitle.textContent = 'Admin';
+        if (tabRow) tabRow.style.display = 'flex';
+        if (dropdownLogin) dropdownLogin.style.display = 'none';
+        if (dropdownUpload) dropdownUpload.style.display = 'block';
+        if (dropdownTitle) dropdownTitle.textContent = 'Admin';
         resetUploadForm();
         switchTab('upload');
         openDropdown(true);
       } else {
-        tabRow.style.display = 'none';
-        dropdownLogin.style.display = 'block';
-        dropdownUpload.style.display = 'none';
-        dropdownTitle.textContent = 'Admin Login';
-        dropdownMsg.textContent = '';
+        if (tabRow) tabRow.style.display = 'none';
+        if (dropdownLogin) dropdownLogin.style.display = 'block';
+        if (dropdownUpload) dropdownUpload.style.display = 'none';
+        if (dropdownTitle) dropdownTitle.textContent = 'Admin Login';
+        if (dropdownMsg) dropdownMsg.textContent = '';
         openDropdown(false);
       }
     }
 
-    newFileBtn.addEventListener('click', openAdminDropdown);
-    newFileIcon.addEventListener('click', openAdminDropdown);
-    if(adminSidebarLink) {
+    if (newFileBtn) newFileBtn.addEventListener('click', openAdminDropdown);
+    if (newFileIcon) newFileIcon.addEventListener('click', openAdminDropdown);
+    if (adminSidebarLink) {
       adminSidebarLink.addEventListener('click', (e) => {
         e.preventDefault();
         openAdminDropdown();
       });
     }
 
-    searchInput.addEventListener('input', (e) => { loadFiles(e.target.value, currentCategory); });
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => { loadFiles(e.target.value, currentCategory); });
+    }
 
     // ==================== INIT ====================
     loadCategories();
