@@ -1,281 +1,714 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Book Archive + Manual Category Upload</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Supabase Dashboard Clone</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, sans-serif; }
-    body { background: #f8fafc; padding: 2rem; display: flex; flex-direction: column; align-items: center; }
-    .container { max-width: 900px; width: 100%; }
-    h1 { font-size: 2.5rem; margin-bottom: 0.2rem; }
-    .sub { color: #475569; margin-bottom: 2rem; }
-    .search-box { display: flex; gap: 10px; margin-bottom: 2rem; }
-    .search-box input { flex: 1; padding: 14px 20px; border: 2px solid #e2e8f0; border-radius: 60px; font-size: 1.1rem; }
-    .search-box input:focus { outline: none; border-color: #2563eb; }
-    .search-box button { background: #2563eb; color: white; border: none; padding: 14px 30px; border-radius: 60px; font-weight: 600; cursor: pointer; }
-    .search-box button:hover { background: #1d4ed8; }
-    .results-grid { display: grid; gap: 16px; }
-    .book-card { background: white; padding: 20px; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; gap: 20px; border: 1px solid #e2e8f0; }
-    .book-cover { width: 80px; height: 110px; background: #f1f5f9; border-radius: 8px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #94a3b8; }
-    .book-cover img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
-    .book-info { flex: 1; }
-    .book-info h3 { margin-bottom: 4px; }
-    .book-info .meta { color: #475569; font-size: 0.9rem; margin-bottom: 6px; }
-    .book-info .desc { color: #64748b; font-size: 0.95rem; margin: 8px 0; }
-    .badge-cat { background: #dbeafe; color: #1e40af; padding: 2px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; margin-right: 6px; }
-    .mirror-btn { background: #22c55e; color: white; border: none; padding: 6px 16px; border-radius: 30px; font-weight: 600; cursor: pointer; font-size: 0.85rem; text-decoration: none; display: inline-block; margin-right: 4px; }
-    .mirror-btn:hover { background: #16a34a; }
-    .stats { margin-top: 1rem; color: #64748b; }
-    .admin-toggle { margin: 2rem 0 1rem; display: flex; gap: 12px; align-items: center; }
-    .admin-toggle button { background: #1e293b; color: white; border: none; padding: 8px 20px; border-radius: 40px; font-weight: 600; cursor: pointer; }
-    .admin-panel { background: white; padding: 24px; border-radius: 16px; border: 2px dashed #94a3b8; margin-bottom: 2rem; }
-    .admin-panel h2 { margin-bottom: 1rem; font-size: 1.3rem; }
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .form-grid .full-width { grid-column: 1 / -1; }
-    .admin-panel input, .admin-panel select, .admin-panel textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
-    .admin-panel textarea { resize: vertical; min-height: 60px; }
-    .admin-panel button[type="submit"] { background: #2563eb; color: white; border: none; padding: 12px; border-radius: 40px; font-weight: 600; cursor: pointer; grid-column: 1 / -1; }
-    .admin-panel .logout-btn { background: #ef4444; border: none; color: white; padding: 6px 16px; border-radius: 30px; cursor: pointer; }
-    .hidden { display: none !important; }
-    .auth-error { color: #dc2626; font-size: 0.9rem; margin: 6px 0; }
-    .success { color: #16a34a; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      display: flex;
+      min-height: 100vh;
+      background: #f1f5f9;
+    }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+      width: 260px;
+      background: #0b0e11;
+      color: #d1d5db;
+      padding: 1.5rem 1rem;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      overflow-y: auto;
+    }
+
+    .sidebar .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 2rem;
+      padding: 0 0.5rem;
+    }
+    .sidebar .logo svg {
+      width: 28px;
+      height: 28px;
+    }
+    .sidebar .logo span {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: white;
+    }
+    .sidebar .logo .badge {
+      background: #1e293b;
+      color: #94a3b8;
+      font-size: 0.55rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 40px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .sidebar .section-label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #6b7280;
+      padding: 0 0.5rem;
+      margin: 1.5rem 0 0.5rem;
+    }
+    .sidebar .section-label:first-of-type {
+      margin-top: 0;
+    }
+
+    .sidebar .nav-item {
+      padding: 7px 12px;
+      border-radius: 6px;
+      cursor: default;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #d1d5db;
+      transition: 0.1s;
+    }
+    .sidebar .nav-item:hover {
+      background: #1e293b;
+      color: white;
+    }
+    .sidebar .nav-item .icon {
+      font-size: 1rem;
+      width: 20px;
+      text-align: center;
+      opacity: 0.6;
+    }
+    .sidebar .nav-item.active {
+      background: #1e293b;
+      color: white;
+      font-weight: 500;
+    }
+    .sidebar .nav-item.active .icon {
+      opacity: 1;
+    }
+
+    .sidebar .spacer {
+      flex: 1;
+    }
+
+    .sidebar .footer-item {
+      padding: 7px 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      color: #6b7280;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 0.5rem;
+      cursor: default;
+    }
+    .sidebar .footer-item:hover {
+      background: #1e293b;
+      color: #d1d5db;
+    }
+
+    /* ===== MAIN WRAPPER ===== */
+    .main-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      max-width: calc(100% - 260px);
+    }
+
+    /* ===== TOP BAR ===== */
+    .topbar {
+      background: #0b0e11;
+      padding: 0.6rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border-bottom: 1px solid #1e293b;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+    .topbar .left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .topbar .left .hou {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: white;
+      letter-spacing: -0.3px;
+    }
+    .topbar .left .free-badge {
+      background: #1e293b;
+      color: #22c55e;
+      font-size: 0.6rem;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 40px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border: 1px solid #22c55e33;
+    }
+    .topbar .left .project-selector {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #1e293b;
+      padding: 4px 14px 4px 16px;
+      border-radius: 40px;
+      color: #d1d5db;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: default;
+    }
+    .topbar .left .project-selector .env {
+      background: #22c55e;
+      color: #0b0e11;
+      font-size: 0.55rem;
+      font-weight: 700;
+      padding: 1px 8px;
+      border-radius: 40px;
+      text-transform: uppercase;
+    }
+    .topbar .left .project-selector .arrow {
+      color: #6b7280;
+      font-size: 0.7rem;
+    }
+
+    .topbar .center {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      min-width: 180px;
+    }
+    .topbar .center .search-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 480px;
+    }
+    .topbar .center .search-wrap input {
+      width: 100%;
+      padding: 7px 18px 7px 38px;
+      border-radius: 40px;
+      border: 1px solid #2d3748;
+      background: #1a1f26;
+      color: #e2e8f0;
+      font-size: 0.9rem;
+      transition: 0.2s;
+    }
+    .topbar .center .search-wrap input::placeholder {
+      color: #6b7280;
+    }
+    .topbar .center .search-wrap input:focus {
+      outline: none;
+      border-color: #22c55e;
+      background: #0f141a;
+    }
+    .topbar .center .search-wrap .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6b7280;
+      font-size: 0.9rem;
+    }
+    .topbar .center .search-wrap .kbd-hint {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6b7280;
+      font-size: 0.65rem;
+      background: #1e293b;
+      padding: 1px 8px;
+      border-radius: 4px;
+      font-family: monospace;
+      border: 1px solid #2d3748;
+    }
+
+    .topbar .right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .topbar .right .ai-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: transparent;
+      border: none;
+      color: #d1d5db;
+      font-size: 0.85rem;
+      font-weight: 500;
+      padding: 6px 14px;
+      border-radius: 40px;
+      cursor: default;
+      transition: 0.15s;
+    }
+    .topbar .right .ai-btn:hover {
+      background: #1e293b;
+    }
+    .topbar .right .ai-btn .ai-icon {
+      font-size: 1.1rem;
+    }
+    .topbar .right .ai-btn .deepseek-label {
+      color: #6b7280;
+      font-weight: 400;
+      font-size: 0.7rem;
+      background: #1e293b;
+      padding: 1px 8px;
+      border-radius: 40px;
+    }
+    .topbar .right .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #1e293b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #d1d5db;
+      font-weight: 600;
+      font-size: 0.8rem;
+      cursor: default;
+      border: 2px solid transparent;
+      transition: 0.15s;
+    }
+    .topbar .right .avatar:hover {
+      border-color: #22c55e;
+    }
+    .topbar .right .settings-icon {
+      color: #6b7280;
+      font-size: 1.2rem;
+      cursor: default;
+      padding: 4px;
+      border-radius: 40px;
+      transition: 0.15s;
+    }
+    .topbar .right .settings-icon:hover {
+      color: #d1d5db;
+      background: #1e293b;
+    }
+
+    /* ===== MAIN CONTENT ===== */
+    .main-content {
+      padding: 2rem 2.5rem;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .main-content .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+    }
+    .main-content .page-header h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #0f172a;
+    }
+    .main-content .page-header .copy-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.95rem;
+      color: #475569;
+    }
+    .main-content .page-header .copy-section .project-name {
+      background: white;
+      padding: 6px 16px;
+      border-radius: 40px;
+      border: 1px solid #e2e8f0;
+      font-weight: 500;
+      color: #0f172a;
+      font-size: 0.9rem;
+    }
+    .main-content .page-header .copy-section .copy-btn {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 40px;
+      padding: 6px 16px;
+      font-size: 0.8rem;
+      color: #475569;
+      cursor: default;
+      font-weight: 500;
+      transition: 0.1s;
+    }
+    .main-content .page-header .copy-section .copy-btn:hover {
+      background: #f1f5f9;
+    }
+
+    .overview-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem 2rem;
+      border: 1px solid #e2e8f0;
+      margin-bottom: 1.5rem;
+    }
+    .overview-card .card-title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      margin-bottom: 1rem;
+    }
+    .overview-card .region-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+    }
+    .overview-card .region-row .region-icon {
+      font-size: 1.2rem;
+    }
+    .overview-card .region-row .region-name {
+      font-weight: 600;
+      color: #0f172a;
+      font-size: 1.05rem;
+    }
+    .overview-card .region-row .region-detail {
+      color: #64748b;
+      font-size: 0.9rem;
+    }
+    .overview-card .region-row .compute-badge {
+      background: #f1f5f9;
+      padding: 2px 14px;
+      border-radius: 40px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #475569;
+      font-family: monospace;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 0.5rem;
+    }
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+    }
+    .stat-item .stat-label {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .stat-item .stat-value {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #0f172a;
+      margin-top: 2px;
+    }
+    .stat-item .stat-value .sub {
+      font-weight: 400;
+      color: #64748b;
+      font-size: 0.9rem;
+    }
+    .stat-item .stat-bar {
+      width: 100%;
+      height: 4px;
+      background: #e2e8f0;
+      border-radius: 40px;
+      margin-top: 6px;
+      overflow: hidden;
+    }
+    .stat-item .stat-bar .fill {
+      height: 100%;
+      border-radius: 40px;
+      background: #22c55e;
+    }
+    .stat-item .stat-bar .fill.warning {
+      background: #f59e0b;
+    }
+
+    .info-rows {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 0.5rem;
+    }
+    .info-row-item {
+      display: flex;
+      flex-direction: column;
+      padding: 0.5rem 0;
+    }
+    .info-row-item .label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: #94a3b8;
+      font-weight: 600;
+    }
+    .info-row-item .value {
+      font-size: 0.95rem;
+      color: #0f172a;
+      font-weight: 500;
+      margin-top: 2px;
+    }
+    .info-row-item .value .muted {
+      color: #94a3b8;
+      font-weight: 400;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #f1f5f9;
+      margin: 1rem 0;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) {
+      .stats-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .info-rows {
+        grid-template-columns: 1fr;
+      }
+      .topbar {
+        padding: 0.6rem 1rem;
+        gap: 10px;
+      }
+      .topbar .center {
+        order: 10;
+        flex-basis: 100%;
+      }
+      .topbar .center .search-wrap {
+        max-width: 100%;
+      }
+    }
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: static;
+        flex-direction: row;
+        flex-wrap: wrap;
+        padding: 1rem;
+        gap: 4px;
+      }
+      .sidebar .logo {
+        margin-bottom: 0;
+        width: 100%;
+      }
+      .sidebar .section-label {
+        display: none;
+      }
+      .sidebar .nav-item {
+        padding: 5px 10px;
+        font-size: 0.8rem;
+      }
+      .sidebar .spacer {
+        display: none;
+      }
+      .sidebar .footer-item {
+        display: none;
+      }
+      .main-wrapper {
+        max-width: 100%;
+      }
+      .main-content {
+        padding: 1rem;
+      }
+      .main-content .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+      .main-content .page-header .copy-section {
+        flex-wrap: wrap;
+      }
+      .stats-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+      .topbar .left .project-selector .env {
+        display: none;
+      }
+    }
+    @media (max-width: 480px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+      .overview-card {
+        padding: 1rem;
+      }
+      .overview-card .region-row {
+        flex-wrap: wrap;
+      }
+      .topbar .left .project-selector {
+        padding: 4px 10px;
+        font-size: 0.75rem;
+      }
+      .topbar .right .ai-btn .deepseek-label {
+        display: none;
+      }
+    }
   </style>
 </head>
 <body>
-<div class="container">
-  <h1>📚 Archive Search</h1>
-  <p class="sub">Search by title, author, ISBN, or category.</p>
 
-  <!-- SEARCH -->
-  <div class="search-box">
-    <input type="text" id="search-input" placeholder="e.g. 'Dune', 'History', or '9780451524935'" />
-    <button id="search-btn">🔍 Search</button>
-  </div>
-  <div id="results-container">
-    <div class="results-grid" id="results-grid"></div>
-    <div class="stats" id="stats"></div>
-  </div>
-
-  <!-- ADMIN TOGGLE -->
-  <div class="admin-toggle">
-    <button id="admin-toggle-btn">🔐 Admin Panel</button>
-    <span id="admin-status" style="color:#64748b; font-size:0.9rem;">(Login to add books)</span>
-  </div>
-
-  <!-- ADMIN PANEL (Hidden by default) -->
-  <div id="admin-panel" class="admin-panel hidden">
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-      <h2>📝 Manually Upload Book by Category</h2>
-      <button id="logout-btn" class="logout-btn">Logout</button>
-    </div>
-    <div id="admin-message" class="auth-error"></div>
-    
-    <!-- Login Form -->
-    <div id="admin-login">
-      <input id="admin-email" type="email" placeholder="Email" style="margin-bottom:8px;" />
-      <input id="admin-pass" type="password" placeholder="Password" style="margin-bottom:8px;" />
-      <button id="admin-login-btn" style="background:#2563eb; color:white; border:none; padding:10px; border-radius:40px; width:100%; font-weight:600; cursor:pointer;">Login to Admin</button>
-      <p style="font-size:0.8rem; color:#64748b; margin-top:6px;">Sign up first if you don't have an account.</p>
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M13.5 2L3 14H12L10.5 22L21 10H12L13.5 2Z" fill="#22c55e" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>Project Overview</span>
+      <span class="badge">NANO</span>
     </div>
 
-    <!-- Upload Form -->
-    <div id="admin-upload" class="hidden">
-      <div class="form-grid">
-        <input id="book-title" placeholder="Title *" />
-        <input id="book-author" placeholder="Author" />
-        <select id="book-category">
-          <option value="">-- Select Category --</option>
-          <option value="Fiction">Fiction</option>
-          <option value="Non-Fiction">Non-Fiction</option>
-          <option value="Science">Science</option>
-          <option value="History">History</option>
-          <option value="Technology">Technology</option>
-          <option value="Philosophy">Philosophy</option>
-          <option value="Biography">Biography</option>
-          <option value="Other">Other</option>
-        </select>
-        <input id="book-isbn" placeholder="ISBN" />
-        <input id="book-year" placeholder="Year (e.g. 2020)" />
-        <input id="book-format" placeholder="Format (e.g. PDF)" />
-        <input id="book-size" placeholder="Size (MB)" />
-        <input id="book-cover" placeholder="Cover Image URL" class="full-width" />
-        <input id="book-mirrors" placeholder="Mirror URLs (comma separated)" class="full-width" />
-        <textarea id="book-desc" placeholder="Description..." class="full-width"></textarea>
-        <button id="upload-btn">➕ Add Book to Archive</button>
+    <div class="section-label">Project Overview</div>
+    <div class="nav-item active"><span class="icon">📊</span> Table Editor</div>
+    <div class="nav-item"><span class="icon">📝</span> SQL Editor</div>
+    <div class="nav-item"><span class="icon">🗄️</span> Database</div>
+    <div class="nav-item"><span class="icon">🔐</span> Authentication</div>
+    <div class="nav-item"><span class="icon">📦</span> Storage</div>
+    <div class="nav-item"><span class="icon">⚡</span> Edge Functions</div>
+    <div class="nav-item"><span class="icon">🔄</span> Realtime</div>
+
+    <div class="section-label">Advisors</div>
+    <div class="nav-item"><span class="icon">👁️</span> Observability</div>
+    <div class="nav-item"><span class="icon">📋</span> Logs</div>
+    <div class="nav-item"><span class="icon">🔌</span> Integrations</div>
+
+    <div class="section-label">Project Settings</div>
+    <div class="nav-item"><span class="icon">⚙️</span> Settings</div>
+
+    <div class="spacer"></div>
+
+    <div class="footer-item"><span class="icon">💬</span> Feedback</div>
+    <div class="footer-item"><span class="icon">❓</span> Help</div>
+  </aside>
+
+  <!-- ===== MAIN WRAPPER ===== -->
+  <div class="main-wrapper">
+
+    <!-- ===== TOP BAR ===== -->
+    <header class="topbar">
+      <!-- Left: logo + project -->
+      <div class="left">
+        <span class="hou">HoU</span>
+        <span class="free-badge">FREE</span>
+        <div class="project-selector">
+          <span>le fou</span>
+          <span class="env">main</span>
+          <span class="env" style="background:#22c55e;color:#0b0e11;font-weight:700;">PRODUCTION</span>
+          <span class="arrow">▾</span>
+        </div>
       </div>
-    </div>
-  </div>
-</div>
 
-<script>
-  // 🔥 YOUR KEYS ARE NOW PRE-FILLED
-  const SUPABASE_URL = "https://zbqsrfurmoowilpyxrfo.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpicXNyZnVybW9vd2lscHl4cmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyODU3NjcsImV4cCI6MjA5Nzg2MTc2N30.Q58fAB5-KliFKo7v0g3e48I6ttgnYzyOom1FVsUOrFM";
+      <!-- Center: Search -->
+      <div class="center">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" placeholder="Search for a project, table, or documentation..." />
+          <span class="kbd-hint">⌘ K</span>
+        </div>
+      </div>
 
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      <!-- Right: AI Assistant + Account -->
+      <div class="right">
+        <button class="ai-btn" title="DeepSeek AI Assistant">
+          <span class="ai-icon">🧠</span>
+          <span>AI</span>
+          <span class="deepseek-label">DeepSeek</span>
+        </button>
+        <span class="settings-icon">⚙️</span>
+        <div class="avatar" title="Account settings">JD</div>
+      </div>
+    </header>
 
-  // ----- DOM refs -----
-  const searchInput = document.getElementById('search-input');
-  const searchBtn = document.getElementById('search-btn');
-  const resultsGrid = document.getElementById('results-grid');
-  const stats = document.getElementById('stats');
-  const adminPanel = document.getElementById('admin-panel');
-  const adminToggleBtn = document.getElementById('admin-toggle-btn');
-  const adminStatus = document.getElementById('admin-status');
-  const adminLogin = document.getElementById('admin-login');
-  const adminUpload = document.getElementById('admin-upload');
-  const adminEmail = document.getElementById('admin-email');
-  const adminPass = document.getElementById('admin-pass');
-  const adminLoginBtn = document.getElementById('admin-login-btn');
-  const logoutBtn = document.getElementById('logout-btn');
-  const adminMessage = document.getElementById('admin-message');
-  const uploadBtn = document.getElementById('upload-btn');
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main-content">
+      <!-- Page Header -->
+      <div class="page-header">
+        <h1>Project Overview</h1>
+        <div class="copy-section">
+          <span class="project-name">100willypxrfo.supabase.co</span>
+          <span class="copy-btn">📋 Copy</span>
+        </div>
+      </div>
 
-  // ----- Search -----
-  async function performSearch(query) {
-    if (!query.trim()) {
-      resultsGrid.innerHTML = '<p style="color:#94a3b8; text-align:center; padding:2rem;">Type a title, author, or category.</p>';
-      stats.textContent = '';
-      return;
-    }
-    resultsGrid.innerHTML = '<p style="color:#94a3b8; text-align:center; padding:2rem;">Searching...</p>';
-    const { data, error, count } = await supabase
-      .from('books')
-      .select('*', { count: 'exact' })
-      .textSearch('search_vector', query, { config: 'english', type: 'websearch' })
-      .order('publication_year', { ascending: false })
-      .limit(50);
+      <!-- Primary Database Card -->
+      <div class="overview-card">
+        <div class="card-title">Primary Database</div>
 
-    if (error) { resultsGrid.innerHTML = `<p style="color:red;">Error</p>`; return; }
-    if (!data.length) { resultsGrid.innerHTML = '<p style="color:#94a3b8; text-align:center; padding:2rem;">No books found.</p>'; stats.textContent = ''; return; }
+        <div class="region-row">
+          <span class="region-icon">🌏</span>
+          <span class="region-name">Northeast Asia (Tokyo)</span>
+          <span class="region-detail">·</span>
+          <span class="compute-badge">ap-northeast-1 · t4g.nano</span>
+        </div>
 
-    stats.textContent = `Found ${count} results.`;
-    resultsGrid.innerHTML = data.map(book => {
-      const coverHtml = book.cover_url ? `<img src="${book.cover_url}" />` : '📖';
-      let mirrors = [];
-      try { mirrors = JSON.parse(book.mirror_urls) || []; } catch { mirrors = [book.mirror_urls]; }
-      if (!Array.isArray(mirrors)) mirrors = [mirrors];
-      const validMirrors = mirrors.filter(u => u && u.startsWith('http'));
+        <hr class="divider" />
 
-      return `
-        <div class="book-card">
-          <div class="book-cover">${coverHtml}</div>
-          <div class="book-info">
-            <h3>${book.title}</h3>
-            <div class="meta">
-              ${book.author ? `✍️ ${book.author}` : ''} 
-              ${book.category ? `<span class="badge-cat">📂 ${book.category}</span>` : ''}
-              ${book.publication_year ? `· ${book.publication_year}` : ''}
-            </div>
-            <div class="meta">
-              ${book.file_format ? `<span class="badge">${book.file_format}</span>` : ''}
-              ${book.file_size_mb ? `${book.file_size_mb} MB` : ''}
-              ${book.isbn ? `ISBN: ${book.isbn}` : ''}
-            </div>
-            ${book.description ? `<div class="desc">${book.description.substring(0, 120)}...</div>` : ''}
-            <div>
-              ${validMirrors.length ? validMirrors.map(u => `<a href="${u}" target="_blank" class="mirror-btn">⬇️ Mirror</a>`).join('') : '<span style="color:#94a3b8;">No mirrors</span>'}
-            </div>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-label">CPU</span>
+            <span class="stat-value">0%</span>
+            <div class="stat-bar"><div class="fill" style="width:0%;"></div></div>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Disk</span>
+            <span class="stat-value">13%</span>
+            <div class="stat-bar"><div class="fill" style="width:13%;"></div></div>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">RAM</span>
+            <span class="stat-value">48%</span>
+            <div class="stat-bar"><div class="fill warning" style="width:48%;"></div></div>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Connections</span>
+            <span class="stat-value">6 <span class="sub">/ 60</span></span>
+            <div class="stat-bar"><div class="fill" style="width:10%;"></div></div>
           </div>
         </div>
-      `;
-    }).join('');
-  }
+      </div>
 
-  searchBtn.addEventListener('click', () => performSearch(searchInput.value));
-  searchInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') performSearch(searchInput.value); });
-  performSearch('');
+      <!-- Bottom Info Rows -->
+      <div class="overview-card" style="margin-bottom:0;">
+        <div class="info-rows">
+          <div class="info-row-item">
+            <span class="label">Recent Branch</span>
+            <span class="value">No branches <span class="muted">—</span></span>
+          </div>
+          <div class="info-row-item">
+            <span class="label">Migration</span>
+            <span class="value">Migrations <span class="muted">—</span></span>
+          </div>
+          <div class="info-row-item">
+            <span class="label">Last Backup</span>
+            <span class="value">No backups <span class="muted">—</span></span>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
 
-  // ----- Admin Auth -----
-  function updateAdminUI(user) {
-    if (user) {
-      adminLogin.classList.add('hidden');
-      adminUpload.classList.remove('hidden');
-      adminStatus.textContent = `✅ Logged in as ${user.email}`;
-      adminMessage.textContent = '';
-      adminMessage.className = 'auth-error';
-    } else {
-      adminLogin.classList.remove('hidden');
-      adminUpload.classList.add('hidden');
-      adminStatus.textContent = '(Login to add books)';
-      adminMessage.textContent = '';
-    }
-  }
-
-  supabase.auth.onAuthStateChange((event, session) => {
-    updateAdminUI(session?.user || null);
-  });
-
-  supabase.auth.getSession().then(({ data }) => {
-    updateAdminUI(data.session?.user || null);
-  });
-
-  adminToggleBtn.addEventListener('click', () => {
-    adminPanel.classList.toggle('hidden');
-  });
-
-  adminLoginBtn.addEventListener('click', async () => {
-    adminMessage.textContent = '';
-    const email = adminEmail.value.trim();
-    const pass = adminPass.value;
-    const { error } = await supabase.auth.signInWithPassword({ email, password: pass });
-    if (error) {
-      adminMessage.textContent = error.message;
-      adminMessage.className = 'auth-error';
-    } else {
-      adminMessage.textContent = '✅ Login successful!';
-      adminMessage.className = 'success';
-    }
-  });
-
-  logoutBtn.addEventListener('click', () => supabase.auth.signOut());
-
-  // ----- Manual Upload -----
-  uploadBtn.addEventListener('click', async () => {
-    const user = (await supabase.auth.getUser()).data.user;
-    if (!user) {
-      adminMessage.textContent = 'Please login first.';
-      adminMessage.className = 'auth-error';
-      return;
-    }
-
-    const title = document.getElementById('book-title').value.trim();
-    if (!title) {
-      adminMessage.textContent = 'Title is required.';
-      adminMessage.className = 'auth-error';
-      return;
-    }
-
-    const mirrorsRaw = document.getElementById('book-mirrors').value.trim();
-    const mirror_urls = mirrorsRaw ? mirrorsRaw.split(',').map(s => s.trim()).filter(s => s) : [];
-
-    const payload = {
-      title,
-      author: document.getElementById('book-author').value.trim() || null,
-      category: document.getElementById('book-category').value || null,
-      isbn: document.getElementById('book-isbn').value.trim() || null,
-      publication_year: parseInt(document.getElementById('book-year').value) || null,
-      file_format: document.getElementById('book-format').value.trim() || null,
-      file_size_mb: parseFloat(document.getElementById('book-size').value) || null,
-      cover_url: document.getElementById('book-cover').value.trim() || null,
-      mirror_urls: mirror_urls.length ? mirror_urls : null,
-      description: document.getElementById('book-desc').value.trim() || null,
-    };
-
-    const { error } = await supabase.from('books').insert(payload);
-    if (error) {
-      adminMessage.textContent = '❌ Upload failed: ' + error.message;
-      adminMessage.className = 'auth-error';
-    } else {
-      adminMessage.textContent = '✅ Book added successfully!';
-      adminMessage.className = 'success';
-      // Clear fields
-      document.querySelectorAll('#admin-upload input, #admin-upload textarea, #admin-upload select').forEach(el => el.value = '');
-      if (searchInput.value.trim()) performSearch(searchInput.value);
-    }
-  });
-</script>
 </body>
 </html>
