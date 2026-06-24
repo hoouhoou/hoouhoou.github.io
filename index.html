@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Book Archive – Dashboard</title>
+  <title>File Manager – Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -13,60 +13,230 @@
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #2e2e2e; border-radius: 3px; }
     ::-webkit-scrollbar-thumb:hover { background: #3e3e3e; }
-    .book-row { transition: 0.15s; }
-    .book-row:hover { background: #1e1e1e; }
+    .file-row { transition: 0.15s; }
+    .file-row:hover { background: #1e1e1e; }
+    .file-row .actions { opacity: 0.3; transition: 0.15s; }
+    .file-row:hover .actions { opacity: 1; }
+
+    /* Dropdown styles */
+    #connect-dropdown {
+      display: none;
+      position: absolute;
+      top: 100%;
+      right: 0;
+      margin-top: 6px;
+      width: 360px;
+      max-height: calc(100vh - 80px);
+      overflow-y: auto;
+      background: #1e1e1e;
+      border: 1px solid #2e2e2e;
+      border-radius: 10px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+      padding: 1.25rem;
+      z-index: 100;
+      color: #e2e8f0;
+    }
+    #connect-dropdown.open { display: block; }
+    #connect-dropdown h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: #f1f5f9;
+    }
+    #connect-dropdown input, #connect-dropdown select, #connect-dropdown textarea {
+      width: 100%;
+      padding: 8px 12px;
+      background: #0d0d0d;
+      border: 1px solid #2e2e2e;
+      border-radius: 6px;
+      color: #e2e8f0;
+      font-size: 0.85rem;
+      margin-bottom: 8px;
+    }
+    #connect-dropdown input:focus, #connect-dropdown select:focus, #connect-dropdown textarea:focus {
+      outline: none;
+      border-color: #3ecf8e;
+    }
+    #connect-dropdown textarea { resize: vertical; min-height: 50px; }
+    #connect-dropdown .btn-primary {
+      width: 100%;
+      background: #3ecf8e;
+      color: #0b0e11;
+      font-weight: 600;
+      border: none;
+      padding: 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    #connect-dropdown .btn-primary:hover { background: #2eb67d; }
+    #connect-dropdown .btn-danger {
+      width: 100%;
+      background: #ef4444;
+      color: white;
+      font-weight: 600;
+      border: none;
+      padding: 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.2s;
+      margin-top: 4px;
+    }
+    #connect-dropdown .btn-danger:hover { background: #dc2626; }
+    #connect-dropdown .btn-secondary {
+      width: 100%;
+      background: #2e2e2e;
+      color: #e2e8f0;
+      font-weight: 600;
+      border: none;
+      padding: 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.2s;
+      margin-top: 4px;
+    }
+    #connect-dropdown .btn-secondary:hover { background: #3e3e3e; }
+    #connect-dropdown .msg { margin: 4px 0; font-size: 0.8rem; }
+    #connect-dropdown .msg.error { color: #f87171; }
+    #connect-dropdown .msg.success { color: #34d399; }
+    #connect-dropdown .helper { font-size: 0.7rem; color: #6b7280; margin-top: 2px; }
+    #connect-dropdown .close-dropdown {
+      position: absolute;
+      top: 6px;
+      right: 10px;
+      background: none;
+      border: none;
+      color: #6b7280;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    #connect-dropdown .close-dropdown:hover { color: #e2e8f0; }
+    #connect-dropdown .tab-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid #2e2e2e;
+      padding-bottom: 8px;
+    }
+    #connect-dropdown .tab-row button {
+      background: none;
+      border: none;
+      color: #6b7280;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    #connect-dropdown .tab-row button:hover { color: #e2e8f0; background: #2e2e2e; }
+    #connect-dropdown .tab-row button.active { color: #3ecf8e; background: #0d2d24; }
+    #connect-dropdown .tab-content { display: none; }
+    #connect-dropdown .tab-content.active { display: block; }
+
+    .connect-wrapper { position: relative; display: inline-block; }
+
+    /* Delete confirmation modal */
+    #delete-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    #delete-modal.active { display: flex; }
+    #delete-modal .modal-box {
+      background: #1e1e1e;
+      border: 1px solid #2e2e2e;
+      border-radius: 12px;
+      padding: 2rem;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+    }
+    #delete-modal .modal-box h3 { color: #f1f5f9; font-size: 1.1rem; margin-bottom: 8px; }
+    #delete-modal .modal-box p { color: #94a3b8; font-size: 0.9rem; margin-bottom: 1.5rem; }
+    #delete-modal .modal-box .btn-row { display: flex; gap: 10px; }
+    #delete-modal .modal-box .btn-row button { flex: 1; padding: 8px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; transition: 0.2s; }
+    #delete-modal .modal-box .btn-row .cancel { background: #2e2e2e; color: #e2e8f0; }
+    #delete-modal .modal-box .btn-row .cancel:hover { background: #3e3e3e; }
+    #delete-modal .modal-box .btn-row .confirm { background: #ef4444; color: white; }
+    #delete-modal .modal-box .btn-row .confirm:hover { background: #dc2626; }
   </style>
 </head>
 <body class="h-full text-zinc-200 font-sans flex flex-col antialiased selection:bg-emerald-500/30 selection:text-emerald-400 overflow-hidden">
 
   <!-- TOP BAR -->
-  <header class="h-12 bg-[#171717] border-b border-zinc-800/80 flex items-center justify-between px-3 shrink-0 text-xs z-30">
+  <header class="h-14 bg-[#141414] border-b border-zinc-800 flex items-center justify-between px-4 shrink-0 z-30">
     <div class="flex items-center space-x-2">
-      <div class="text-[#3ecf8e] text-lg font-bold mr-2 flex items-center justify-center">
-        <svg viewBox="0 0 24 24" class="w-5 h-5 fill-current"><path d="M21.357 11.102a.5.5 0 0 0-.5-.102l-8.214 2.738L16.43 3.61a.5.5 0 0 0-.834-.465L2.643 12.898a.5.5 0 0 0 .5.102l8.214-2.738-3.786 10.13a.5.5 0 0 0 .834.466l12.956-9.753a.5.5 0 0 0 .1-.503z"/></svg>
+      <div class="text-[#3ecf8e] text-xl font-bold flex items-center justify-center">
+        <svg viewBox="0 0 24 24" class="w-6 h-6 fill-current"><path d="M21.357 11.102a.5.5 0 0 0-.5-.102l-8.214 2.738L16.43 3.61a.5.5 0 0 0-.834-.465L2.643 12.898a.5.5 0 0 0 .5.102l8.214-2.738-3.786 10.13a.5.5 0 0 0 .834.466l12.956-9.753a.5.5 0 0 0 .1-.503z"/></svg>
       </div>
-      <div class="flex items-center space-x-1.5 cursor-pointer hover:bg-zinc-800/60 px-2 py-1 rounded transition">
-        <span class="w-4 h-4 rounded bg-zinc-700 flex items-center justify-center text-[9px] text-zinc-300 font-bold">Bo</span>
-        <span class="font-normal text-zinc-200">BookArc</span>
-        <span class="text-[9px] px-1 bg-zinc-800 text-zinc-400 border border-zinc-700/60 rounded font-semibold uppercase tracking-wider scale-90">Free</span>
-        <i class="fa-solid fa-chevron-down text-[9px] text-zinc-500 ml-0.5"></i>
-      </div>
-      <span class="text-zinc-700 text-sm">/</span>
-      <div class="flex items-center space-x-1.5 cursor-pointer hover:bg-zinc-800/60 px-2 py-1 rounded transition">
-        <i class="fa-solid fa-cube text-zinc-400 text-[11px]"></i>
-        <span class="font-normal text-zinc-200">my-archive</span>
-        <i class="fa-solid fa-chevron-down text-[9px] text-zinc-500 ml-0.5"></i>
-      </div>
-      <span class="text-zinc-700 text-sm">/</span>
-      <div class="flex items-center space-x-1.5 cursor-pointer hover:bg-zinc-800/60 px-2 py-1 rounded transition">
-        <span class="font-mono text-zinc-300">main</span>
-        <span class="text-[9px] px-1.5 py-0.5 bg-amber-500/10 text-amber-500 border border-amber-500/20 rounded font-medium uppercase tracking-wider scale-90">Production</span>
-        <i class="fa-solid fa-chevron-down text-[9px] text-zinc-500 ml-0.5"></i>
-      </div>
-      <button id="admin-login-toggle" class="ml-2 bg-[#0d2d24] text-[#3ecf8e] border border-emerald-900/60 hover:border-emerald-700/80 px-2.5 py-1 rounded font-medium flex items-center space-x-1.5 transition">
-        <i class="fa-solid fa-plug text-[10px]"></i>
-        <span id="admin-status-label">Connect</span>
-      </button>
+      <span class="text-zinc-300 font-semibold text-sm">File Manager</span>
     </div>
 
-    <div class="flex items-center space-x-3 text-zinc-400">
-      <span class="hover:text-zinc-200 text-xs cursor-pointer transition">Feedback</span>
-      <div class="bg-[#1e1e1e] border border-zinc-800 rounded px-2 py-1 flex items-center justify-between w-40 cursor-pointer hover:border-zinc-700 transition">
-        <div class="flex items-center space-x-1.5 text-zinc-500">
-          <i class="fa-solid fa-magnifying-glass text-[10px]"></i>
-          <input type="text" id="search-input" placeholder="Search books..." class="bg-transparent border-none outline-none text-zinc-200 w-full text-xs" />
+    <div class="flex items-center space-x-4">
+      <div class="bg-[#1e1e1e] border border-zinc-800 rounded-lg px-3 py-1.5 flex items-center justify-between w-64 cursor-pointer hover:border-zinc-700 transition">
+        <div class="flex items-center space-x-2 text-zinc-400 w-full">
+          <i class="fa-solid fa-magnifying-glass text-xs"></i>
+          <input type="text" id="search-input" placeholder="Search files..." class="bg-transparent border-none outline-none text-zinc-200 w-full text-sm" />
         </div>
-        <span class="text-[9px] bg-zinc-800 px-1 py-0.5 rounded text-zinc-500 font-mono">⌘K</span>
+        <span class="text-[10px] bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-500 font-mono">⌘K</span>
       </div>
-      <div class="flex items-center space-x-3 text-sm text-zinc-400">
-        <i class="fa-regular fa-circle-question hover:text-zinc-200 cursor-pointer transition"></i>
-        <i class="fa-regular fa-lightbulb hover:text-zinc-200 cursor-pointer transition"></i>
-        <i class="fa-regular fa-bell hover:text-zinc-200 cursor-pointer transition"></i>
-      </div>
-      <div class="w-6 h-6 rounded-full border border-zinc-700 overflow-hidden cursor-pointer">
-        <div class="grid grid-cols-2 w-full h-full">
-          <div class="bg-zinc-800"></div><div class="bg-emerald-600"></div>
-          <div class="bg-emerald-500"></div><div class="bg-zinc-700"></div>
+
+      <div class="connect-wrapper">
+        <button id="admin-login-toggle" class="bg-[#10b981] hover:bg-[#059669] text-[#121212] px-4 py-1.5 rounded-lg font-semibold text-sm flex items-center space-x-2 transition shadow-lg shadow-emerald-900/20">
+          <i class="fa-solid fa-plug text-xs"></i>
+          <span id="admin-status-label">Connect</span>
+        </button>
+
+        <div id="connect-dropdown">
+          <button class="close-dropdown" id="dropdown-close">&times;</button>
+          <h3 id="dropdown-title">Admin</h3>
+
+          <!-- Tabs -->
+          <div class="tab-row" id="tab-row" style="display:none;">
+            <button class="active" data-tab="upload">Add File</button>
+            <button data-tab="categories">Categories</button>
+          </div>
+
+          <!-- TAB: Upload / Edit -->
+          <div id="tab-upload" class="tab-content active">
+            <div id="dropdown-login">
+              <input id="admin-email" type="email" placeholder="Email" />
+              <input id="admin-pass" type="password" placeholder="Password" />
+              <button id="admin-login-btn" class="btn-primary">Login</button>
+              <div class="helper">First time? Create user in Supabase Auth.</div>
+              <div id="dropdown-msg" class="msg"></div>
+            </div>
+
+            <div id="dropdown-upload" style="display:none;">
+              <input id="file-title" placeholder="File Name *" />
+              <input id="file-author" placeholder="Author / Source" />
+              <select id="file-category">
+                <option value="">Select Category</option>
+              </select>
+              <input id="file-format" placeholder="Format (PDF, Image, Video...)" />
+              <input id="file-size" placeholder="Size (MB)" />
+              <input id="file-urls" placeholder="File URLs (comma separated)" />
+              <textarea id="file-desc" placeholder="Description"></textarea>
+              <input type="hidden" id="edit-file-id" value="" />
+              <button id="upload-btn" class="btn-primary">➕ Add File</button>
+              <button id="update-btn" class="btn-primary" style="display:none;">💾 Update File</button>
+              <div id="dropdown-upload-msg" class="msg"></div>
+            </div>
+          </div>
+
+          <!-- TAB: Categories -->
+          <div id="tab-categories" class="tab-content">
+            <div style="display:flex; gap:6px; margin-bottom:10px;">
+              <input id="new-category-input" placeholder="New category name..." style="flex:1; margin:0;" />
+              <button id="add-category-btn" class="btn-primary" style="width:auto; padding:8px 16px;">Add</button>
+            </div>
+            <div id="category-list-admin" class="space-y-1 text-sm"></div>
+            <div id="category-msg" class="msg"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -76,42 +246,47 @@
   <div class="flex flex-1 overflow-hidden relative">
 
     <!-- SIDEBAR -->
-    <div id="navigation-shell" class="flex shrink-0 transition-all-custom z-20 w-60 border-r border-zinc-800/80 bg-[#141414]">
-      
-      <!-- Icon bar -->
-      <aside class="w-12 bg-[#171717] border-r border-zinc-800/80 flex flex-col justify-between py-2 items-center shrink-0">
-        <div class="w-full flex flex-col items-center space-y-0.5">
-          <button onclick="switchView('overview')" class="nav-icon-btn w-8 h-8 rounded-md flex items-center justify-center text-emerald-400 bg-zinc-800/80 border border-zinc-700/40" title="Project Overview"><i class="fa-solid fa-house-chimney text-xs"></i></button>
-          <button onclick="switchView('categories')" class="nav-icon-btn w-8 h-8 rounded-md flex items-center justify-center text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 transition" title="Categories"><i class="fa-solid fa-tags text-xs"></i></button>
-          <button class="nav-icon-btn w-8 h-8 rounded-md flex items-center justify-center text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 transition" title="Admin"><i class="fa-solid fa-plus text-xs" id="new-book-icon"></i></button>
-          <div class="w-6 border-b border-zinc-800/60 my-1.5"></div>
-          <button class="nav-icon-btn w-8 h-8 rounded-md flex items-center justify-center text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 transition" title="Database"><i class="fa-solid fa-database text-xs"></i></button>
-          <button class="nav-icon-btn w-8 h-8 rounded-md flex items-center justify-center text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 transition" title="Authentication"><i class="fa-solid fa-user-shield text-xs"></i></button>
+    <div id="navigation-shell" class="flex shrink-0 transition-all-custom z-20 w-14 border-r border-zinc-800 bg-[#141414]">
+      <aside class="w-14 bg-[#141414] flex flex-col justify-between py-4 items-center shrink-0">
+        <div class="w-full flex flex-col items-center space-y-4">
+          <button onclick="switchView('overview')" class="nav-icon-btn w-10 h-10 rounded-xl flex items-center justify-center text-emerald-400 bg-zinc-800/80 border border-zinc-700/40" title="Dashboard">
+            <i class="fa-solid fa-house-chimney text-base"></i>
+          </button>
+          <button onclick="switchView('categories')" class="nav-icon-btn w-10 h-10 rounded-xl flex items-center justify-center text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 transition" title="Categories">
+            <i class="fa-solid fa-tags text-base"></i>
+          </button>
+          <button class="nav-icon-btn w-10 h-10 rounded-xl flex items-center justify-center text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 transition" title="Add File" id="new-file-icon">
+            <i class="fa-solid fa-plus text-base"></i>
+          </button>
+          <div class="w-8 border-b border-zinc-800 my-1"></div>
+          <button class="nav-icon-btn w-10 h-10 rounded-xl flex items-center justify-center text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 transition" title="Database">
+            <i class="fa-solid fa-database text-base"></i>
+          </button>
         </div>
-        <div class="w-full flex flex-col items-center space-y-0.5">
-          <button class="nav-icon-btn w-8 h-8 rounded-md flex items-center justify-center text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 transition" title="Settings"><i class="fa-solid fa-gear text-xs"></i></button>
-          <button id="toggle-sidebar" class="w-8 h-8 rounded-md flex items-center justify-center text-zinc-500 hover:text-zinc-200 transition">
-            <i id="toggle-icon" class="fa-solid fa-bars-staggered text-xs"></i>
+        <div class="w-full flex flex-col items-center space-y-4">
+          <button class="nav-icon-btn w-10 h-10 rounded-xl flex items-center justify-center text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 transition" title="Settings">
+            <i class="fa-solid fa-gear text-base"></i>
+          </button>
+          <button id="toggle-sidebar" class="w-10 h-10 rounded-xl flex items-center justify-center text-zinc-500 hover:text-zinc-200 transition">
+            <i id="toggle-icon" class="fa-solid fa-bars-staggered text-base"></i>
           </button>
         </div>
       </aside>
 
-      <!-- Sub-sidebar -->
-      <aside id="sub-sidebar" class="flex-1 flex flex-col p-2.5 text-xs overflow-hidden">
-        
+      <aside id="sub-sidebar" class="flex-1 flex flex-col p-2.5 text-xs overflow-hidden hidden">
         <div id="menu-overview" class="flex flex-col h-full space-y-4">
-          <div class="font-normal text-zinc-200 px-1 text-sm h-6 flex items-center">Book Archive</div>
+          <div class="font-normal text-zinc-200 px-1 text-sm h-6 flex items-center">File Manager</div>
           <nav class="space-y-0.5">
             <a href="#" class="flex items-center space-x-2.5 px-2 py-1.5 rounded bg-zinc-800/80 text-white font-medium">
               <i class="fa-solid fa-house-chimney text-zinc-400 w-4 text-center"></i><span>Dashboard</span>
             </a>
             <a href="#" class="flex items-center space-x-2.5 px-2 py-1.5 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/30 transition" onclick="setCategory('')">
-              <i class="fa-solid fa-book-open text-zinc-500 w-4 text-center"></i><span>All Books</span>
+              <i class="fa-solid fa-folder-open text-zinc-500 w-4 text-center"></i><span>All Files</span>
             </a>
             <div id="category-list" class="space-y-0.5 mt-1"></div>
             <div class="border-b border-zinc-800/60 my-2 mx-1"></div>
             <a href="#" class="flex items-center space-x-2.5 px-2 py-1.5 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/30 transition" id="admin-sidebar-link">
-              <i class="fa-solid fa-pen-to-square text-emerald-400 w-4 text-center"></i><span>Add Book</span>
+              <i class="fa-solid fa-pen-to-square text-emerald-400 w-4 text-center"></i><span>Add File</span>
             </a>
           </nav>
         </div>
@@ -121,125 +296,219 @@
           <nav id="category-nav" class="space-y-0.5"></nav>
         </div>
 
-        <div id="menu-admin" class="flex flex-col h-full space-y-4 hidden">
-          <div class="font-normal text-zinc-200 px-1 text-sm h-6 flex items-center">Admin</div>
-          <div id="admin-upload-form" class="space-y-3 text-xs">
-            <div id="admin-login-box">
-              <input id="admin-email" type="email" placeholder="Email" class="w-full bg-[#1e1e1e] border border-zinc-700 rounded px-2 py-1.5 text-zinc-200 text-xs" />
-              <input id="admin-pass" type="password" placeholder="Password" class="w-full bg-[#1e1e1e] border border-zinc-700 rounded px-2 py-1.5 text-zinc-200 text-xs mt-1" />
-              <button id="admin-login-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-black font-semibold text-xs px-3 py-1.5 rounded transition mt-1">Login</button>
-              <p class="text-zinc-500 text-[10px] mt-1">First time? Create user in Supabase Auth.</p>
-            </div>
-            <div id="admin-upload-fields" style="display:none;">
-              <input id="book-title" placeholder="Title *" class="w-full bg-[#1e1e1e] border border-zinc-700 rounded px-2 py-1.5 text-zinc-200 text-xs" />
-              <input id="book-author" placeholder="Author" class="w-full bg-[#1e1e1e] border border-zinc-700 rounded px-2 py-1.5 text-zinc-200 text-xs mt-1" />
-              <select id="book-category" class="w-full bg-[#1e1e1e] border border-zinc-700 rounded px-2 py-1.5 text-zinc-200 text-xs mt-1">
-                <option value="">Select Category</option>
-                <option value="Fiction">Fiction</option>
-                <option value="Non-Fiction">Non-Fiction</option>
-                <option value="Science">Science</option>
-                <option value="History">History</option>
-                <option value="Technology">Technology</option>
-                <option value="Philosophy">Philosophy</option>
-                <option value="Biography">Biography</option>
-                <option value="Other">Other</option>
-              </select>
-              <input id="book-isbn" placeholder="ISBN" class="w-full bg-[#1e1e1e] border border-zinc-700 rounded px-2 py-1.5 text-zinc-200 text-xs mt-1" />
-              <input id="book-year" placeholder="Year" class="w-full bg-[#1e1e1e] border border-zinc-700 rounded px-2 py-1.5 text-zinc-200 text-xs mt-1" />
-              <input id="book-format" placeholder="Format (PDF, EPUB...)" class="w-full bg-[#1e1e1e] border border-zinc-700 rounded px-2 py-1.5 text-zinc-200 text-xs mt-1" />
-              <input id="book-mirrors" placeholder="Mirror URLs (comma separated)" class="w-full bg-[#1e1e1e] border border-zinc-700 rounded px-2 py-1.5 text-zinc-200 text-xs mt-1" />
-              <textarea id="book-desc" placeholder="Description" class="w-full bg-[#1e1e1e] border border-zinc-700 rounded px-2 py-1.5 text-zinc-200 text-xs mt-1 resize-none h-16"></textarea>
-              <button id="upload-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-black font-semibold text-xs px-3 py-1.5 rounded transition mt-2">➕ Add Book</button>
-              <button id="logout-btn" class="w-full bg-zinc-700 hover:bg-zinc-600 text-zinc-200 text-xs px-3 py-1.5 rounded transition mt-1">Logout</button>
-              <div id="admin-msg" class="text-xs mt-1 text-emerald-400"></div>
-            </div>
-          </div>
-        </div>
-
         <div id="menu-settings" class="flex flex-col h-full space-y-4 hidden overflow-y-auto">
           <div class="font-normal text-zinc-200 px-1 text-sm h-6 flex items-center">Settings</div>
-          <div class="text-zinc-500 text-xs">Project settings would go here.</div>
+          <div class="text-zinc-500 text-xs">Settings would go here.</div>
         </div>
       </aside>
     </div>
 
     <!-- MAIN CONTENT -->
-    <main class="flex-1 bg-[#121212] overflow-y-auto p-6 md:p-8">
-      
-      <div class="flex flex-wrap items-center gap-4 mb-4 max-w-4xl">
-        <div class="text-zinc-400 text-xs flex items-center gap-2">
-          <i class="fa-solid fa-book"></i>
-          <span id="total-count">0</span> books
+    <div class="flex-1 border-l border-zinc-800 relative bg-[#121212]">
+      <main class="h-full overflow-y-auto p-6 md:p-8">
+        <div class="flex flex-wrap items-center gap-4 mb-4 max-w-4xl">
+          <div class="text-zinc-400 text-xs flex items-center gap-2">
+            <i class="fa-solid fa-file"></i>
+            <span id="total-count">0</span> files
+          </div>
+          <div class="text-zinc-400 text-xs flex items-center gap-2">
+            <i class="fa-solid fa-tag"></i>
+            <span id="category-label">All categories</span>
+          </div>
+          <button id="new-file-btn" class="ml-auto bg-emerald-600 hover:bg-emerald-700 text-black font-semibold text-xs px-3 py-1.5 rounded shadow-sm transition">
+            <i class="fa-solid fa-plus mr-1"></i> New File
+          </button>
         </div>
-        <div class="text-zinc-400 text-xs flex items-center gap-2">
-          <i class="fa-solid fa-tag"></i>
-          <span id="category-label">All categories</span>
+
+        <div id="file-list" class="space-y-1 max-w-4xl">
+          <div class="text-zinc-500 text-center py-8 text-xs">Loading files...</div>
         </div>
-        <button id="new-book-btn" class="ml-auto bg-emerald-600 hover:bg-emerald-700 text-black font-semibold text-xs px-3 py-1.5 rounded shadow-sm transition">
-          <i class="fa-solid fa-plus mr-1"></i> New Book
-        </button>
-      </div>
+      </main>
+    </div>
+  </div>
 
-      <div id="book-list" class="space-y-1 max-w-4xl">
-        <div class="text-zinc-500 text-center py-8 text-xs">Loading books...</div>
+  <!-- DELETE CONFIRMATION MODAL -->
+  <div id="delete-modal">
+    <div class="modal-box">
+      <h3>⚠️ Delete this file?</h3>
+      <p id="delete-file-name">This action cannot be undone.</p>
+      <div class="btn-row">
+        <button class="cancel" id="delete-cancel">Cancel</button>
+        <button class="confirm" id="delete-confirm">Delete</button>
       </div>
-
-    </main>
+    </div>
   </div>
 
   <script>
-    // ==================== SUPABASE (HARDCODED) ====================
+    // ==================== SUPABASE ====================
     const SUPABASE_URL = "https://zbqsrfurmoowilpyxrfo.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpicXNyZnVybW9vd2lscHl4cmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyODU3NjcsImV4cCI6MjA5Nzg2MTc2N30.Q58fAB5-KliFKo7v0g3e48I6ttgnYzyOom1FVsUOrFM";
-    // Use a unique variable name to avoid redeclaration
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // ==================== DOM REFS ====================
     const searchInput = document.getElementById('search-input');
-    const bookList = document.getElementById('book-list');
+    const fileList = document.getElementById('file-list');
     const totalCount = document.getElementById('total-count');
     const categoryLabel = document.getElementById('category-label');
     const categoryList = document.getElementById('category-list');
     const categoryNav = document.getElementById('category-nav');
-    const newBookBtn = document.getElementById('new-book-btn');
+    const newFileBtn = document.getElementById('new-file-btn');
+    const newFileIcon = document.getElementById('new-file-icon');
     const adminToggleBtn = document.getElementById('admin-login-toggle');
     const adminStatusLabel = document.getElementById('admin-status-label');
-    const adminLoginBox = document.getElementById('admin-login-box');
-    const adminUploadFields = document.getElementById('admin-upload-fields');
+    const dropdown = document.getElementById('connect-dropdown');
+    const dropdownClose = document.getElementById('dropdown-close');
+    const dropdownTitle = document.getElementById('dropdown-title');
+    const dropdownLogin = document.getElementById('dropdown-login');
+    const dropdownUpload = document.getElementById('dropdown-upload');
+    const dropdownMsg = document.getElementById('dropdown-msg');
+    const dropdownUploadMsg = document.getElementById('dropdown-upload-msg');
     const adminEmail = document.getElementById('admin-email');
     const adminPass = document.getElementById('admin-pass');
     const adminLoginBtn = document.getElementById('admin-login-btn');
     const logoutBtn = document.getElementById('logout-btn');
     const uploadBtn = document.getElementById('upload-btn');
-    const adminMsg = document.getElementById('admin-msg');
-    const newBookIcon = document.getElementById('new-book-icon');
+    const updateBtn = document.getElementById('update-btn');
+    const adminSidebarLink = document.getElementById('admin-sidebar-link');
+    const fileTitle = document.getElementById('file-title');
+    const fileAuthor = document.getElementById('file-author');
+    const fileCategory = document.getElementById('file-category');
+    const fileFormat = document.getElementById('file-format');
+    const fileSize = document.getElementById('file-size');
+    const fileUrls = document.getElementById('file-urls');
+    const fileDesc = document.getElementById('file-desc');
+    const editFileId = document.getElementById('edit-file-id');
+
+    // Category management
+    const newCategoryInput = document.getElementById('new-category-input');
+    const addCategoryBtn = document.getElementById('add-category-btn');
+    const categoryListAdmin = document.getElementById('category-list-admin');
+    const categoryMsg = document.getElementById('category-msg');
+
+    // Delete modal
+    const deleteModal = document.getElementById('delete-modal');
+    const deleteCancel = document.getElementById('delete-cancel');
+    const deleteConfirm = document.getElementById('delete-confirm');
+    const deleteFileName = document.getElementById('delete-file-name');
+    let deleteTargetId = null;
+
+    // Tabs
+    const tabRow = document.getElementById('tab-row');
+    const tabUpload = document.getElementById('tab-upload');
+    const tabCategories = document.getElementById('tab-categories');
 
     let currentCategory = '';
     let isAdminLoggedIn = false;
+    let isDropdownOpen = false;
+    let allCategories = [];
+
+    // ==================== DROPDOWN ====================
+    function toggleDropdown(forceState) {
+      isDropdownOpen = (forceState !== undefined) ? forceState : !isDropdownOpen;
+      if (isDropdownOpen) {
+        dropdown.classList.add('open');
+      } else {
+        dropdown.classList.remove('open');
+      }
+    }
+
+    function openDropdown(showUpload) {
+      if (isAdminLoggedIn) {
+        tabRow.style.display = 'flex';
+        dropdownLogin.style.display = 'none';
+        dropdownUpload.style.display = 'block';
+        dropdownTitle.textContent = 'Admin';
+        switchTab('upload');
+        if (showUpload) {
+          // reset form
+          resetUploadForm();
+        }
+      } else {
+        tabRow.style.display = 'none';
+        dropdownLogin.style.display = 'block';
+        dropdownUpload.style.display = 'none';
+        dropdownTitle.textContent = 'Admin Login';
+        dropdownMsg.textContent = '';
+      }
+      toggleDropdown(true);
+    }
+
+    function closeDropdown() {
+      toggleDropdown(false);
+    }
+
+    dropdownClose.addEventListener('click', closeDropdown);
+
+    document.addEventListener('click', (e) => {
+      if (isDropdownOpen) {
+        const wrapper = document.querySelector('.connect-wrapper');
+        if (!wrapper.contains(e.target)) {
+          closeDropdown();
+        }
+      }
+    });
+
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-row button').forEach(el => el.classList.remove('active'));
+      if (tab === 'upload') {
+        tabUpload.classList.add('active');
+        document.querySelector('[data-tab="upload"]').classList.add('active');
+        resetUploadForm();
+      } else if (tab === 'categories') {
+        tabCategories.classList.add('active');
+        document.querySelector('[data-tab="categories"]').classList.add('active');
+        loadCategoriesAdmin();
+      }
+    }
+
+    document.querySelectorAll('.tab-row button').forEach(btn => {
+      btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+    });
+
+    function resetUploadForm() {
+      fileTitle.value = '';
+      fileAuthor.value = '';
+      fileFormat.value = '';
+      fileSize.value = '';
+      fileUrls.value = '';
+      fileDesc.value = '';
+      editFileId.value = '';
+      uploadBtn.style.display = 'block';
+      updateBtn.style.display = 'none';
+      dropdownUploadMsg.textContent = '';
+      // Keep category selected
+    }
 
     // ==================== SIDEBAR ====================
     const toggleBtn = document.getElementById('toggle-sidebar');
     const navShell = document.getElementById('navigation-shell');
     const toggleIcon = document.getElementById('toggle-icon');
-    let isCollapsed = false;
+    let isCollapsed = true;
+    
     toggleBtn.addEventListener('click', () => {
       isCollapsed = !isCollapsed;
-      navShell.style.width = isCollapsed ? '48px' : '240px';
-      toggleIcon.className = isCollapsed ? 'fa-solid fa-chevron-right' : 'fa-solid fa-bars-staggered';
+      navShell.style.width = isCollapsed ? '56px' : '240px';
+      const subSidebar = document.getElementById('sub-sidebar');
+      if (isCollapsed) {
+        subSidebar.classList.add('hidden');
+      } else {
+        subSidebar.classList.remove('hidden');
+      }
     });
 
     function switchView(view) {
       const overview = document.getElementById('menu-overview');
       const categories = document.getElementById('menu-categories');
-      const admin = document.getElementById('menu-admin');
       const settings = document.getElementById('menu-settings');
+      const subSidebar = document.getElementById('sub-sidebar');
       const icons = document.querySelectorAll('.nav-icon-btn');
+      
       icons.forEach(btn => btn.classList.remove('text-emerald-400', 'bg-zinc-800/80', 'border', 'border-zinc-700/40'));
       icons.forEach(btn => btn.classList.add('text-zinc-400', 'hover:text-zinc-200', 'hover:bg-zinc-800/40'));
 
       overview.classList.add('hidden');
       categories.classList.add('hidden');
-      admin.classList.add('hidden');
       settings.classList.add('hidden');
 
       if (view === 'overview') {
@@ -248,18 +517,16 @@
       } else if (view === 'categories') {
         categories.classList.remove('hidden');
         icons[1].classList.add('text-emerald-400', 'bg-zinc-800/80', 'border', 'border-zinc-700/40');
-      } else if (view === 'admin') {
-        admin.classList.remove('hidden');
-        icons[2].classList.add('text-emerald-400', 'bg-zinc-800/80', 'border', 'border-zinc-700/40');
+        loadCategoriesAdmin();
       } else if (view === 'settings') {
         settings.classList.remove('hidden');
-        icons[icons.length-1].classList.add('text-emerald-400', 'bg-zinc-800/80', 'border', 'border-zinc-700/40');
+        icons[icons.length-2].classList.add('text-emerald-400', 'bg-zinc-800/80', 'border', 'border-zinc-700/40');
       }
-      if (isCollapsed) {
-        isCollapsed = false;
-        navShell.style.width = '240px';
-        toggleIcon.className = 'fa-solid fa-bars-staggered';
-      }
+      
+      isCollapsed = false;
+      navShell.style.width = '240px';
+      subSidebar.classList.remove('hidden');
+      toggleIcon.className = 'fa-solid fa-bars-staggered';
     }
 
     function setCategory(cat) {
@@ -270,95 +537,293 @@
         el.classList.toggle('text-white', el.dataset.category === cat);
         el.classList.toggle('text-zinc-400', el.dataset.category !== cat);
       });
-      loadBooks(searchInput.value, cat);
+      loadFiles(searchInput.value, cat);
       switchView('overview');
     }
 
-    // ==================== LOAD BOOKS ====================
-    async function loadBooks(query = '', category = '') {
-      let supabaseQuery = supabaseClient.from('books').select('*', { count: 'exact' });
+    // ==================== LOAD FILES ====================
+    async function loadFiles(query = '', category = '') {
+      let supabaseQuery = supabaseClient.from('books').select('*, categories!left(name)');
       if (query.trim()) {
         supabaseQuery = supabaseQuery.textSearch('search_vector', query, { config: 'english', type: 'websearch' });
       }
       if (category) {
-        supabaseQuery = supabaseQuery.eq('category', category);
+        // Find category ID by name
+        const cat = allCategories.find(c => c.name === category);
+        if (cat) {
+          supabaseQuery = supabaseQuery.eq('category_id', cat.id);
+        } else {
+          // Try direct match on category column for backward compatibility
+          supabaseQuery = supabaseQuery.eq('category', category);
+        }
       }
-      const { data, error, count } = await supabaseQuery.order('publication_year', { ascending: false }).limit(100);
+      const { data, error, count } = await supabaseQuery.order('created_at', { ascending: false }).limit(100);
+
       if (error) {
-        bookList.innerHTML = `<div class="text-zinc-500 text-center py-8 text-xs">⚠️ Error loading books</div>`;
+        fileList.innerHTML = `<div class="text-zinc-500 text-center py-8 text-xs">⚠️ Error loading files</div>`;
         return;
       }
       totalCount.textContent = count || 0;
+
       if (!data || data.length === 0) {
-        bookList.innerHTML = `<div class="text-zinc-500 text-center py-8 text-xs">No books found. Add your first one using "New Book".</div>`;
+        fileList.innerHTML = `<div class="text-zinc-500 text-center py-8 text-xs">No files found. Add your first one using "New File".</div>`;
         return;
       }
+
       let html = '';
-      data.forEach(book => {
-        let mirrors = [];
-        try { mirrors = JSON.parse(book.mirror_urls) || []; } catch { mirrors = [book.mirror_urls]; }
-        if (!Array.isArray(mirrors)) mirrors = [mirrors];
-        const valid = mirrors.filter(u => u && u.startsWith('http'));
-        const badge = book.category ? `<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-900/60 px-1.5 py-0.5 rounded text-[9px] font-medium">${book.category}</span>` : '';
+      data.forEach(file => {
+        let urls = [];
+        try { urls = JSON.parse(file.mirror_urls) || []; } catch { urls = [file.mirror_urls]; }
+        if (!Array.isArray(urls)) urls = [urls];
+        const valid = urls.filter(u => u && u.startsWith('http'));
+
+        const categoryName = file.categories?.name || file.category || 'Uncategorized';
+        const badge = `<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-900/60 px-1.5 py-0.5 rounded text-[9px] font-medium">${categoryName}</span>`;
+        const fileId = file.id;
+
         html += `
-          <div class="book-row bg-[#171717] border border-zinc-800/80 rounded-lg p-3 flex flex-wrap items-center justify-between gap-2">
+          <div class="file-row bg-[#171717] border border-zinc-800/80 rounded-lg p-3 flex flex-wrap items-center justify-between gap-2">
             <div class="flex-1 min-w-0">
-              <div class="text-sm font-medium text-zinc-200 truncate">${book.title}</div>
+              <div class="text-sm font-medium text-zinc-200 truncate">${file.title}</div>
               <div class="flex flex-wrap items-center gap-1 text-xs text-zinc-400 mt-0.5">
-                ${book.author ? `✍️ ${book.author}` : ''}
+                ${file.author ? `✍️ ${file.author}` : ''}
                 ${badge}
-                ${book.isbn ? `· ISBN ${book.isbn}` : ''}
-                ${book.description ? `· ${book.description.substring(0, 40)}${book.description.length > 40 ? '…' : ''}` : ''}
+                ${file.file_format ? `· ${file.file_format}` : ''}
+                ${file.file_size_mb ? `· ${file.file_size_mb} MB` : ''}
+                ${file.description ? `· ${file.description.substring(0, 40)}${file.description.length > 40 ? '…' : ''}` : ''}
               </div>
             </div>
             <div class="flex items-center gap-2 text-xs text-zinc-400 shrink-0">
-              <span>${book.publication_year || 'N/A'}</span>
-              ${book.file_format ? `<span class="bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-300">${book.file_format}</span>` : ''}
-              ${valid.length ? `<a href="${valid[0]}" target="_blank" class="bg-emerald-600 hover:bg-emerald-700 text-black px-2 py-0.5 rounded font-medium transition">Mirror</a>` : ''}
+              ${valid.length ? `<a href="${valid[0]}" target="_blank" class="bg-emerald-600 hover:bg-emerald-700 text-black px-2 py-0.5 rounded font-medium transition">Open</a>` : ''}
+              <button onclick="editFile('${fileId}')" class="text-zinc-400 hover:text-emerald-400 transition" title="Edit"><i class="fa-solid fa-pen text-xs"></i></button>
+              <button onclick="confirmDelete('${fileId}', '${file.title.replace(/'/g, "\\'")}')" class="text-zinc-400 hover:text-red-400 transition" title="Delete"><i class="fa-solid fa-trash text-xs"></i></button>
             </div>
           </div>
         `;
       });
-      bookList.innerHTML = html;
-      loadCategories();
+      fileList.innerHTML = html;
     }
 
     // ==================== CATEGORIES ====================
     async function loadCategories() {
-      const { data, error } = await supabaseClient.from('books').select('category');
-      if (error || !data) return;
-      const cats = [...new Set(data.map(b => b.category).filter(Boolean))].sort();
-      renderCategories(cats);
+      const { data, error } = await supabaseClient.from('categories').select('*').order('name');
+      if (error || !data) {
+        // Fallback: get categories from books table
+        const { data: books, error: booksError } = await supabaseClient.from('books').select('category');
+        if (!booksError && books) {
+          const cats = [...new Set(books.map(b => b.category).filter(Boolean))];
+          allCategories = cats.map(c => ({ id: c, name: c }));
+          renderCategories(allCategories);
+        }
+        return;
+      }
+      allCategories = data;
+      renderCategories(data);
+
+      // Populate category dropdown in upload form
+      const select = fileCategory;
+      select.innerHTML = '<option value="">Select Category</option>';
+      data.forEach(c => {
+        select.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+      });
     }
 
     function renderCategories(cats) {
       const list = categoryList;
       const nav = categoryNav;
       let html = cats.map(c => `
-        <a href="#" class="category-item flex items-center space-x-2.5 px-2 py-1.5 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/30 transition" data-category="${c}" onclick="setCategory('${c}')">
-          <i class="fa-solid fa-tag text-zinc-500 w-4 text-center"></i><span>${c}</span>
+        <a href="#" class="category-item flex items-center space-x-2.5 px-2 py-1.5 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/30 transition" data-category="${c.name}" onclick="setCategory('${c.name}')">
+          <i class="fa-solid fa-tag text-zinc-500 w-4 text-center"></i><span>${c.name}</span>
         </a>
       `).join('');
       list.innerHTML = html;
       nav.innerHTML = `<div class="font-normal text-zinc-200 px-1 text-sm h-6 flex items-center">Filter by</div>` + html;
     }
 
+    // ==================== CATEGORIES ADMIN ====================
+    async function loadCategoriesAdmin() {
+      const { data, error } = await supabaseClient.from('categories').select('*').order('name');
+      if (error || !data) {
+        categoryListAdmin.innerHTML = '<div class="text-zinc-500 text-xs">No categories</div>';
+        return;
+      }
+      if (data.length === 0) {
+        categoryListAdmin.innerHTML = '<div class="text-zinc-500 text-xs">No categories yet</div>';
+        return;
+      }
+      let html = '';
+      data.forEach(c => {
+        html += `
+          <div class="flex items-center justify-between py-1.5 px-2 bg-zinc-900/50 rounded">
+            <span class="text-zinc-300 text-sm">${c.name}</span>
+            <button onclick="deleteCategory('${c.id}')" class="text-zinc-500 hover:text-red-400 transition text-xs"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        `;
+      });
+      categoryListAdmin.innerHTML = html;
+    }
+
+    async function addCategory() {
+      const name = newCategoryInput.value.trim();
+      if (!name) {
+        categoryMsg.textContent = '❌ Please enter a category name.';
+        categoryMsg.className = 'msg error';
+        return;
+      }
+      const { error } = await supabaseClient.from('categories').insert({ name });
+      if (error) {
+        categoryMsg.textContent = '❌ ' + error.message;
+        categoryMsg.className = 'msg error';
+      } else {
+        categoryMsg.textContent = '✅ Category added!';
+        categoryMsg.className = 'msg success';
+        newCategoryInput.value = '';
+        loadCategoriesAdmin();
+        loadCategories();
+        loadFiles(searchInput.value, currentCategory);
+      }
+    }
+
+    async function deleteCategory(id) {
+      if (!confirm('Delete this category? Files in this category will become uncategorized.')) return;
+      const { error } = await supabaseClient.from('categories').delete().eq('id', id);
+      if (error) {
+        categoryMsg.textContent = '❌ ' + error.message;
+        categoryMsg.className = 'msg error';
+      } else {
+        categoryMsg.textContent = '✅ Category deleted.';
+        categoryMsg.className = 'msg success';
+        loadCategoriesAdmin();
+        loadCategories();
+        loadFiles(searchInput.value, currentCategory);
+      }
+    }
+
+    addCategoryBtn.addEventListener('click', addCategory);
+    newCategoryInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') addCategory(); });
+
+    // ==================== EDIT FILE ====================
+    async function editFile(id) {
+      // Open dropdown if not open
+      if (!isDropdownOpen) {
+        openDropdown(true);
+      } else {
+        // Switch to upload tab
+        switchTab('upload');
+      }
+      // Load file data
+      const { data, error } = await supabaseClient.from('books').select('*').eq('id', id).single();
+      if (error || !data) {
+        dropdownUploadMsg.textContent = '❌ Error loading file data.';
+        dropdownUploadMsg.className = 'msg error';
+        return;
+      }
+      fileTitle.value = data.title || '';
+      fileAuthor.value = data.author || '';
+      fileCategory.value = data.category_id || '';
+      fileFormat.value = data.file_format || '';
+      fileSize.value = data.file_size_mb || '';
+      fileUrls.value = data.mirror_urls ? JSON.stringify(data.mirror_urls).replace(/[\[\]"]/g, '') : '';
+      fileDesc.value = data.description || '';
+      editFileId.value = id;
+      uploadBtn.style.display = 'none';
+      updateBtn.style.display = 'block';
+      dropdownUploadMsg.textContent = '';
+    }
+
+    // ==================== UPDATE FILE ====================
+    updateBtn.addEventListener('click', async () => {
+      const id = editFileId.value;
+      if (!id) {
+        dropdownUploadMsg.textContent = '❌ No file selected for update.';
+        dropdownUploadMsg.className = 'msg error';
+        return;
+      }
+      const title = fileTitle.value.trim();
+      if (!title) {
+        dropdownUploadMsg.textContent = '❌ Title is required.';
+        dropdownUploadMsg.className = 'msg error';
+        return;
+      }
+      const urlsRaw = fileUrls.value.trim();
+      const mirror_urls = urlsRaw ? urlsRaw.split(',').map(s => s.trim()).filter(s => s) : [];
+      const payload = {
+        title,
+        author: fileAuthor.value.trim() || null,
+        category_id: fileCategory.value || null,
+        file_format: fileFormat.value.trim() || null,
+        file_size_mb: parseFloat(fileSize.value) || null,
+        mirror_urls: mirror_urls.length ? mirror_urls : null,
+        description: fileDesc.value.trim() || null,
+        updated_at: new Date().toISOString(),
+      };
+      const { error } = await supabaseClient.from('books').update(payload).eq('id', id);
+      if (error) {
+        dropdownUploadMsg.textContent = '❌ ' + error.message;
+        dropdownUploadMsg.className = 'msg error';
+      } else {
+        dropdownUploadMsg.textContent = '✅ File updated successfully!';
+        dropdownUploadMsg.className = 'msg success';
+        resetUploadForm();
+        loadFiles(searchInput.value, currentCategory);
+        setTimeout(() => closeDropdown(), 1500);
+      }
+    });
+
+    // ==================== DELETE FILE ====================
+    function confirmDelete(id, name) {
+      deleteTargetId = id;
+      deleteFileName.textContent = `"${name}" – this action cannot be undone.`;
+      deleteModal.classList.add('active');
+    }
+
+    deleteCancel.addEventListener('click', () => {
+      deleteModal.classList.remove('active');
+      deleteTargetId = null;
+    });
+
+    deleteConfirm.addEventListener('click', async () => {
+      if (!deleteTargetId) return;
+      const { error } = await supabaseClient.from('books').delete().eq('id', deleteTargetId);
+      deleteModal.classList.remove('active');
+      if (error) {
+        alert('Error deleting: ' + error.message);
+      } else {
+        loadFiles(searchInput.value, currentCategory);
+      }
+      deleteTargetId = null;
+    });
+
+    // Close modal on overlay click
+    deleteModal.addEventListener('click', (e) => {
+      if (e.target === deleteModal) {
+        deleteModal.classList.remove('active');
+        deleteTargetId = null;
+      }
+    });
+
     // ==================== ADMIN AUTH ====================
     function updateAdminUI(user) {
       if (user) {
-        adminLoginBox.style.display = 'none';
-        adminUploadFields.style.display = 'block';
-        adminStatusLabel.textContent = `✅ ${user.email}`;
-        adminToggleBtn.classList.add('bg-emerald-900/30', 'border-emerald-700');
+        adminStatusLabel.textContent = 'Sign Out';
+        adminToggleBtn.classList.add('bg-zinc-800', 'text-red-400', 'border-zinc-700');
         isAdminLoggedIn = true;
+        tabRow.style.display = 'flex';
+        dropdownLogin.style.display = 'none';
+        dropdownUpload.style.display = 'block';
+        dropdownTitle.textContent = 'Admin';
+        resetUploadForm();
       } else {
-        adminLoginBox.style.display = 'block';
-        adminUploadFields.style.display = 'none';
         adminStatusLabel.textContent = 'Connect';
-        adminToggleBtn.classList.remove('bg-emerald-900/30', 'border-emerald-700');
+        adminToggleBtn.classList.remove('bg-zinc-800', 'text-red-400', 'border-zinc-700');
         isAdminLoggedIn = false;
+        tabRow.style.display = 'none';
+        dropdownLogin.style.display = 'block';
+        dropdownUpload.style.display = 'none';
+        dropdownTitle.textContent = 'Admin Login';
+        dropdownMsg.textContent = '';
+        closeDropdown();
       }
-      adminMsg.textContent = '';
     }
 
     supabaseClient.auth.onAuthStateChange((event, session) => {
@@ -368,71 +833,115 @@
       updateAdminUI(data.session?.user || null);
     });
 
+    // LOGIN
     adminLoginBtn.addEventListener('click', async () => {
       const email = adminEmail.value.trim();
       const pass = adminPass.value;
       const { error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
       if (error) {
-        adminMsg.textContent = '❌ ' + error.message;
-        adminMsg.className = 'text-red-400 text-xs';
+        dropdownMsg.textContent = '❌ ' + error.message;
+        dropdownMsg.className = 'msg error';
       } else {
-        adminMsg.textContent = '✅ Login successful';
-        adminMsg.className = 'text-emerald-400 text-xs';
+        dropdownMsg.textContent = '✅ Login successful';
+        dropdownMsg.className = 'msg success';
       }
     });
 
+    // LOGOUT
     logoutBtn.addEventListener('click', () => {
       supabaseClient.auth.signOut();
+      closeDropdown();
     });
 
-    // ==================== UPLOAD BOOK ====================
+    // TOP BAR BUTTON
+    adminToggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (isAdminLoggedIn) {
+        supabaseClient.auth.signOut();
+        closeDropdown();
+      } else {
+        dropdownLogin.style.display = 'block';
+        dropdownUpload.style.display = 'none';
+        dropdownTitle.textContent = 'Admin Login';
+        dropdownMsg.textContent = '';
+        openDropdown(false);
+      }
+    });
+
+    // ==================== UPLOAD FILE ====================
     uploadBtn.addEventListener('click', async () => {
       const user = (await supabaseClient.auth.getUser()).data.user;
       if (!user) {
-        adminMsg.textContent = '❌ Please login first.';
-        adminMsg.className = 'text-red-400 text-xs';
+        dropdownUploadMsg.textContent = '❌ Please login first.';
+        dropdownUploadMsg.className = 'msg error';
         return;
       }
-      const title = document.getElementById('book-title').value.trim();
+      const title = fileTitle.value.trim();
       if (!title) {
-        adminMsg.textContent = '❌ Title is required.';
-        adminMsg.className = 'text-red-400 text-xs';
+        dropdownUploadMsg.textContent = '❌ Title is required.';
+        dropdownUploadMsg.className = 'msg error';
         return;
       }
-      const mirrorsRaw = document.getElementById('book-mirrors').value.trim();
-      const mirror_urls = mirrorsRaw ? mirrorsRaw.split(',').map(s => s.trim()).filter(s => s) : [];
+      const urlsRaw = fileUrls.value.trim();
+      const mirror_urls = urlsRaw ? urlsRaw.split(',').map(s => s.trim()).filter(s => s) : [];
       const payload = {
         title,
-        author: document.getElementById('book-author').value.trim() || null,
-        category: document.getElementById('book-category').value || null,
-        isbn: document.getElementById('book-isbn').value.trim() || null,
-        publication_year: parseInt(document.getElementById('book-year').value) || null,
-        file_format: document.getElementById('book-format').value.trim() || null,
+        author: fileAuthor.value.trim() || null,
+        category_id: fileCategory.value || null,
+        file_format: fileFormat.value.trim() || null,
+        file_size_mb: parseFloat(fileSize.value) || null,
         mirror_urls: mirror_urls.length ? mirror_urls : null,
-        description: document.getElementById('book-desc').value.trim() || null,
+        description: fileDesc.value.trim() || null,
+        user_id: user.id,
       };
       const { error } = await supabaseClient.from('books').insert(payload);
       if (error) {
-        adminMsg.textContent = '❌ ' + error.message;
-        adminMsg.className = 'text-red-400 text-xs';
+        dropdownUploadMsg.textContent = '❌ ' + error.message;
+        dropdownUploadMsg.className = 'msg error';
       } else {
-        adminMsg.textContent = '✅ Book added successfully!';
-        adminMsg.className = 'text-emerald-400 text-xs';
-        document.querySelectorAll('#admin-upload-fields input, #admin-upload-fields textarea, #admin-upload-fields select').forEach(el => el.value = '');
-        loadBooks(searchInput.value, currentCategory);
+        dropdownUploadMsg.textContent = '✅ File added successfully!';
+        dropdownUploadMsg.className = 'msg success';
+        resetUploadForm();
+        loadFiles(searchInput.value, currentCategory);
         loadCategories();
+        setTimeout(() => closeDropdown(), 1500);
       }
     });
 
     // ==================== EVENTS ====================
-    adminToggleBtn.addEventListener('click', () => { switchView('admin'); });
-    newBookBtn.addEventListener('click', () => { switchView('admin'); });
-    newBookIcon.addEventListener('click', () => { switchView('admin'); });
-    searchInput.addEventListener('input', (e) => { loadBooks(e.target.value, currentCategory); });
+    function openAdminDropdown() {
+      if (isAdminLoggedIn) {
+        tabRow.style.display = 'flex';
+        dropdownLogin.style.display = 'none';
+        dropdownUpload.style.display = 'block';
+        dropdownTitle.textContent = 'Admin';
+        resetUploadForm();
+        switchTab('upload');
+        openDropdown(true);
+      } else {
+        tabRow.style.display = 'none';
+        dropdownLogin.style.display = 'block';
+        dropdownUpload.style.display = 'none';
+        dropdownTitle.textContent = 'Admin Login';
+        dropdownMsg.textContent = '';
+        openDropdown(false);
+      }
+    }
+
+    newFileBtn.addEventListener('click', openAdminDropdown);
+    newFileIcon.addEventListener('click', openAdminDropdown);
+    if(adminSidebarLink) {
+      adminSidebarLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        openAdminDropdown();
+      });
+    }
+
+    searchInput.addEventListener('input', (e) => { loadFiles(e.target.value, currentCategory); });
 
     // ==================== INIT ====================
-    loadBooks('', '');
     loadCategories();
+    loadFiles('', '');
   </script>
 </body>
 </html>
