@@ -1,8 +1,26 @@
 const fs = require('fs');
-const html = fs.readFileSync('index.html', 'utf8');
-const result = html
-  .replace(/\{\{SUPABASE_URL\}\}/g, process.env.SUPABASE_URL || '')
-  .replace(/\{\{SUPABASE_ANON_KEY\}\}/g, process.env.SUPABASE_ANON_KEY || '');
-if (!fs.existsSync('dist')) fs.mkdirSync('dist');
-fs.writeFileSync('dist/index.html', result);
-console.log('✅ Built');
+
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
+
+console.log('🔍 Checking environment variables...');
+console.log('SUPABASE_URL present?', !!SUPABASE_URL);
+console.log('SUPABASE_ANON_KEY present?', !!SUPABASE_ANON_KEY);
+
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  console.error('❌ Missing required environment variables!');
+  process.exit(1);
+}
+
+try {
+  let html = fs.readFileSync('index.html', 'utf8');
+  html = html.replace(/\{\{SUPABASE_URL\}\}/g, SUPABASE_URL);
+  html = html.replace(/\{\{SUPABASE_ANON_KEY\}\}/g, SUPABASE_ANON_KEY);
+
+  if (!fs.existsSync('dist')) fs.mkdirSync('dist');
+  fs.writeFileSync('dist/index.html', html);
+  console.log('✅ Built successfully with injected variables.');
+} catch (err) {
+  console.error('❌ Build failed:', err.message);
+  process.exit(1);
+}
