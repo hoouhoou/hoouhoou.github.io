@@ -198,9 +198,9 @@
   </div>
 
   <script>
-    // ======================== SUPABASE ========================
-    const SUPABASE_URL = "https://zbqsrfurmoowilpyxrfo.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpicXNyZnVybW9vd2lscHl4cmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyODU3NjcsImV4cCI6MjA5Nzg2MTc2N30.Q58fAB5-KliFKo7v0g3e48I6ttgnYzyOom1FVsUOrFM";
+    // ======================== SUPABASE (INJECTED VIA BUILD) ========================
+    const SUPABASE_URL = "{{SUPABASE_URL}}";
+    const SUPABASE_ANON_KEY = "{{SUPABASE_ANON_KEY}}";
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // ======================== DOM REFS ========================
@@ -268,25 +268,21 @@
         icons[icons.length-1].classList.add('text-emerald-400', 'bg-zinc-800/80', 'border', 'border-zinc-700/40');
       }
       if (isCollapsed) {
-        // expand sidebar when switching view
         isCollapsed = false;
         navShell.style.width = '240px';
         toggleIcon.className = 'fa-solid fa-bars-staggered';
       }
     }
 
-    // Sidebar category click handler
     function setCategory(cat) {
       currentCategory = cat;
       categoryLabel.textContent = cat ? cat : 'All categories';
-      // Update active state in category nav
       document.querySelectorAll('#category-nav .category-item, #category-list .category-item').forEach(el => {
         el.classList.toggle('bg-zinc-800/80', el.dataset.category === cat);
         el.classList.toggle('text-white', el.dataset.category === cat);
         el.classList.toggle('text-zinc-400', el.dataset.category !== cat);
       });
       loadBooks(searchInput.value, cat);
-      // Switch back to overview view
       switchView('overview');
     }
 
@@ -309,7 +305,6 @@
         bookList.innerHTML = `<div class="text-zinc-500 text-center py-8 text-xs">No books found. Add your first one using "New Book".</div>`;
         return;
       }
-      // Build HTML
       let html = '';
       data.forEach(book => {
         let mirrors = [];
@@ -337,7 +332,6 @@
         `;
       });
       bookList.innerHTML = html;
-      // Update categories (in case new categories appear)
       loadCategories();
     }
 
@@ -351,7 +345,6 @@
     }
 
     function renderCategories(cats) {
-      // Render in both sidebar locations
       const list = categoryList;
       const nav = categoryNav;
       let html = cats.map(c => `
@@ -363,9 +356,7 @@
       nav.innerHTML = `<div class="font-normal text-zinc-200 px-1 text-sm h-6 flex items-center">Filter by</div>` + html;
     }
 
-    function renderCategoryNav() {
-      // Already rendered in loadCategories, but we can update if needed
-    }
+    function renderCategoryNav() {}
 
     // ======================== ADMIN AUTH ========================
     function updateAdminUI(user) {
@@ -442,43 +433,21 @@
       } else {
         adminMsg.textContent = '✅ Book added successfully!';
         adminMsg.className = 'text-emerald-400 text-xs';
-        // Clear fields
         document.querySelectorAll('#admin-upload-fields input, #admin-upload-fields textarea, #admin-upload-fields select').forEach(el => el.value = '');
         loadBooks(searchInput.value, currentCategory);
         loadCategories();
       }
     });
 
-    // ======================== TOP BAR LOGIN TOGGLE ========================
-    adminToggleBtn.addEventListener('click', () => {
-      if (isAdminLoggedIn) {
-        // If logged in, maybe open admin panel
-        switchView('admin');
-      } else {
-        // Toggle admin panel
-        switchView('admin');
-      }
-    });
-
-    // ======================== NEW BOOK BUTTON ========================
-    newBookBtn.addEventListener('click', () => {
-      switchView('admin');
-    });
-    newBookIcon.addEventListener('click', () => {
-      switchView('admin');
-    });
-
-    // ======================== SEARCH ========================
-    searchInput.addEventListener('input', (e) => {
-      loadBooks(e.target.value, currentCategory);
-    });
+    // ======================== EVENT BINDINGS ========================
+    adminToggleBtn.addEventListener('click', () => { switchView('admin'); });
+    newBookBtn.addEventListener('click', () => { switchView('admin'); });
+    newBookIcon.addEventListener('click', () => { switchView('admin'); });
+    searchInput.addEventListener('input', (e) => { loadBooks(e.target.value, currentCategory); });
 
     // ======================== INIT ========================
     loadBooks('', '');
     loadCategories();
-
-    // Also handle click on "All Books" from sidebar
-    document.querySelector('[onclick="setCategory(\'\')"]')?.addEventListener('click', (e) => e.preventDefault());
   </script>
 </body>
 </html>
