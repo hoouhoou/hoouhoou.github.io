@@ -3,398 +3,279 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Projects Dashboard</title>
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <title>Book Archive + Manual Category Upload</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, sans-serif; }
+    body { background: #f8fafc; padding: 2rem; display: flex; flex-direction: column; align-items: center; }
+    .container { max-width: 900px; width: 100%; }
+    h1 { font-size: 2.5rem; margin-bottom: 0.2rem; }
+    .sub { color: #475569; margin-bottom: 2rem; }
+    .search-box { display: flex; gap: 10px; margin-bottom: 2rem; }
+    .search-box input { flex: 1; padding: 14px 20px; border: 2px solid #e2e8f0; border-radius: 60px; font-size: 1.1rem; }
+    .search-box input:focus { outline: none; border-color: #2563eb; }
+    .search-box button { background: #2563eb; color: white; border: none; padding: 14px 30px; border-radius: 60px; font-weight: 600; cursor: pointer; }
+    .search-box button:hover { background: #1d4ed8; }
+    .results-grid { display: grid; gap: 16px; }
+    .book-card { background: white; padding: 20px; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; gap: 20px; border: 1px solid #e2e8f0; }
+    .book-cover { width: 80px; height: 110px; background: #f1f5f9; border-radius: 8px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #94a3b8; }
+    .book-cover img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
+    .book-info { flex: 1; }
+    .book-info h3 { margin-bottom: 4px; }
+    .book-info .meta { color: #475569; font-size: 0.9rem; margin-bottom: 6px; }
+    .book-info .desc { color: #64748b; font-size: 0.95rem; margin: 8px 0; }
+    .badge-cat { background: #dbeafe; color: #1e40af; padding: 2px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; margin-right: 6px; }
+    .mirror-btn { background: #22c55e; color: white; border: none; padding: 6px 16px; border-radius: 30px; font-weight: 600; cursor: pointer; font-size: 0.85rem; text-decoration: none; display: inline-block; margin-right: 4px; }
+    .mirror-btn:hover { background: #16a34a; }
+    .stats { margin-top: 1rem; color: #64748b; }
+    .admin-toggle { margin: 2rem 0 1rem; display: flex; gap: 12px; align-items: center; }
+    .admin-toggle button { background: #1e293b; color: white; border: none; padding: 8px 20px; border-radius: 40px; font-weight: 600; cursor: pointer; }
+    .admin-panel { background: white; padding: 24px; border-radius: 16px; border: 2px dashed #94a3b8; margin-bottom: 2rem; }
+    .admin-panel h2 { margin-bottom: 1rem; font-size: 1.3rem; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-grid .full-width { grid-column: 1 / -1; }
+    .admin-panel input, .admin-panel select, .admin-panel textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
+    .admin-panel textarea { resize: vertical; min-height: 60px; }
+    .admin-panel button[type="submit"] { background: #2563eb; color: white; border: none; padding: 12px; border-radius: 40px; font-weight: 600; cursor: pointer; grid-column: 1 / -1; }
+    .admin-panel .logout-btn { background: #ef4444; border: none; color: white; padding: 6px 16px; border-radius: 30px; cursor: pointer; }
+    .hidden { display: none !important; }
+    .auth-error { color: #dc2626; font-size: 0.9rem; margin: 6px 0; }
+    .success { color: #16a34a; }
+  </style>
 </head>
-<body class="bg-[#1c1c1c] text-[#ededed] min-h-screen flex antialiased font-sans relative w-full overflow-x-hidden">
+<body>
+<div class="container">
+  <h1>📚 Archive Search</h1>
+  <p class="sub">Search by title, author, ISBN, or category.</p>
 
-  <div id="toast-container" class="fixed bottom-5 right-5 z-50 max-w-md hidden">
-    <div id="toast-card" class="border rounded-lg p-4 shadow-2xl flex gap-3 text-sm">
-      <span id="toast-icon">🚨</span>
-      <div class="flex flex-col gap-1">
-        <div id="toast-title" class="font-semibold text-zinc-200 font-mono text-xs">Title</div>
-        <div id="toast-msg" class="text-zinc-400 font-mono text-[11px] leading-relaxed">Message detail...</div>
-      </div>
-      <button onclick="hideToast()" class="text-zinc-500 hover:text-zinc-300 ml-auto text-xs font-bold cursor-pointer px-1">✕</button>
-    </div>
+  <!-- SEARCH -->
+  <div class="search-box">
+    <input type="text" id="search-input" placeholder="e.g. 'Dune', 'History', or '9780451524935'" />
+    <button id="search-btn">🔍 Search</button>
+  </div>
+  <div id="results-container">
+    <div class="results-grid" id="results-grid"></div>
+    <div class="stats" id="stats"></div>
   </div>
 
-  <div id="modal-container" class="fixed inset-0 bg-black/75 z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-[#141414] border border-[#242424] w-full max-w-2xl rounded-xl shadow-2xl flex flex-col max-h-[85vh]">
-      <div class="p-6 border-b border-[#242424] flex items-start justify-between">
-        <div>
-          <span class="text-[10px] text-emerald-400 font-mono font-bold uppercase tracking-widest block mb-1">Archive Contents</span>
-          <h2 id="modal-project-title" class="text-lg font-bold text-white font-mono">Project Title</h2>
-          <p id="modal-project-meta" class="text-xs text-zinc-500 font-mono mt-0.5">Venue details go here</p>
-        </div>
-        <button onclick="closeModal()" class="text-zinc-400 hover:text-white cursor-pointer text-sm p-1">✕</button>
-      </div>
-      
-      <div id="modal-performance-list" class="p-6 overflow-y-auto flex flex-col gap-3 flex-1">
-        </div>
+  <!-- ADMIN TOGGLE -->
+  <div class="admin-toggle">
+    <button id="admin-toggle-btn">🔐 Admin Panel</button>
+    <span id="admin-status" style="color:#64748b; font-size:0.9rem;">(Login to add books)</span>
+  </div>
 
-      <div class="p-4 bg-[#111] border-t border-[#242424] flex items-center justify-between gap-3 rounded-b-xl">
-        <span id="modal-item-id-tag" class="text-[10px] font-mono text-zinc-600">ID reference...</span>
-        <button id="modal-add-perf-btn" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-semibold text-xs px-3 py-1.5 rounded border border-[#333] transition-colors cursor-pointer flex items-center gap-1">
-          <span>🎵</span> Add Track/Performance
-        </button>
+  <!-- ADMIN PANEL (Hidden by default) -->
+  <div id="admin-panel" class="admin-panel hidden">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h2>📝 Manually Upload Book by Category</h2>
+      <button id="logout-btn" class="logout-btn">Logout</button>
+    </div>
+    <div id="admin-message" class="auth-error"></div>
+    
+    <!-- Login Form -->
+    <div id="admin-login">
+      <input id="admin-email" type="email" placeholder="Email" style="margin-bottom:8px;" />
+      <input id="admin-pass" type="password" placeholder="Password" style="margin-bottom:8px;" />
+      <button id="admin-login-btn" style="background:#2563eb; color:white; border:none; padding:10px; border-radius:40px; width:100%; font-weight:600; cursor:pointer;">Login to Admin</button>
+      <p style="font-size:0.8rem; color:#64748b; margin-top:6px;">Sign up first if you don't have an account.</p>
+    </div>
+
+    <!-- Upload Form -->
+    <div id="admin-upload" class="hidden">
+      <div class="form-grid">
+        <input id="book-title" placeholder="Title *" />
+        <input id="book-author" placeholder="Author" />
+        <select id="book-category">
+          <option value="">-- Select Category --</option>
+          <option value="Fiction">Fiction</option>
+          <option value="Non-Fiction">Non-Fiction</option>
+          <option value="Science">Science</option>
+          <option value="History">History</option>
+          <option value="Technology">Technology</option>
+          <option value="Philosophy">Philosophy</option>
+          <option value="Biography">Biography</option>
+          <option value="Other">Other</option>
+        </select>
+        <input id="book-isbn" placeholder="ISBN" />
+        <input id="book-year" placeholder="Year (e.g. 2020)" />
+        <input id="book-format" placeholder="Format (e.g. PDF)" />
+        <input id="book-size" placeholder="Size (MB)" />
+        <input id="book-cover" placeholder="Cover Image URL" class="full-width" />
+        <input id="book-mirrors" placeholder="Mirror URLs (comma separated)" class="full-width" />
+        <textarea id="book-desc" placeholder="Description..." class="full-width"></textarea>
+        <button id="upload-btn">➕ Add Book to Archive</button>
       </div>
     </div>
   </div>
+</div>
 
-  <nav id="sidebar" class="fixed inset-y-0 left-0 w-64 md:w-14 bg-[#141414] border-r border-[#242424] flex flex-col items-center py-3 justify-between z-50 -translate-x-full md:translate-x-0 transition-transform duration-200 shrink-0">
-    <div class="flex flex-col items-center gap-5 w-full">
-      <div class="w-full flex items-center justify-between md:justify-center px-4 md:px-0">
-        <div class="w-7 h-7 bg-[#242424] rounded-md flex items-center justify-center text-emerald-500 font-bold text-sm border border-[#2e2e2e]">⚡</div>
-        <button onclick="toggleMobileMenu()" class="md:hidden text-zinc-400 hover:text-zinc-200 text-lg cursor-pointer">✕</button>
-      </div>
-      <div class="w-full h-[1px] bg-[#242424] px-2"></div>
-      <div class="w-full px-3 md:px-0 flex flex-col items-center gap-2">
-        <button class="w-full md:w-9 h-9 rounded-md flex items-center justify-start md:justify-center gap-3 px-3 md:px-0 text-emerald-400 bg-[#242424] border border-[#2e2e2e] text-base cursor-pointer">
-          <span>📁</span>
-          <span class="md:hidden text-xs font-medium text-zinc-300">Archive Files</span>
-        </button>
-      </div>
-    </div>
-    <div class="w-full px-4 md:px-0 flex items-center justify-start md:justify-center gap-3">
-      <div class="w-7 h-7 bg-zinc-800 rounded-full flex items-center justify-center text-[10px] font-bold text-zinc-300 border border-[#2e2e2e] shrink-0">RJ</div>
-      <span class="md:hidden text-xs font-medium text-zinc-400">Archivist Portal</span>
-    </div>
-  </nav>
+<script>
+  // 🔥 REPLACE THESE TWO LINES WITH YOUR VALUES FROM STEP 2
+  const SUPABASE_URL = "YOUR_PROJECT_URL";
+  const SUPABASE_ANON_KEY = "YOUR_ANON_KEY";
 
-  <div id="sidebar-overlay" onclick="toggleMobileMenu()" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden transition-opacity"></div>
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  <div class="flex-1 flex flex-col min-w-0 md:ml-14">
-    <header class="h-12 bg-[#141414] border-b border-[#242424] px-4 md:px-6 flex items-center justify-between text-xs font-medium text-zinc-400 shrink-0">
-      <div class="flex items-center gap-2">
-        <button onclick="toggleMobileMenu()" class="md:hidden p-1.5 rounded-md hover:bg-zinc-800 text-zinc-300 mr-1 cursor-pointer">☰</button>
-        <span>⚡ HoU</span>
-        <span>/</span>
-        <span class="text-zinc-200 font-semibold">Projects</span>
-      </div>
-    </header>
+  // ----- DOM refs -----
+  const searchInput = document.getElementById('search-input');
+  const searchBtn = document.getElementById('search-btn');
+  const resultsGrid = document.getElementById('results-grid');
+  const stats = document.getElementById('stats');
+  const adminPanel = document.getElementById('admin-panel');
+  const adminToggleBtn = document.getElementById('admin-toggle-btn');
+  const adminStatus = document.getElementById('admin-status');
+  const adminLogin = document.getElementById('admin-login');
+  const adminUpload = document.getElementById('admin-upload');
+  const adminEmail = document.getElementById('admin-email');
+  const adminPass = document.getElementById('admin-pass');
+  const adminLoginBtn = document.getElementById('admin-login-btn');
+  const logoutBtn = document.getElementById('logout-btn');
+  const adminMessage = document.getElementById('admin-message');
+  const uploadBtn = document.getElementById('upload-btn');
 
-    <main class="flex-1 p-6 md:p-10 overflow-y-auto">
-      <div class="max-w-6xl mx-auto flex flex-col gap-6 md:gap-8">
-        <h1 class="text-xl md:text-2xl font-semibold tracking-tight text-white">Projects</h1>
+  // ----- Search -----
+  async function performSearch(query) {
+    if (!query.trim()) {
+      resultsGrid.innerHTML = '<p style="color:#94a3b8; text-align:center; padding:2rem;">Type a title, author, or category.</p>';
+      stats.textContent = '';
+      return;
+    }
+    resultsGrid.innerHTML = '<p style="color:#94a3b8; text-align:center; padding:2rem;">Searching...</p>';
+    const { data, error, count } = await supabase
+      .from('books')
+      .select('*', { count: 'exact' })
+      .textSearch('search_vector', query, { config: 'english', type: 'websearch' })
+      .order('publication_year', { ascending: false })
+      .limit(50);
 
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 flex-1 max-w-3xl">
-            <input 
-              type="text" 
-              id="search-input"
-              placeholder="Search for a project" 
-              oninput="fetchItems()"
-              class="bg-[#141414] border border-[#242424] text-xs rounded-md px-3 py-1.5 w-full sm:w-64 text-zinc-200 focus:outline-none focus:border-emerald-500 placeholder-zinc-600"
-            />
-            
-            <div class="grid grid-cols-2 gap-2 sm:flex sm:items-center">
-              <select id="venue-filter" onchange="fetchItems()" class="bg-[#141414] border border-[#242424] text-xs rounded-md px-3 py-1.5 text-zinc-300 focus:outline-none focus:border-emerald-500 cursor-pointer w-full">
-                <option value="">All Venues</option>
-                <option value="RJ Bistro Dusit Hotel">RJ Bistro Dusit Hotel</option>
-                <option value="Mandarin Hotel">Mandarin Hotel</option>
-                <option value="One Shangri-La">One Shangri-La</option>
-              </select>
+    if (error) { resultsGrid.innerHTML = `<p style="color:red;">Error</p>`; return; }
+    if (!data.length) { resultsGrid.innerHTML = '<p style="color:#94a3b8; text-align:center; padding:2rem;">No books found.</p>'; stats.textContent = ''; return; }
 
-              <select id="media-filter" onchange="fetchItems()" class="bg-[#141414] border border-[#242424] text-xs rounded-md px-3 py-1.5 text-zinc-300 focus:outline-none focus:border-emerald-500 cursor-pointer w-full">
-                <option value="">All Formats</option>
-                <option value="video">📺 Video Tracks</option>
-                <option value="audio">🎵 Audio Recordings</option>
-              </select>
+    stats.textContent = `Found ${count} results.`;
+    resultsGrid.innerHTML = data.map(book => {
+      const coverHtml = book.cover_url ? `<img src="${book.cover_url}" />` : '📖';
+      let mirrors = [];
+      try { mirrors = JSON.parse(book.mirror_urls) || []; } catch { mirrors = [book.mirror_urls]; }
+      if (!Array.isArray(mirrors)) mirrors = [mirrors];
+      const validMirrors = mirrors.filter(u => u && u.startsWith('http'));
+
+      return `
+        <div class="book-card">
+          <div class="book-cover">${coverHtml}</div>
+          <div class="book-info">
+            <h3>${book.title}</h3>
+            <div class="meta">
+              ${book.author ? `✍️ ${book.author}` : ''} 
+              ${book.category ? `<span class="badge-cat">📂 ${book.category}</span>` : ''}
+              ${book.publication_year ? `· ${book.publication_year}` : ''}
+            </div>
+            <div class="meta">
+              ${book.file_format ? `<span class="badge">${book.file_format}</span>` : ''}
+              ${book.file_size_mb ? `${book.file_size_mb} MB` : ''}
+              ${book.isbn ? `ISBN: ${book.isbn}` : ''}
+            </div>
+            ${book.description ? `<div class="desc">${book.description.substring(0, 120)}...</div>` : ''}
+            <div>
+              ${validMirrors.length ? validMirrors.map(u => `<a href="${u}" target="_blank" class="mirror-btn">⬇️ Mirror</a>`).join('') : '<span style="color:#94a3b8;">No mirrors</span>'}
             </div>
           </div>
-
-          <button onclick="handleAddRecord()" class="bg-[#3ecf8e] hover:bg-[#34b279] text-[#121212] font-semibold text-xs px-3 py-1.5 rounded-md flex items-center gap-1 transition-colors whitespace-nowrap self-start lg:self-auto cursor-pointer">
-            <span class="text-sm font-bold">+</span> Add Record
-          </button>
-        </div>
-
-        <div id="grid-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          </div>
-
-      </div>
-    </main>
-  </div>
-
-  <script>
-    const SUPABASE_URL = "https://lmggzgvvtzeuukcuxlma.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtZ2d6Z3Z2dHpldXVrY3V4bG1hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTI1ODAsImV4cCI6MjA5NTc4ODU4MH0.OgvoFHe6efoZIjaVR7BojTPsTUJ1oICU-5KY3EBhmcQ";
-    
-    const appSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    let mobileMenuOpen = false;
-
-    // Toast alert handlers
-    function showToast(title, msg, isError = true) {
-      const container = document.getElementById('toast-container');
-      const card = document.getElementById('toast-card');
-      document.getElementById('toast-icon').innerText = isError ? '🚨' : '⚡';
-      document.getElementById('toast-title').innerText = title;
-      document.getElementById('toast-msg').innerText = msg;
-
-      if (isError) {
-        card.className = "bg-[#181111] border-[#f87171]/30 border rounded-lg p-4 shadow-2xl flex gap-3 text-sm";
-      } else {
-        card.className = "bg-[#111813] border-[#3ecf8e]/30 border rounded-lg p-4 shadow-2xl flex gap-3 text-sm";
-      }
-      container.classList.remove('hidden');
-    }
-
-    function hideToast() {
-      document.getElementById('toast-container').classList.add('hidden');
-    }
-
-    // Responsive Sidebar Engine
-    function toggleMobileMenu() {
-      mobileMenuOpen = !mobileMenuOpen;
-      const sidebar = document.getElementById('sidebar');
-      const overlay = document.getElementById('sidebar-overlay');
-      
-      if (mobileMenuOpen) {
-        sidebar.classList.remove('-translate-x-full');
-        overlay.classList.remove('hidden');
-      } else {
-        sidebar.classList.add('-translate-x-full');
-        overlay.classList.add('hidden');
-      }
-    }
-
-    // Dynamic database querying engine
-    async function fetchItems() {
-      const grid = document.getElementById('grid-container');
-      grid.innerHTML = `
-        <div class="col-span-full border border-dashed border-[#2e2e2e] rounded-lg p-12 bg-[#141414] text-center text-xs text-zinc-500 font-mono animate-pulse">
-          Querying archive metadata server vectors...
         </div>
       `;
+    }).join('');
+  }
 
-      try {
-        const searchVal = document.getElementById('search-input').value.trim();
-        const venueVal = document.getElementById('venue-filter').value;
-        const mediaVal = document.getElementById('media-filter').value;
+  searchBtn.addEventListener('click', () => performSearch(searchInput.value));
+  searchInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') performSearch(searchInput.value); });
+  performSearch('');
 
-        let query = appSupabase.from('archive_items').select('*');
+  // ----- Admin Auth -----
+  function updateAdminUI(user) {
+    if (user) {
+      adminLogin.classList.add('hidden');
+      adminUpload.classList.remove('hidden');
+      adminStatus.textContent = `✅ Logged in as ${user.email}`;
+      adminMessage.textContent = '';
+      adminMessage.className = 'auth-error';
+    } else {
+      adminLogin.classList.remove('hidden');
+      adminUpload.classList.add('hidden');
+      adminStatus.textContent = '(Login to add books)';
+      adminMessage.textContent = '';
+    }
+  }
 
-        if (searchVal) {
-          query = query.ilike('title', `%${searchVal}%`);
-        }
-        if (venueVal) {
-          query = query.eq('venue', venueVal);
-        }
-        if (mediaVal) {
-          query = query.eq('media_type', mediaVal);
-        }
+  supabase.auth.onAuthStateChange((event, session) => {
+    updateAdminUI(session?.user || null);
+  });
 
-        const { data, error } = await query.order('created_at', { ascending: false });
+  supabase.auth.getSession().then(({ data }) => {
+    updateAdminUI(data.session?.user || null);
+  });
 
-        if (error) {
-          showToast(`Database Error [${error.code || 'PGRST'}]`, error.message);
-          grid.innerHTML = `
-            <div class="col-span-full border border-dashed border-[#f87171]/20 rounded-lg p-12 bg-[#181111] text-center text-xs font-mono text-red-400">
-              Failed to pull records. Check table layout definitions or API keys.
-            </div>
-          `;
-          return;
-        }
+  adminToggleBtn.addEventListener('click', () => {
+    adminPanel.classList.toggle('hidden');
+  });
 
-        if (!data || data.length === 0) {
-          grid.innerHTML = `
-            <div class="col-span-full border border-dashed border-[#2e2e2e] rounded-lg p-12 bg-[#141414] text-center text-xs font-mono text-zinc-500">
-              No matching archive segments found.
-            </div>
-          `;
-          return;
-        }
+  adminLoginBtn.addEventListener('click', async () => {
+    adminMessage.textContent = '';
+    const email = adminEmail.value.trim();
+    const pass = adminPass.value;
+    const { error } = await supabase.auth.signInWithPassword({ email, password: pass });
+    if (error) {
+      adminMessage.textContent = error.message;
+      adminMessage.className = 'auth-error';
+    } else {
+      adminMessage.textContent = '✅ Login successful!';
+      adminMessage.className = 'success';
+    }
+  });
 
-        grid.innerHTML = data.map(item => {
-          const escapedTitle = item.title.replace(/'/g, "\\'");
-          const escapedVenue = (item.venue || 'Unknown Location').replace(/'/g, "\\'");
-          
-          return `
-            <div onclick="openProjectDetails('${item.id}', '${escapedTitle}', '${escapedVenue}', '${item.original_broadcast_date || 'Undated'}')" 
-                 class="bg-[#141414] border border-[#242424] hover:border-[#3ecf8e]/50 rounded-lg p-5 flex flex-col justify-between h-40 transition-all group cursor-pointer hover:shadow-lg hover:shadow-emerald-950/10">
-              <div class="min-w-0">
-                <div class="flex items-start justify-between gap-4 w-full">
-                  <h3 class="font-semibold text-white text-sm md:text-base group-hover:text-[#3ecf8e] transition-colors truncate max-w-[85%] font-mono">${item.title}</h3>
-                  <span class="text-zinc-600 text-sm">${item.media_type === 'video' ? '📺' : '🎵'}</span>
-                </div>
-                <p class="text-xs text-zinc-500 font-medium mt-1 truncate font-mono">
-                  ${item.venue || 'Unknown Location'} &nbsp;|&nbsp; ${item.original_broadcast_date || 'Undated'}
-                </p>
-              </div>
-              <div class="flex items-center justify-between mt-4">
-                <span class="bg-zinc-800 text-[10px] text-zinc-400 border border-[#2e2e2e] font-mono uppercase font-bold tracking-wider px-1.5 py-0.5 rounded">${item.media_type}</span>
-                <span class="text-[11px] text-zinc-600 font-mono group-hover:text-zinc-400">id: ${item.id.substring(0, 8)}...</span>
-              </div>
-            </div>
-          `;
-        }).join('');
+  logoutBtn.addEventListener('click', () => supabase.auth.signOut());
 
-      } catch (err) {
-        showToast("System Crash", err.message || "Failed to initialize request loop vectors.");
-      }
+  // ----- Manual Upload -----
+  uploadBtn.addEventListener('click', async () => {
+    const user = (await supabase.auth.getUser()).data.user;
+    if (!user) {
+      adminMessage.textContent = 'Please login first.';
+      adminMessage.className = 'auth-error';
+      return;
     }
 
-    // Modal View Control Subsystem
-    async function openProjectDetails(id, title, venue, date) {
-      document.getElementById('modal-project-title').innerText = title;
-      document.getElementById('modal-project-meta').innerText = `${venue} | ${date}`;
-      document.getElementById('modal-item-id-tag').innerText = `item_id: ${id}`;
-      
-      document.getElementById('modal-add-perf-btn').onclick = () => handleAddPerformance(id);
-
-      const listContainer = document.getElementById('modal-performance-list');
-      listContainer.innerHTML = `<div class="text-center font-mono text-xs text-zinc-500 py-6 animate-pulse">Fetching tracklist segments...</div>`;
-      
-      document.getElementById('modal-container').classList.remove('hidden');
-
-      try {
-        const { data, error } = await appSupabase
-          .from('archive_performances')
-          .select('*')
-          .eq('item_id', id)
-          .order('performance_order', { ascending: true });
-
-        if (error) {
-          listContainer.innerHTML = `<div class="text-xs font-mono text-red-400 p-4 bg-[#1a1111] border border-red-900/30 rounded">Error loading tracks: ${error.message}</div>`;
-          return;
-        }
-
-        if (!data || data.length === 0) {
-          listContainer.innerHTML = `
-            <div class="text-center font-mono text-xs text-zinc-600 py-8 border border-dashed border-[#242424] rounded-lg">
-              No individual tracks or songs cataloged for this segment yet.
-            </div>
-          `;
-          return;
-        }
-
-        listContainer.innerHTML = data.map((perf, index) => {
-          const escapedSong = perf.song_title.replace(/'/g, "\\'");
-          return `
-            <div class="bg-[#1a1a1a] border border-[#282828] rounded-md px-4 py-3 flex items-start justify-between gap-4 font-mono text-xs w-full group">
-              <div class="flex items-start gap-3 flex-1 min-w-0">
-                <span class="text-zinc-600 font-bold mt-0.5 select-none shrink-0">${perf.performance_order || (index + 1)}.</span>
-                <span class="text-zinc-200 font-semibold break-words whitespace-normal block flex-1">${perf.song_title}</span>
-              </div>
-              <div class="flex items-center gap-2 shrink-0">
-                ${perf.duration ? `<span class="text-zinc-500 bg-zinc-900 px-1.5 py-0.5 border border-[#242424] rounded text-[10px] font-mono">${perf.duration}</span>` : ''}
-                <button onclick="handleEditPerformance('${perf.id}', '${escapedSong}', '${id}')" class="text-[11px] text-zinc-500 hover:text-[#3ecf8e] transition-colors px-1 py-0.5 rounded hover:bg-zinc-800 cursor-pointer" title="Edit Performance text">
-                  ✏️ Edit
-                </button>
-              </div>
-            </div>
-          `;
-        }).join('');
-
-      } catch (err) {
-        listContainer.innerHTML = `<div class="text-xs font-mono text-red-400 p-4">System runtime failure.</div>`;
-      }
+    const title = document.getElementById('book-title').value.trim();
+    if (!title) {
+      adminMessage.textContent = 'Title is required.';
+      adminMessage.className = 'auth-error';
+      return;
     }
 
-    // Performance Data Modification Engine
-    async function handleEditPerformance(perfId, currentText, itemId) {
-      const updatedText = prompt("Edit track / performance details:", currentText);
-      
-      // If user clicks cancel or leaves empty text, don't execute
-      if (updatedText === null || updatedText.trim() === "") return;
+    const mirrorsRaw = document.getElementById('book-mirrors').value.trim();
+    const mirror_urls = mirrorsRaw ? mirrorsRaw.split(',').map(s => s.trim()).filter(s => s) : [];
 
-      const { error } = await appSupabase
-        .from('archive_performances')
-        .update({ song_title: updatedText.trim() })
-        .eq('id', perfId);
+    const payload = {
+      title,
+      author: document.getElementById('book-author').value.trim() || null,
+      category: document.getElementById('book-category').value || null,
+      isbn: document.getElementById('book-isbn').value.trim() || null,
+      publication_year: parseInt(document.getElementById('book-year').value) || null,
+      file_format: document.getElementById('book-format').value.trim() || null,
+      file_size_mb: parseFloat(document.getElementById('book-size').value) || null,
+      cover_url: document.getElementById('book-cover').value.trim() || null,
+      mirror_urls: mirror_urls.length ? mirror_urls : null,
+      description: document.getElementById('book-desc').value.trim() || null,
+    };
 
-      if (error) {
-        showToast("Update Failed", error.message);
-      } else {
-        showToast("Updated", "Track listing data rewritten successfully.", false);
-        
-        // Refresh modal seamlessly
-        const currentTitle = document.getElementById('modal-project-title').innerText;
-        const currentMeta = document.getElementById('modal-project-meta').innerText;
-        const parts = currentMeta.split(' | ');
-        openProjectDetails(itemId, currentTitle, parts[0], parts[1] || '');
-      }
+    const { error } = await supabase.from('books').insert(payload);
+    if (error) {
+      adminMessage.textContent = '❌ Upload failed: ' + error.message;
+      adminMessage.className = 'auth-error';
+    } else {
+      adminMessage.textContent = '✅ Book added successfully!';
+      adminMessage.className = 'success';
+      // Clear fields
+      document.querySelectorAll('#admin-upload input, #admin-upload textarea, #admin-upload select').forEach(el => el.value = '');
+      if (searchInput.value.trim()) performSearch(searchInput.value);
     }
-
-    function closeModal() {
-      document.getElementById('modal-container').classList.add('hidden');
-    }
-
-    // Add track/song items to the specific selected Project Card
-    async function handleAddPerformance(itemId) {
-      const songName = prompt("Enter performance song title:");
-      if (!songName) return;
-
-      const trackOrder = prompt("Enter track sequence order number:", "1");
-      const trackDuration = prompt("Enter performance running length (e.g. 03:15, or leave blank):", "");
-
-      const { error } = await appSupabase
-        .from('archive_performances')
-        .insert([
-          {
-            item_id: itemId,
-            song_title: songName,
-            performance_order: parseInt(trackOrder) || 1,
-            duration: trackDuration ? trackDuration : null
-          }
-        ]);
-
-      if (error) {
-        showToast("Track Addition Failed", error.message);
-      } else {
-        showToast("Success", "Performance track successfully added.", false);
-        const currentTitle = document.getElementById('modal-project-title').innerText;
-        const currentMeta = document.getElementById('modal-project-meta').innerText;
-        const parts = currentMeta.split(' | ');
-        openProjectDetails(itemId, currentTitle, parts[0], parts[1] || '');
-      }
-    }
-
-    // Handle database project record insertions
-    async function handleAddRecord() {
-      const userTitle = prompt("Enter asset title:");
-      if (!userTitle) return;
-
-      const userVenue = prompt("Enter venue (e.g., RJ Bistro Dusit Hotel, Mandarin Hotel, One Shangri-La):", "RJ Bistro Dusit Hotel");
-      const userType = prompt("Enter media format ('video' or 'audio'):", "video");
-      const userDate = prompt("Enter recorded tracking date (MM-DD-YY):", "05-31-26");
-      const filePath = prompt("Enter target file system storage path:", `archives/${userType}/${Date.now()}.mp4`);
-
-      if (!filePath) {
-        showToast("Constraint Violation", 'The "storage_file_path" string field cannot be blank.');
-        return;
-      }
-
-      const { error } = await appSupabase
-        .from('archive_items')
-        .insert([
-          { 
-            title: userTitle, 
-            creator: "RJ",
-            media_type: userType === "audio" ? "audio" : "video",
-            venue: userVenue,
-            original_broadcast_date: userDate,
-            storage_file_path: filePath
-          }
-        ]);
-
-      if (error) {
-        showToast(`Insertion Failed: ERROR ${error.code}`, error.message);
-      } else {
-        showToast("Success", "Asset descriptor successfully written to active tables.", false);
-        fetchItems();
-      }
-    }
-
-    window.onclick = function(event) {
-      const modal = document.getElementById('modal-container');
-      if (event.target === modal) {
-        closeModal();
-      }
-    }
-
-    window.addEventListener('DOMContentLoaded', fetchItems);
-  </script>
+  });
+</script>
 </body>
 </html>
