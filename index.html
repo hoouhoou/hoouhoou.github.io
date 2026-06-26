@@ -16,7 +16,6 @@
     .file-row { transition: 0.15s; }
     .file-row:hover { background: #1e1e1e; }
 
-    /* Dropdown */
     #connect-dropdown {
       display: none;
       position: absolute;
@@ -82,19 +81,6 @@
       margin-top: 4px;
     }
     #connect-dropdown .btn-danger:hover { background: #dc2626; }
-    #connect-dropdown .btn-secondary {
-      width: 100%;
-      background: #2e2e2e;
-      color: #e2e8f0;
-      font-weight: 600;
-      border: none;
-      padding: 8px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: 0.2s;
-      margin-top: 4px;
-    }
-    #connect-dropdown .btn-secondary:hover { background: #3e3e3e; }
     #connect-dropdown .msg { margin: 4px 0; font-size: 0.8rem; }
     #connect-dropdown .msg.error { color: #f87171; }
     #connect-dropdown .msg.success { color: #34d399; }
@@ -135,7 +121,6 @@
 
     .connect-wrapper { position: relative; display: inline-block; }
 
-    /* Delete modal */
     #delete-modal {
       display: none;
       position: fixed;
@@ -164,7 +149,6 @@
     #delete-modal .modal-box .btn-row .confirm { background: #ef4444; color: white; }
     #delete-modal .modal-box .btn-row .confirm:hover { background: #dc2626; }
 
-    /* Sidebar responsive */
     #sidebar-overlay {
       display: none;
       position: fixed;
@@ -174,8 +158,7 @@
     }
     #sidebar-overlay.active { display: block; }
     @media (min-width: 768px) {
-      #sidebar-overlay { display: none !important; }
-      #sidebar-overlay.active { display: none !important; }
+      #sidebar-overlay, #sidebar-overlay.active { display: none !important; }
     }
     #navigation-shell {
       transition: transform 0.3s ease;
@@ -192,9 +175,7 @@
         background: #141414;
         border-right: 1px solid #2e2e2e;
       }
-      #navigation-shell.open {
-        transform: translateX(0);
-      }
+      #navigation-shell.open { transform: translateX(0); }
       #navigation-shell .w-14 { width: 100%; }
       #navigation-shell aside.w-14 { width: 100%; flex-direction: row; flex-wrap: wrap; justify-content: center; }
       #navigation-shell aside.w-14 > div { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 8px; }
@@ -207,7 +188,6 @@
   <!-- TOP BAR -->
   <header class="h-14 bg-[#141414] border-b border-zinc-800 flex items-center justify-between px-3 sm:px-4 shrink-0 z-30">
     <div class="flex items-center space-x-2">
-      <!-- Hamburger for mobile -->
       <button id="mobile-menu-toggle" class="md:hidden text-zinc-400 hover:text-zinc-200 transition">
         <i class="fa-solid fa-bars text-lg"></i>
       </button>
@@ -218,7 +198,6 @@
     </div>
 
     <div class="flex items-center space-x-2 sm:space-x-4 flex-1 justify-end">
-      <!-- Search bar -->
       <div class="bg-[#1e1e1e] border border-zinc-800 rounded-lg px-2 py-1 flex items-center w-32 sm:w-48 md:w-64 transition hover:border-zinc-700">
         <i class="fa-solid fa-magnifying-glass text-xs text-zinc-500 mr-1"></i>
         <input type="text" id="search-input" placeholder="Search files..." class="bg-transparent border-none outline-none text-zinc-200 w-full text-sm" />
@@ -237,7 +216,8 @@
 
           <div class="tab-row" id="tab-row" style="display:none;">
             <button class="active" data-tab="upload">Add File</button>
-            <button data-tab="categories">Categories</button>
+            <!-- Categories tab is hidden by default, shown only to admins via JavaScript -->
+            <button data-tab="categories" id="categories-tab-btn" style="display:none;">Categories</button>
           </div>
 
           <div id="tab-upload" class="tab-content active">
@@ -278,12 +258,9 @@
     </div>
   </header>
 
-  <!-- SIDEBAR OVERLAY (mobile) -->
   <div id="sidebar-overlay"></div>
 
-  <!-- BODY -->
   <div class="flex flex-1 overflow-hidden relative">
-
     <!-- SIDEBAR -->
     <div id="navigation-shell" class="flex shrink-0 transition-all-custom z-20 w-14 border-r border-zinc-800 bg-[#141414]">
       <aside class="w-14 bg-[#141414] flex flex-col justify-between py-4 items-center shrink-0">
@@ -329,12 +306,10 @@
             </a>
           </nav>
         </div>
-
         <div id="menu-categories" class="flex flex-col h-full space-y-4 hidden">
           <div class="font-normal text-zinc-200 px-1 text-sm h-6 flex items-center">Categories</div>
           <nav id="category-nav" class="space-y-0.5"></nav>
         </div>
-
         <div id="menu-settings" class="flex flex-col h-full space-y-4 hidden overflow-y-auto">
           <div class="font-normal text-zinc-200 px-1 text-sm h-6 flex items-center">Settings</div>
           <div class="text-zinc-500 text-xs">Settings would go here.</div>
@@ -384,6 +359,10 @@
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpicXNyZnVybW9vd2lscHl4cmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyODU3NjcsImV4cCI6MjA5Nzg2MTc2N30.Q58fAB5-KliFKo7v0g3e48I6ttgnYzyOom1FVsUOrFM";
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    // ==================== GLOBALS ====================
+    window.currentUserRole = 'user';
+    window.currentUserId = null;
+
     // ==================== DOM REFS ====================
     const searchInput = document.getElementById('search-input');
     const fileList = document.getElementById('file-list');
@@ -428,6 +407,7 @@
     const tabRow = document.getElementById('tab-row');
     const tabUpload = document.getElementById('tab-upload');
     const tabCategories = document.getElementById('tab-categories');
+    const categoriesTabBtn = document.getElementById('categories-tab-btn');
     const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
     const sidebarOverlay = document.getElementById('sidebar-overlay');
 
@@ -457,11 +437,8 @@
     if (sidebarOverlay) {
       sidebarOverlay.addEventListener('click', closeSidebar);
     }
-    // Close sidebar on window resize to desktop
     window.addEventListener('resize', () => {
-      if (window.innerWidth >= 768) {
-        closeSidebar();
-      }
+      if (window.innerWidth >= 768) closeSidebar();
     });
 
     // ==================== DROPDOWN ====================
@@ -477,6 +454,12 @@
     function openDropdown(showUpload) {
       if (isAdminLoggedIn) {
         tabRow.style.display = 'flex';
+        // Show categories tab only for admins
+        if (window.currentUserRole === 'admin') {
+          categoriesTabBtn.style.display = 'inline-block';
+        } else {
+          categoriesTabBtn.style.display = 'none';
+        }
         dropdownLogin.style.display = 'none';
         dropdownUpload.style.display = 'block';
         dropdownTitle.textContent = 'Admin';
@@ -495,7 +478,6 @@
     function closeDropdown() {
       toggleDropdown(false);
     }
-
     if (dropdownClose) dropdownClose.addEventListener('click', closeDropdown);
 
     document.addEventListener('click', (e) => {
@@ -547,7 +529,7 @@
       if (dropdownUploadMsg) dropdownUploadMsg.textContent = '';
     }
 
-    // ==================== SIDEBAR TOGGLE (desktop) ====================
+    // ==================== SIDEBAR TOGGLE (DESKTOP) ====================
     const toggleBtn = document.getElementById('toggle-sidebar');
     const navShell = document.getElementById('navigation-shell');
     const toggleIcon = document.getElementById('toggle-icon');
@@ -559,10 +541,6 @@
         const subSidebar = document.getElementById('sub-sidebar');
         if (isCollapsed) subSidebar.classList.add('hidden');
         else subSidebar.classList.remove('hidden');
-        // On mobile, we don't want to interfere with the slide-in
-        if (window.innerWidth < 768) {
-          // Keep as is
-        }
       });
     }
 
@@ -585,22 +563,18 @@
       } else if (view === 'categories') {
         if (categories) categories.classList.remove('hidden');
         if (icons[1]) icons[1].classList.add('text-emerald-400', 'bg-zinc-800/80', 'border', 'border-zinc-700/40');
-        loadCategoriesAdmin();
+        if (window.currentUserRole === 'admin') loadCategoriesAdmin();
       } else if (view === 'settings') {
         if (settings) settings.classList.remove('hidden');
         if (icons[icons.length-2]) icons[icons.length-2].classList.add('text-emerald-400', 'bg-zinc-800/80', 'border', 'border-zinc-700/40');
       }
-      // On desktop, expand sidebar
       if (window.innerWidth >= 768) {
         isCollapsed = false;
         navShell.style.width = '240px';
         if (subSidebar) subSidebar.classList.remove('hidden');
         if (toggleIcon) toggleIcon.className = 'fa-solid fa-bars-staggered';
       }
-      // On mobile, close sidebar
-      if (window.innerWidth < 768) {
-        closeSidebar();
-      }
+      if (window.innerWidth < 768) closeSidebar();
     }
 
     function setCategory(cat) {
@@ -615,9 +589,22 @@
       switchView('overview');
     }
 
-    // ==================== LOAD FILES ====================
+    // ==================== LOAD FILES (RBAC) ====================
     async function loadFiles(query = '', category = '') {
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      if (!user) {
+        if (fileList) fileList.innerHTML = `<div class="text-zinc-500 text-center py-8 text-xs">Please log in to view files.</div>`;
+        return;
+      }
+      window.currentUserId = user.id;
+
       let supabaseQuery = supabaseClient.from('books').select('*, categories!left(name)');
+      
+      // Role-based filtering
+      if (window.currentUserRole !== 'admin') {
+        supabaseQuery = supabaseQuery.eq('user_id', user.id);
+      }
+      
       if (query.trim()) {
         supabaseQuery = supabaseQuery.textSearch('search_vector', query, { config: 'english', type: 'websearch' });
       }
@@ -645,6 +632,10 @@
         const categoryName = file.categories?.name || file.category || 'Uncategorized';
         const badge = `<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-900/60 px-1.5 py-0.5 rounded text-[9px] font-medium">${categoryName}</span>`;
         const fileId = file.id;
+        const isOwner = file.user_id === user.id;
+        const isAdmin = window.currentUserRole === 'admin';
+        const canEdit = isAdmin || isOwner;
+
         html += `
           <div class="file-row bg-[#171717] border border-zinc-800/80 rounded-lg p-3 flex flex-wrap items-center justify-between gap-2">
             <div class="flex-1 min-w-0">
@@ -655,12 +646,13 @@
                 ${file.file_format ? `· ${file.file_format}` : ''}
                 ${file.file_size_mb ? `· ${file.file_size_mb} MB` : ''}
                 ${file.description ? `· ${file.description.substring(0, 40)}${file.description.length > 40 ? '…' : ''}` : ''}
+                ${!isAdmin ? `<span class="text-[9px] text-zinc-500 ml-1">(owned)</span>` : ''}
               </div>
             </div>
             <div class="flex items-center gap-2 text-xs text-zinc-400 shrink-0">
               ${valid.length ? `<a href="${valid[0]}" target="_blank" class="bg-emerald-600 hover:bg-emerald-700 text-black px-2 py-0.5 rounded font-medium transition">Open</a>` : ''}
-              <button onclick="editFile('${fileId}')" class="text-zinc-400 hover:text-emerald-400 transition" title="Edit"><i class="fa-solid fa-pen text-xs"></i></button>
-              <button onclick="confirmDelete('${fileId}', '${file.title.replace(/'/g, "\\'")}')" class="text-zinc-400 hover:text-red-400 transition" title="Delete"><i class="fa-solid fa-trash text-xs"></i></button>
+              ${canEdit ? `<button onclick="editFile('${fileId}')" class="text-zinc-400 hover:text-emerald-400 transition" title="Edit"><i class="fa-solid fa-pen text-xs"></i></button>` : ''}
+              ${canEdit ? `<button onclick="confirmDelete('${fileId}', '${file.title.replace(/'/g, "\\'")}')" class="text-zinc-400 hover:text-red-400 transition" title="Delete"><i class="fa-solid fa-trash text-xs"></i></button>` : ''}
             </div>
           </div>
         `;
@@ -703,8 +695,12 @@
       if (nav) nav.innerHTML = `<div class="font-normal text-zinc-200 px-1 text-sm h-6 flex items-center">Filter by</div>` + html;
     }
 
-    // ==================== CATEGORIES ADMIN ====================
+    // ==================== CATEGORIES ADMIN (RBAC) ====================
     async function loadCategoriesAdmin() {
+      if (window.currentUserRole !== 'admin') {
+        if (categoryListAdmin) categoryListAdmin.innerHTML = '<div class="text-zinc-500 text-xs">Only admins can manage categories.</div>';
+        return;
+      }
       const { data, error } = await supabaseClient.from('categories').select('*').order('name');
       if (error || !data) {
         if (categoryListAdmin) categoryListAdmin.innerHTML = '<div class="text-zinc-500 text-xs">No categories</div>';
@@ -727,6 +723,13 @@
     }
 
     async function addCategory() {
+      if (window.currentUserRole !== 'admin') {
+        if (categoryMsg) {
+          categoryMsg.textContent = '❌ Only admins can add categories.';
+          categoryMsg.className = 'msg error';
+        }
+        return;
+      }
       const name = newCategoryInput ? newCategoryInput.value.trim() : '';
       if (!name) {
         if (categoryMsg) {
@@ -754,6 +757,10 @@
     }
 
     async function deleteCategory(id) {
+      if (window.currentUserRole !== 'admin') {
+        alert('Only admins can delete categories.');
+        return;
+      }
       if (!confirm('Delete this category? Files in this category will become uncategorized.')) return;
       const { error } = await supabaseClient.from('categories').delete().eq('id', id);
       if (error) {
@@ -777,7 +784,7 @@
       newCategoryInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') addCategory(); });
     }
 
-    // ==================== EDIT FILE ====================
+    // ==================== EDIT / UPDATE / DELETE ====================
     window.editFile = async function(id) {
       if (!isDropdownOpen) openDropdown(true);
       else switchTab('upload');
@@ -802,7 +809,6 @@
       if (dropdownUploadMsg) dropdownUploadMsg.textContent = '';
     };
 
-    // ==================== UPDATE FILE ====================
     if (updateBtn) {
       updateBtn.addEventListener('click', async () => {
         const id = editFileId ? editFileId.value : '';
@@ -851,7 +857,6 @@
       });
     }
 
-    // ==================== DELETE FILE ====================
     window.confirmDelete = function(id, name) {
       deleteTargetId = id;
       if (deleteFileName) deleteFileName.textContent = `"${name}" – this action cannot be undone.`;
@@ -888,24 +893,48 @@
       });
     }
 
-    // ==================== ADMIN AUTH ====================
-    function updateAdminUI(user) {
+    // ==================== ADMIN AUTH + PROFILE FETCH ====================
+    async function updateAdminUI(user) {
       if (user) {
+        window.currentUserId = user.id;
+        // Fetch user role from profiles
+        const { data: profile, error: profileError } = await supabaseClient
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+
+        if (profileError || !profile) {
+          window.currentUserRole = 'user';
+        } else {
+          window.currentUserRole = profile.role;
+        }
+
         if (adminStatusLabel) adminStatusLabel.textContent = 'Sign Out';
         if (adminToggleBtn) {
           adminToggleBtn.classList.add('bg-zinc-800', 'text-red-400', 'border-zinc-700');
         }
         isAdminLoggedIn = true;
+
         if (tabRow) tabRow.style.display = 'flex';
+        if (window.currentUserRole === 'admin') {
+          categoriesTabBtn.style.display = 'inline-block';
+        } else {
+          categoriesTabBtn.style.display = 'none';
+        }
+
         if (dropdownLogin) dropdownLogin.style.display = 'none';
         if (dropdownUpload) dropdownUpload.style.display = 'block';
         if (dropdownTitle) dropdownTitle.textContent = 'Admin';
         resetUploadForm();
-        // Close dropdown after login if it was open
         if (isDropdownOpen) {
           setTimeout(() => closeDropdown(), 500);
         }
+        // Reload files with new role
+        loadFiles(searchInput ? searchInput.value : '', currentCategory);
       } else {
+        window.currentUserRole = 'user';
+        window.currentUserId = null;
         if (adminStatusLabel) adminStatusLabel.textContent = 'Connect';
         if (adminToggleBtn) {
           adminToggleBtn.classList.remove('bg-zinc-800', 'text-red-400', 'border-zinc-700');
@@ -917,6 +946,7 @@
         if (dropdownTitle) dropdownTitle.textContent = 'Admin Login';
         if (dropdownMsg) dropdownMsg.textContent = '';
         closeDropdown();
+        if (fileList) fileList.innerHTML = `<div class="text-zinc-500 text-center py-8 text-xs">Please log in to view files.</div>`;
       }
     }
 
@@ -943,12 +973,10 @@
             dropdownMsg.textContent = '✅ Login successful';
             dropdownMsg.className = 'msg success';
           }
-          // Will close after a moment via updateAdminUI
         }
       });
     }
 
-    // LOGOUT (from dropdown)
     if (logoutBtn) {
       logoutBtn.addEventListener('click', () => {
         supabaseClient.auth.signOut();
@@ -956,7 +984,6 @@
       });
     }
 
-    // TOP BAR BUTTON (Connect/Sign Out)
     if (adminToggleBtn) {
       adminToggleBtn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -1023,10 +1050,15 @@
       });
     }
 
-    // ==================== OPEN ADMIN DROPDOWN (triggers) ====================
+    // ==================== OPEN ADMIN DROPDOWN (TRIGGERS) ====================
     function openAdminDropdown() {
       if (isAdminLoggedIn) {
         if (tabRow) tabRow.style.display = 'flex';
+        if (window.currentUserRole === 'admin') {
+          categoriesTabBtn.style.display = 'inline-block';
+        } else {
+          categoriesTabBtn.style.display = 'none';
+        }
         if (dropdownLogin) dropdownLogin.style.display = 'none';
         if (dropdownUpload) dropdownUpload.style.display = 'block';
         if (dropdownTitle) dropdownTitle.textContent = 'Admin';
@@ -1069,7 +1101,10 @@
 
     // ==================== INIT ====================
     loadCategories();
-    loadFiles('', '');
+    // loadFiles will be called by updateAdminUI if user is logged in, or fallback
+    if (!window.currentUserId) {
+      if (fileList) fileList.innerHTML = `<div class="text-zinc-500 text-center py-8 text-xs">Please log in to view files.</div>`;
+    }
   </script>
 </body>
 </html>
