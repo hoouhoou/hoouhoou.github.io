@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Google Sheets Redirects</title>
+  <title>Sheets Redirects</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -121,7 +122,6 @@
 </head>
 <body>
 
-  <!-- Top Navigation (optional – link back to main app) -->
   <div class="top-bar">
     <div>
       <a href="index.html" class="flex items-center gap-2">
@@ -144,7 +144,7 @@
       <button id="toggle-add-btn" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Add New</button>
     </div>
 
-    <!-- Add/Edit Form (hidden by default) -->
+    <!-- Add/Edit Form -->
     <div id="add-form" class="card" style="display:none;">
       <h3 class="text-white font-semibold mb-2"><i class="fa-regular fa-pen-to-square"></i> Add / Edit Link</h3>
       <input id="sheet-title" class="input-field" placeholder="Title (e.g., Sales Q1)" />
@@ -165,7 +165,6 @@
 
     <!-- Link Grid -->
     <div id="sheet-grid" class="grid-list">
-      <!-- Rows will be injected by JavaScript -->
       <div class="empty-state">Loading links...</div>
     </div>
   </div>
@@ -212,7 +211,7 @@
     const cancelBtn = document.getElementById('cancel-sheet-btn');
     const formMsg = document.getElementById('form-msg');
 
-    let editingId = null; // if not null, we're editing
+    let editingId = null;
 
     // Render the grid
     function render(filter = '') {
@@ -269,7 +268,6 @@
       });
     }
 
-    // Simple escape to prevent XSS
     function escapeHtml(unsafe) {
       if (!unsafe) return '';
       return unsafe.replace(/[&<>"]/g, function(m) {
@@ -281,7 +279,6 @@
       });
     }
 
-    // Start editing
     function startEdit(sheet) {
       editingId = sheet.id;
       titleInput.value = sheet.title;
@@ -290,12 +287,9 @@
       addForm.style.display = 'block';
       toggleAddBtn.textContent = 'Cancel';
       formMsg.textContent = '';
-      document.getElementById('toggle-add-btn').innerHTML = '<i class="fa-solid fa-xmark"></i> Cancel';
-      // We'll change the button behavior temporarily – we'll handle via cancel button.
-      // The toggle button will close the form.
+      toggleAddBtn.innerHTML = '<i class="fa-solid fa-xmark"></i> Cancel';
     }
 
-    // Reset form
     function resetForm() {
       editingId = null;
       titleInput.value = '';
@@ -306,7 +300,6 @@
       toggleAddBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Add New';
     }
 
-    // Save (add or update)
     function saveSheet() {
       const title = titleInput.value.trim();
       const url = urlInput.value.trim();
@@ -314,14 +307,12 @@
         formMsg.textContent = '❌ Title and URL are required.';
         return;
       }
-      // Simple URL validation
       if (!url.startsWith('http://') && !url.startsWith('https://')) {
         formMsg.textContent = '❌ Please enter a valid URL (starts with http:// or https://).';
         return;
       }
 
       if (editingId) {
-        // Update
         const index = sheets.findIndex(s => s.id === editingId);
         if (index !== -1) {
           sheets[index].title = title;
@@ -329,7 +320,6 @@
           sheets[index].description = descInput.value.trim() || '';
         }
       } else {
-        // Add new
         const newId = Date.now().toString(36) + Math.random().toString(36).slice(2);
         sheets.push({
           id: newId,
@@ -353,15 +343,12 @@
         addForm.style.display = 'block';
         toggleAddBtn.innerHTML = '<i class="fa-solid fa-xmark"></i> Cancel';
         formMsg.textContent = '';
-        if (editingId) { /* keep editing state */ }
       }
     });
 
     cancelBtn.addEventListener('click', resetForm);
-
     saveBtn.addEventListener('click', saveSheet);
 
-    // Enter key on any input triggers save
     [titleInput, urlInput, descInput].forEach(inp => {
       inp.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') saveSheet();
@@ -373,8 +360,6 @@
     // Initialize
     loadSheets();
     render('');
-
-    // Also allow double-click on a card to open in new tab? optional.
   </script>
 </body>
 </html>
