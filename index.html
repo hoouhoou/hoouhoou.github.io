@@ -216,7 +216,6 @@
 
           <div class="tab-row" id="tab-row" style="display:none;">
             <button class="active" data-tab="upload">Add File</button>
-            <!-- Categories tab is hidden by default, shown only to admins via JavaScript -->
             <button data-tab="categories" id="categories-tab-btn" style="display:none;">Categories</button>
           </div>
 
@@ -271,7 +270,8 @@
           <button onclick="switchView('categories')" class="nav-icon-btn w-10 h-10 rounded-xl flex items-center justify-center text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 transition" title="Categories">
             <i class="fa-solid fa-tags text-base"></i>
           </button>
-          <button class="nav-icon-btn w-10 h-10 rounded-xl flex items-center justify-center text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 transition" title="Add File" id="new-file-icon">
+          <!-- ADD FILE icon – hidden for non-admins (we hide via JS) -->
+          <button id="new-file-icon" class="nav-icon-btn w-10 h-10 rounded-xl flex items-center justify-center text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 transition" title="Add File" style="display:none;">
             <i class="fa-solid fa-plus text-base"></i>
           </button>
           <div class="w-8 border-b border-zinc-800 my-1"></div>
@@ -301,8 +301,13 @@
             </a>
             <div id="category-list" class="space-y-0.5 mt-1"></div>
             <div class="border-b border-zinc-800/60 my-2 mx-1"></div>
-            <a href="#" class="flex items-center space-x-2.5 px-2 py-1.5 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/30 transition" id="admin-sidebar-link">
+            <!-- Add File link – hidden for non-admins -->
+            <a href="#" class="flex items-center space-x-2.5 px-2 py-1.5 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/30 transition" id="admin-sidebar-link" style="display:none;">
               <i class="fa-solid fa-pen-to-square text-emerald-400 w-4 text-center"></i><span>Add File</span>
+            </a>
+            <!-- NEW: Sheets link – visible to all authenticated users -->
+            <a href="sheets.html" class="flex items-center space-x-2.5 px-2 py-1.5 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/30 transition">
+              <i class="fa-regular fa-file-spreadsheet text-emerald-400 w-4 text-center"></i><span>Sheets</span>
             </a>
           </nav>
         </div>
@@ -329,7 +334,8 @@
             <i class="fa-solid fa-tag"></i>
             <span id="category-label">All categories</span>
           </div>
-          <button id="new-file-btn" class="ml-auto bg-emerald-600 hover:bg-emerald-700 text-black font-semibold text-xs px-3 py-1.5 rounded shadow-sm transition">
+          <!-- New File button – hidden for non-admins -->
+          <button id="new-file-btn" class="ml-auto bg-emerald-600 hover:bg-emerald-700 text-black font-semibold text-xs px-3 py-1.5 rounded shadow-sm transition" style="display:none;">
             <i class="fa-solid fa-plus mr-1"></i> New File
           </button>
         </div>
@@ -452,25 +458,21 @@
     }
 
     function openDropdown(showUpload) {
-      if (isAdminLoggedIn) {
+      // Only show upload tab if user is admin
+      const isAdmin = window.currentUserRole === 'admin';
+      if (isAdmin) {
         tabRow.style.display = 'flex';
-        // Show categories tab only for admins
-        if (window.currentUserRole === 'admin') {
-          categoriesTabBtn.style.display = 'inline-block';
-        } else {
-          categoriesTabBtn.style.display = 'none';
-        }
+        categoriesTabBtn.style.display = 'inline-block';
         dropdownLogin.style.display = 'none';
         dropdownUpload.style.display = 'block';
         dropdownTitle.textContent = 'Admin';
         switchTab('upload');
         if (showUpload) resetUploadForm();
       } else {
-        tabRow.style.display = 'none';
-        dropdownLogin.style.display = 'block';
-        dropdownUpload.style.display = 'none';
-        dropdownTitle.textContent = 'Admin Login';
-        dropdownMsg.textContent = '';
+        // If not admin, show only login (or nothing) – but we don't want to open the dropdown for non-admins at all.
+        // We'll just close it.
+        closeDropdown();
+        return;
       }
       toggleDropdown(true);
     }
@@ -786,6 +788,10 @@
 
     // ==================== EDIT / UPDATE / DELETE ====================
     window.editFile = async function(id) {
+      if (window.currentUserRole !== 'admin') {
+        alert('Only admins can edit files.');
+        return;
+      }
       if (!isDropdownOpen) openDropdown(true);
       else switchTab('upload');
       const { data, error } = await supabaseClient.from('books').select('*').eq('id', id).single();
@@ -811,6 +817,10 @@
 
     if (updateBtn) {
       updateBtn.addEventListener('click', async () => {
+        if (window.currentUserRole !== 'admin') {
+          alert('Only admins can update files.');
+          return;
+        }
         const id = editFileId ? editFileId.value : '';
         if (!id) {
           if (dropdownUploadMsg) {
@@ -858,6 +868,10 @@
     }
 
     window.confirmDelete = function(id, name) {
+      if (window.currentUserRole !== 'admin') {
+        alert('Only admins can delete files.');
+        return;
+      }
       deleteTargetId = id;
       if (deleteFileName) deleteFileName.textContent = `"${name}" – this action cannot be undone.`;
       if (deleteModal) deleteModal.classList.add('active');
@@ -872,6 +886,10 @@
 
     if (deleteConfirm) {
       deleteConfirm.addEventListener('click', async () => {
+        if (window.currentUserRole !== 'admin') {
+          alert('Only admins can delete files.');
+          return;
+        }
         if (!deleteTargetId) return;
         const { error } = await supabaseClient.from('books').delete().eq('id', deleteTargetId);
         if (deleteModal) deleteModal.classList.remove('active');
@@ -916,11 +934,23 @@
         }
         isAdminLoggedIn = true;
 
-        if (tabRow) tabRow.style.display = 'flex';
-        if (window.currentUserRole === 'admin') {
+        // Show admin-only elements if role is admin
+        const isAdmin = window.currentUserRole === 'admin';
+        if (isAdmin) {
+          tabRow.style.display = 'flex';
           categoriesTabBtn.style.display = 'inline-block';
+          newFileBtn.style.display = 'inline-block';
+          newFileIcon.style.display = 'flex';
+          adminSidebarLink.style.display = 'flex';
+          // Also enable upload dropdown
         } else {
+          tabRow.style.display = 'none';
           categoriesTabBtn.style.display = 'none';
+          newFileBtn.style.display = 'none';
+          newFileIcon.style.display = 'none';
+          adminSidebarLink.style.display = 'none';
+          // Close dropdown if open
+          if (isDropdownOpen) closeDropdown();
         }
 
         if (dropdownLogin) dropdownLogin.style.display = 'none';
@@ -940,7 +970,11 @@
           adminToggleBtn.classList.remove('bg-zinc-800', 'text-red-400', 'border-zinc-700');
         }
         isAdminLoggedIn = false;
-        if (tabRow) tabRow.style.display = 'none';
+        tabRow.style.display = 'none';
+        categoriesTabBtn.style.display = 'none';
+        newFileBtn.style.display = 'none';
+        newFileIcon.style.display = 'none';
+        adminSidebarLink.style.display = 'none';
         if (dropdownLogin) dropdownLogin.style.display = 'block';
         if (dropdownUpload) dropdownUpload.style.display = 'none';
         if (dropdownTitle) dropdownTitle.textContent = 'Admin Login';
@@ -991,6 +1025,7 @@
           supabaseClient.auth.signOut();
           closeDropdown();
         } else {
+          // Show login form
           if (dropdownLogin) dropdownLogin.style.display = 'block';
           if (dropdownUpload) dropdownUpload.style.display = 'none';
           if (dropdownTitle) dropdownTitle.textContent = 'Admin Login';
@@ -1003,6 +1038,10 @@
     // ==================== UPLOAD FILE ====================
     if (uploadBtn) {
       uploadBtn.addEventListener('click', async () => {
+        if (window.currentUserRole !== 'admin') {
+          alert('Only admins can add files.');
+          return;
+        }
         const user = (await supabaseClient.auth.getUser()).data.user;
         if (!user) {
           if (dropdownUploadMsg) {
@@ -1052,26 +1091,17 @@
 
     // ==================== OPEN ADMIN DROPDOWN (TRIGGERS) ====================
     function openAdminDropdown() {
-      if (isAdminLoggedIn) {
-        if (tabRow) tabRow.style.display = 'flex';
-        if (window.currentUserRole === 'admin') {
-          categoriesTabBtn.style.display = 'inline-block';
-        } else {
-          categoriesTabBtn.style.display = 'none';
-        }
-        if (dropdownLogin) dropdownLogin.style.display = 'none';
-        if (dropdownUpload) dropdownUpload.style.display = 'block';
-        if (dropdownTitle) dropdownTitle.textContent = 'Admin';
+      if (window.currentUserRole === 'admin') {
+        tabRow.style.display = 'flex';
+        categoriesTabBtn.style.display = 'inline-block';
+        dropdownLogin.style.display = 'none';
+        dropdownUpload.style.display = 'block';
+        dropdownTitle.textContent = 'Admin';
         resetUploadForm();
         switchTab('upload');
         openDropdown(true);
       } else {
-        if (tabRow) tabRow.style.display = 'none';
-        if (dropdownLogin) dropdownLogin.style.display = 'block';
-        if (dropdownUpload) dropdownUpload.style.display = 'none';
-        if (dropdownTitle) dropdownTitle.textContent = 'Admin Login';
-        if (dropdownMsg) dropdownMsg.textContent = '';
-        openDropdown(false);
+        alert('Only admins can add files.');
       }
     }
 
@@ -1101,7 +1131,6 @@
 
     // ==================== INIT ====================
     loadCategories();
-    // loadFiles will be called by updateAdminUI if user is logged in, or fallback
     if (!window.currentUserId) {
       if (fileList) fileList.innerHTML = `<div class="text-zinc-500 text-center py-8 text-xs">Please log in to view files.</div>`;
     }
