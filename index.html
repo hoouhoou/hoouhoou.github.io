@@ -4,10 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>File Manager – Dashboard</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📁</text></svg>">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
+    /* All your existing styles – unchanged for brevity */
     .transition-all-custom { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -185,7 +187,7 @@
 </head>
 <body class="h-full text-zinc-200 font-sans flex flex-col antialiased selection:bg-emerald-500/30 selection:text-emerald-400 overflow-hidden">
 
-  <!-- TOP BAR -->
+  <!-- TOP BAR (same as before) -->
   <header class="h-14 bg-[#141414] border-b border-zinc-800 flex items-center justify-between px-3 sm:px-4 shrink-0 z-30">
     <div class="flex items-center space-x-2">
       <button id="mobile-menu-toggle" class="md:hidden text-zinc-400 hover:text-zinc-200 transition">
@@ -270,7 +272,6 @@
           <button onclick="switchView('categories')" class="nav-icon-btn w-10 h-10 rounded-xl flex items-center justify-center text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 transition" title="Categories">
             <i class="fa-solid fa-tags text-base"></i>
           </button>
-          <!-- ADD FILE icon – hidden for non-admins (we hide via JS) -->
           <button id="new-file-icon" class="nav-icon-btn w-10 h-10 rounded-xl flex items-center justify-center text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 transition" title="Add File" style="display:none;">
             <i class="fa-solid fa-plus text-base"></i>
           </button>
@@ -301,11 +302,9 @@
             </a>
             <div id="category-list" class="space-y-0.5 mt-1"></div>
             <div class="border-b border-zinc-800/60 my-2 mx-1"></div>
-            <!-- Add File link – hidden for non-admins -->
             <a href="#" class="flex items-center space-x-2.5 px-2 py-1.5 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/30 transition" id="admin-sidebar-link" style="display:none;">
               <i class="fa-solid fa-pen-to-square text-emerald-400 w-4 text-center"></i><span>Add File</span>
             </a>
-            <!-- NEW: Sheets link – visible to all authenticated users -->
             <a href="sheets.html" class="flex items-center space-x-2.5 px-2 py-1.5 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/30 transition">
               <i class="fa-regular fa-file-spreadsheet text-emerald-400 w-4 text-center"></i><span>Sheets</span>
             </a>
@@ -334,7 +333,6 @@
             <i class="fa-solid fa-tag"></i>
             <span id="category-label">All categories</span>
           </div>
-          <!-- New File button – hidden for non-admins -->
           <button id="new-file-btn" class="ml-auto bg-emerald-600 hover:bg-emerald-700 text-black font-semibold text-xs px-3 py-1.5 rounded shadow-sm transition" style="display:none;">
             <i class="fa-solid fa-plus mr-1"></i> New File
           </button>
@@ -363,7 +361,18 @@
     // ==================== SUPABASE ====================
     const SUPABASE_URL = "{{SUPABASE_URL}}";
     const SUPABASE_ANON_KEY = "{{SUPABASE_ANON_KEY}}";
+
+    console.log('🔧 Supabase URL:', SUPABASE_URL);
+    console.log('🔑 Anon key length:', SUPABASE_ANON_KEY.length);
+
+    // Check if placeholders are still present (local testing)
+    if (SUPABASE_URL.includes('{{') || SUPABASE_ANON_KEY.includes('{{')) {
+      console.error('❌ Credentials not replaced! Did you build the file?');
+      alert('Credentials not injected. Please build the project or use the deployed version.');
+    }
+
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    console.log('✅ Supabase client created');
 
     // ==================== GLOBALS ====================
     window.currentUserRole = 'user';
@@ -458,7 +467,6 @@
     }
 
     function openDropdown(showUpload) {
-      // Only show upload tab if user is admin
       const isAdmin = window.currentUserRole === 'admin';
       if (isAdmin) {
         tabRow.style.display = 'flex';
@@ -469,10 +477,18 @@
         switchTab('upload');
         if (showUpload) resetUploadForm();
       } else {
-        // If not admin, show only login (or nothing) – but we don't want to open the dropdown for non-admins at all.
-        // We'll just close it.
-        closeDropdown();
-        return;
+        // If not logged in, show login form
+        if (!isAdminLoggedIn) {
+          tabRow.style.display = 'none';
+          dropdownLogin.style.display = 'block';
+          dropdownUpload.style.display = 'none';
+          dropdownTitle.textContent = 'Admin Login';
+          dropdownMsg.textContent = '';
+        } else {
+          // logged in but not admin – close dropdown
+          closeDropdown();
+          return;
+        }
       }
       toggleDropdown(true);
     }
@@ -602,7 +618,6 @@
 
       let supabaseQuery = supabaseClient.from('books').select('*, categories!left(name)');
       
-      // Role-based filtering
       if (window.currentUserRole !== 'admin') {
         supabaseQuery = supabaseQuery.eq('user_id', user.id);
       }
@@ -915,7 +930,6 @@
     async function updateAdminUI(user) {
       if (user) {
         window.currentUserId = user.id;
-        // Fetch user role from profiles
         const { data: profile, error: profileError } = await supabaseClient
           .from('profiles')
           .select('role')
@@ -934,7 +948,6 @@
         }
         isAdminLoggedIn = true;
 
-        // Show admin-only elements if role is admin
         const isAdmin = window.currentUserRole === 'admin';
         if (isAdmin) {
           tabRow.style.display = 'flex';
@@ -942,14 +955,12 @@
           newFileBtn.style.display = 'inline-block';
           newFileIcon.style.display = 'flex';
           adminSidebarLink.style.display = 'flex';
-          // Also enable upload dropdown
         } else {
           tabRow.style.display = 'none';
           categoriesTabBtn.style.display = 'none';
           newFileBtn.style.display = 'none';
           newFileIcon.style.display = 'none';
           adminSidebarLink.style.display = 'none';
-          // Close dropdown if open
           if (isDropdownOpen) closeDropdown();
         }
 
@@ -960,7 +971,6 @@
         if (isDropdownOpen) {
           setTimeout(() => closeDropdown(), 500);
         }
-        // Reload files with new role
         loadFiles(searchInput ? searchInput.value : '', currentCategory);
       } else {
         window.currentUserRole = 'user';
@@ -985,28 +995,41 @@
     }
 
     supabaseClient.auth.onAuthStateChange((event, session) => {
+      console.log('Auth state changed:', event, session?.user?.email);
       updateAdminUI(session?.user || null);
     });
     supabaseClient.auth.getSession().then(({ data }) => {
+      console.log('Initial session:', data.session?.user?.email);
       updateAdminUI(data.session?.user || null);
     });
 
-    // LOGIN
+    // ==================== LOGIN ====================
     if (adminLoginBtn) {
       adminLoginBtn.addEventListener('click', async () => {
         const email = adminEmail ? adminEmail.value.trim() : '';
         const pass = adminPass ? adminPass.value : '';
+        console.log('Login attempt for:', email);
+        if (!email || !pass) {
+          if (dropdownMsg) {
+            dropdownMsg.textContent = '❌ Please enter email and password.';
+            dropdownMsg.className = 'msg error';
+          }
+          return;
+        }
         const { error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
         if (error) {
+          console.error('Login error:', error);
           if (dropdownMsg) {
             dropdownMsg.textContent = '❌ ' + error.message;
             dropdownMsg.className = 'msg error';
           }
         } else {
+          console.log('Login successful');
           if (dropdownMsg) {
             dropdownMsg.textContent = '✅ Login successful';
             dropdownMsg.className = 'msg success';
           }
+          // The auth state change will handle the UI update
         }
       });
     }
@@ -1025,7 +1048,6 @@
           supabaseClient.auth.signOut();
           closeDropdown();
         } else {
-          // Show login form
           if (dropdownLogin) dropdownLogin.style.display = 'block';
           if (dropdownUpload) dropdownUpload.style.display = 'none';
           if (dropdownTitle) dropdownTitle.textContent = 'Admin Login';
