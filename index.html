@@ -15,10 +15,8 @@
     ::-webkit-scrollbar-thumb:hover { background: #3e3e3e; }
     .file-row { transition: 0.15s; }
     .file-row:hover { background: #1e1e1e; }
-    .file-row .actions { opacity: 0.3; transition: 0.15s; }
-    .file-row:hover .actions { opacity: 1; }
 
-    /* Dropdown styles */
+    /* Dropdown */
     #connect-dropdown {
       display: none;
       position: absolute;
@@ -26,6 +24,7 @@
       right: 0;
       margin-top: 6px;
       width: 360px;
+      max-width: calc(100vw - 20px);
       max-height: calc(100vh - 80px);
       overflow-y: auto;
       background: #1e1e1e;
@@ -117,6 +116,7 @@
       margin-bottom: 12px;
       border-bottom: 1px solid #2e2e2e;
       padding-bottom: 8px;
+      flex-wrap: wrap;
     }
     #connect-dropdown .tab-row button {
       background: none;
@@ -135,7 +135,7 @@
 
     .connect-wrapper { position: relative; display: inline-block; }
 
-    /* Delete confirmation modal */
+    /* Delete modal */
     #delete-modal {
       display: none;
       position: fixed;
@@ -163,30 +163,70 @@
     #delete-modal .modal-box .btn-row .cancel:hover { background: #3e3e3e; }
     #delete-modal .modal-box .btn-row .confirm { background: #ef4444; color: white; }
     #delete-modal .modal-box .btn-row .confirm:hover { background: #dc2626; }
+
+    /* Sidebar responsive */
+    #sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 25;
+    }
+    #sidebar-overlay.active { display: block; }
+    @media (min-width: 768px) {
+      #sidebar-overlay { display: none !important; }
+      #sidebar-overlay.active { display: none !important; }
+    }
+    #navigation-shell {
+      transition: transform 0.3s ease;
+    }
+    @media (max-width: 767px) {
+      #navigation-shell {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        transform: translateX(-100%);
+        width: 260px;
+        z-index: 30;
+        background: #141414;
+        border-right: 1px solid #2e2e2e;
+      }
+      #navigation-shell.open {
+        transform: translateX(0);
+      }
+      #navigation-shell .w-14 { width: 100%; }
+      #navigation-shell aside.w-14 { width: 100%; flex-direction: row; flex-wrap: wrap; justify-content: center; }
+      #navigation-shell aside.w-14 > div { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 8px; }
+      #navigation-shell #sub-sidebar { display: none !important; }
+    }
   </style>
 </head>
 <body class="h-full text-zinc-200 font-sans flex flex-col antialiased selection:bg-emerald-500/30 selection:text-emerald-400 overflow-hidden">
 
   <!-- TOP BAR -->
-  <header class="h-14 bg-[#141414] border-b border-zinc-800 flex items-center justify-between px-4 shrink-0 z-30">
+  <header class="h-14 bg-[#141414] border-b border-zinc-800 flex items-center justify-between px-3 sm:px-4 shrink-0 z-30">
     <div class="flex items-center space-x-2">
+      <!-- Hamburger for mobile -->
+      <button id="mobile-menu-toggle" class="md:hidden text-zinc-400 hover:text-zinc-200 transition">
+        <i class="fa-solid fa-bars text-lg"></i>
+      </button>
       <div class="text-[#3ecf8e] text-xl font-bold flex items-center justify-center">
         <svg viewBox="0 0 24 24" class="w-6 h-6 fill-current"><path d="M21.357 11.102a.5.5 0 0 0-.5-.102l-8.214 2.738L16.43 3.61a.5.5 0 0 0-.834-.465L2.643 12.898a.5.5 0 0 0 .5.102l8.214-2.738-3.786 10.13a.5.5 0 0 0 .834.466l12.956-9.753a.5.5 0 0 0 .1-.503z"/></svg>
       </div>
-      <span class="text-zinc-300 font-semibold text-sm">File Manager</span>
+      <span class="text-zinc-300 font-semibold text-sm hidden sm:inline">File Manager</span>
     </div>
 
-    <div class="flex items-center space-x-4">
-      <div class="bg-[#1e1e1e] border border-zinc-800 rounded-lg px-3 py-1.5 flex items-center justify-between w-64 cursor-pointer hover:border-zinc-700 transition">
-        <div class="flex items-center space-x-2 text-zinc-400 w-full">
-          <i class="fa-solid fa-magnifying-glass text-xs"></i>
-          <input type="text" id="search-input" placeholder="Search files..." class="bg-transparent border-none outline-none text-zinc-200 w-full text-sm" />
-        </div>
-        <span class="text-[10px] bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-500 font-mono">⌘K</span>
+    <div class="flex items-center space-x-2 sm:space-x-4 flex-1 justify-end">
+      <!-- Search bar -->
+      <div class="bg-[#1e1e1e] border border-zinc-800 rounded-lg px-2 py-1 flex items-center w-32 sm:w-48 md:w-64 transition hover:border-zinc-700">
+        <i class="fa-solid fa-magnifying-glass text-xs text-zinc-500 mr-1"></i>
+        <input type="text" id="search-input" placeholder="Search files..." class="bg-transparent border-none outline-none text-zinc-200 w-full text-sm" />
+        <span class="text-[10px] bg-zinc-800 px-1 py-0.5 rounded text-zinc-500 font-mono hidden sm:inline">⌘K</span>
       </div>
 
       <div class="connect-wrapper">
-        <button id="admin-login-toggle" class="bg-[#10b981] hover:bg-[#059669] text-[#121212] px-4 py-1.5 rounded-lg font-semibold text-sm flex items-center space-x-2 transition shadow-lg shadow-emerald-900/20">
+        <button id="admin-login-toggle" class="bg-[#10b981] hover:bg-[#059669] text-[#121212] px-3 sm:px-4 py-1.5 rounded-lg font-semibold text-xs sm:text-sm flex items-center space-x-1 sm:space-x-2 transition shadow-lg shadow-emerald-900/20 whitespace-nowrap">
           <i class="fa-solid fa-plug text-xs"></i>
           <span id="admin-status-label">Connect</span>
         </button>
@@ -195,13 +235,11 @@
           <button class="close-dropdown" id="dropdown-close">&times;</button>
           <h3 id="dropdown-title">Admin</h3>
 
-          <!-- Tabs -->
           <div class="tab-row" id="tab-row" style="display:none;">
             <button class="active" data-tab="upload">Add File</button>
             <button data-tab="categories">Categories</button>
           </div>
 
-          <!-- TAB: Upload / Edit -->
           <div id="tab-upload" class="tab-content active">
             <div id="dropdown-login">
               <input id="admin-email" type="email" placeholder="Email" />
@@ -214,14 +252,12 @@
             <div id="dropdown-upload" style="display:none;">
               <input id="file-title" placeholder="File Name *" />
               <input id="file-author" placeholder="Author / Source" />
-              <select id="file-category">
-                <option value="">Select Category</option>
-              </select>
+              <select id="file-category"><option value="">Select Category</option></select>
               <input id="file-format" placeholder="Format (PDF, Image, Video...)" />
               <input id="file-size" placeholder="Size (MB)" />
               <input id="file-urls" placeholder="File URLs (comma separated)" />
               <textarea id="file-desc" placeholder="Description"></textarea>
-              <input type="hidden" id="edit-file-id" value="" />
+              <input type="hidden" id="edit-file-id" />
               <button id="upload-btn" class="btn-primary">➕ Add File</button>
               <button id="update-btn" class="btn-primary" style="display:none;">💾 Update File</button>
               <button id="logout-btn" class="btn-danger">Logout</button>
@@ -229,10 +265,9 @@
             </div>
           </div>
 
-          <!-- TAB: Categories -->
           <div id="tab-categories" class="tab-content">
-            <div style="display:flex; gap:6px; margin-bottom:10px;">
-              <input id="new-category-input" placeholder="New category name..." style="flex:1; margin:0;" />
+            <div style="display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap;">
+              <input id="new-category-input" placeholder="New category name..." style="flex:1; min-width:120px; margin:0;" />
               <button id="add-category-btn" class="btn-primary" style="width:auto; padding:8px 16px;">Add</button>
             </div>
             <div id="category-list-admin" class="space-y-1 text-sm"></div>
@@ -242,6 +277,9 @@
       </div>
     </div>
   </header>
+
+  <!-- SIDEBAR OVERLAY (mobile) -->
+  <div id="sidebar-overlay"></div>
 
   <!-- BODY -->
   <div class="flex flex-1 overflow-hidden relative">
@@ -306,8 +344,8 @@
 
     <!-- MAIN CONTENT -->
     <div class="flex-1 border-l border-zinc-800 relative bg-[#121212]">
-      <main class="h-full overflow-y-auto p-6 md:p-8">
-        <div class="flex flex-wrap items-center gap-4 mb-4 max-w-4xl">
+      <main class="h-full overflow-y-auto p-3 sm:p-4 md:p-6">
+        <div class="flex flex-wrap items-center gap-3 mb-4 max-w-4xl">
           <div class="text-zinc-400 text-xs flex items-center gap-2">
             <i class="fa-solid fa-file"></i>
             <span id="total-count">0</span> files
@@ -328,7 +366,7 @@
     </div>
   </div>
 
-  <!-- DELETE CONFIRMATION MODAL -->
+  <!-- DELETE MODAL -->
   <div id="delete-modal">
     <div class="modal-box">
       <h3>⚠️ Delete this file?</h3>
@@ -379,29 +417,52 @@
     const fileUrls = document.getElementById('file-urls');
     const fileDesc = document.getElementById('file-desc');
     const editFileId = document.getElementById('edit-file-id');
-
-    // Category management
     const newCategoryInput = document.getElementById('new-category-input');
     const addCategoryBtn = document.getElementById('add-category-btn');
     const categoryListAdmin = document.getElementById('category-list-admin');
     const categoryMsg = document.getElementById('category-msg');
-
-    // Delete modal
     const deleteModal = document.getElementById('delete-modal');
     const deleteCancel = document.getElementById('delete-cancel');
     const deleteConfirm = document.getElementById('delete-confirm');
     const deleteFileName = document.getElementById('delete-file-name');
-    let deleteTargetId = null;
-
-    // Tabs
     const tabRow = document.getElementById('tab-row');
     const tabUpload = document.getElementById('tab-upload');
     const tabCategories = document.getElementById('tab-categories');
+    const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
 
     let currentCategory = '';
     let isAdminLoggedIn = false;
     let isDropdownOpen = false;
     let allCategories = [];
+    let deleteTargetId = null;
+
+    // ==================== MOBILE SIDEBAR ====================
+    function openSidebar() {
+      document.getElementById('navigation-shell').classList.add('open');
+      sidebarOverlay.classList.add('active');
+    }
+    function closeSidebar() {
+      document.getElementById('navigation-shell').classList.remove('open');
+      sidebarOverlay.classList.remove('active');
+    }
+    if (mobileMenuToggle) {
+      mobileMenuToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const nav = document.getElementById('navigation-shell');
+        if (nav.classList.contains('open')) closeSidebar();
+        else openSidebar();
+      });
+    }
+    if (sidebarOverlay) {
+      sidebarOverlay.addEventListener('click', closeSidebar);
+    }
+    // Close sidebar on window resize to desktop
+    window.addEventListener('resize', () => {
+      if (window.innerWidth >= 768) {
+        closeSidebar();
+      }
+    });
 
     // ==================== DROPDOWN ====================
     function toggleDropdown(forceState) {
@@ -420,9 +481,7 @@
         dropdownUpload.style.display = 'block';
         dropdownTitle.textContent = 'Admin';
         switchTab('upload');
-        if (showUpload) {
-          resetUploadForm();
-        }
+        if (showUpload) resetUploadForm();
       } else {
         tabRow.style.display = 'none';
         dropdownLogin.style.display = 'block';
@@ -442,7 +501,14 @@
     document.addEventListener('click', (e) => {
       if (isDropdownOpen) {
         const wrapper = document.querySelector('.connect-wrapper');
-        if (wrapper && !wrapper.contains(e.target)) {
+        let isTrigger = false;
+        let target = e.target;
+        const triggers = ['new-file-btn', 'new-file-icon', 'admin-sidebar-link'];
+        while (target) {
+          if (triggers.includes(target.id)) { isTrigger = true; break; }
+          target = target.parentElement;
+        }
+        if (wrapper && !wrapper.contains(e.target) && !isTrigger) {
           closeDropdown();
         }
       }
@@ -481,21 +547,21 @@
       if (dropdownUploadMsg) dropdownUploadMsg.textContent = '';
     }
 
-    // ==================== SIDEBAR ====================
+    // ==================== SIDEBAR TOGGLE (desktop) ====================
     const toggleBtn = document.getElementById('toggle-sidebar');
     const navShell = document.getElementById('navigation-shell');
     const toggleIcon = document.getElementById('toggle-icon');
     let isCollapsed = true;
-    
     if (toggleBtn) {
       toggleBtn.addEventListener('click', () => {
         isCollapsed = !isCollapsed;
         navShell.style.width = isCollapsed ? '56px' : '240px';
         const subSidebar = document.getElementById('sub-sidebar');
-        if (isCollapsed) {
-          subSidebar.classList.add('hidden');
-        } else {
-          subSidebar.classList.remove('hidden');
+        if (isCollapsed) subSidebar.classList.add('hidden');
+        else subSidebar.classList.remove('hidden');
+        // On mobile, we don't want to interfere with the slide-in
+        if (window.innerWidth < 768) {
+          // Keep as is
         }
       });
     }
@@ -506,7 +572,6 @@
       const settings = document.getElementById('menu-settings');
       const subSidebar = document.getElementById('sub-sidebar');
       const icons = document.querySelectorAll('.nav-icon-btn');
-      
       icons.forEach(btn => btn.classList.remove('text-emerald-400', 'bg-zinc-800/80', 'border', 'border-zinc-700/40'));
       icons.forEach(btn => btn.classList.add('text-zinc-400', 'hover:text-zinc-200', 'hover:bg-zinc-800/40'));
 
@@ -525,11 +590,17 @@
         if (settings) settings.classList.remove('hidden');
         if (icons[icons.length-2]) icons[icons.length-2].classList.add('text-emerald-400', 'bg-zinc-800/80', 'border', 'border-zinc-700/40');
       }
-      
-      isCollapsed = false;
-      navShell.style.width = '240px';
-      if (subSidebar) subSidebar.classList.remove('hidden');
-      if (toggleIcon) toggleIcon.className = 'fa-solid fa-bars-staggered';
+      // On desktop, expand sidebar
+      if (window.innerWidth >= 768) {
+        isCollapsed = false;
+        navShell.style.width = '240px';
+        if (subSidebar) subSidebar.classList.remove('hidden');
+        if (toggleIcon) toggleIcon.className = 'fa-solid fa-bars-staggered';
+      }
+      // On mobile, close sidebar
+      if (window.innerWidth < 768) {
+        closeSidebar();
+      }
     }
 
     function setCategory(cat) {
@@ -552,36 +623,28 @@
       }
       if (category) {
         const cat = allCategories.find(c => c.name === category);
-        if (cat) {
-          supabaseQuery = supabaseQuery.eq('category_id', cat.id);
-        } else {
-          supabaseQuery = supabaseQuery.eq('category', category);
-        }
+        if (cat) supabaseQuery = supabaseQuery.eq('category_id', cat.id);
+        else supabaseQuery = supabaseQuery.eq('category', category);
       }
       const { data, error, count } = await supabaseQuery.order('created_at', { ascending: false }).limit(100);
-
       if (error) {
         if (fileList) fileList.innerHTML = `<div class="text-zinc-500 text-center py-8 text-xs">⚠️ Error loading files</div>`;
         return;
       }
       if (totalCount) totalCount.textContent = count || 0;
-
       if (!data || data.length === 0) {
         if (fileList) fileList.innerHTML = `<div class="text-zinc-500 text-center py-8 text-xs">No files found. Add your first one using "New File".</div>`;
         return;
       }
-
       let html = '';
       data.forEach(file => {
         let urls = [];
         try { urls = JSON.parse(file.mirror_urls) || []; } catch { urls = [file.mirror_urls]; }
         if (!Array.isArray(urls)) urls = [urls];
         const valid = urls.filter(u => u && u.startsWith('http'));
-
         const categoryName = file.categories?.name || file.category || 'Uncategorized';
         const badge = `<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-900/60 px-1.5 py-0.5 rounded text-[9px] font-medium">${categoryName}</span>`;
         const fileId = file.id;
-
         html += `
           <div class="file-row bg-[#171717] border border-zinc-800/80 rounded-lg p-3 flex flex-wrap items-center justify-between gap-2">
             <div class="flex-1 min-w-0">
@@ -619,7 +682,6 @@
       }
       allCategories = data;
       renderCategories(data);
-
       if (fileCategory) {
         const select = fileCategory;
         select.innerHTML = '<option value="">Select Category</option>';
@@ -717,11 +779,8 @@
 
     // ==================== EDIT FILE ====================
     window.editFile = async function(id) {
-      if (!isDropdownOpen) {
-        openDropdown(true);
-      } else {
-        switchTab('upload');
-      }
+      if (!isDropdownOpen) openDropdown(true);
+      else switchTab('upload');
       const { data, error } = await supabaseClient.from('books').select('*').eq('id', id).single();
       if (error || !data) {
         if (dropdownUploadMsg) {
@@ -842,6 +901,10 @@
         if (dropdownUpload) dropdownUpload.style.display = 'block';
         if (dropdownTitle) dropdownTitle.textContent = 'Admin';
         resetUploadForm();
+        // Close dropdown after login if it was open
+        if (isDropdownOpen) {
+          setTimeout(() => closeDropdown(), 500);
+        }
       } else {
         if (adminStatusLabel) adminStatusLabel.textContent = 'Connect';
         if (adminToggleBtn) {
@@ -880,6 +943,7 @@
             dropdownMsg.textContent = '✅ Login successful';
             dropdownMsg.className = 'msg success';
           }
+          // Will close after a moment via updateAdminUI
         }
       });
     }
@@ -892,7 +956,7 @@
       });
     }
 
-    // TOP BAR BUTTON
+    // TOP BAR BUTTON (Connect/Sign Out)
     if (adminToggleBtn) {
       adminToggleBtn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -959,7 +1023,7 @@
       });
     }
 
-    // ==================== EVENTS ====================
+    // ==================== OPEN ADMIN DROPDOWN (triggers) ====================
     function openAdminDropdown() {
       if (isAdminLoggedIn) {
         if (tabRow) tabRow.style.display = 'flex';
@@ -979,11 +1043,22 @@
       }
     }
 
-    if (newFileBtn) newFileBtn.addEventListener('click', openAdminDropdown);
-    if (newFileIcon) newFileIcon.addEventListener('click', openAdminDropdown);
+    if (newFileBtn) {
+      newFileBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openAdminDropdown();
+      });
+    }
+    if (newFileIcon) {
+      newFileIcon.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openAdminDropdown();
+      });
+    }
     if (adminSidebarLink) {
       adminSidebarLink.addEventListener('click', (e) => {
         e.preventDefault();
+        e.stopPropagation();
         openAdminDropdown();
       });
     }
