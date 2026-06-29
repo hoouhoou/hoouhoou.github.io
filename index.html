@@ -1,84 +1,312 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full bg-[#121212]">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Personal Document Archive</title>
-  <link rel="stylesheet" href="style.css">
-  <script type="module" src="script.js"></script>
+  <title>Vault – Personal Archive</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔒</text></svg>">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body>
+<body class="h-full text-zinc-100 flex flex-col justify-between selection:bg-emerald-500/30">
 
-  <div id="auth-screen" class="auth-container">
-    <div class="card bg-surface auth-card">
-      <div class="brand">
-        <h2>ARCHIVE // SECURE</h2>
-        <p class="subtitle">Personal Document Management Vault</p>
+  <div id="auth-screen" class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+    <div class="sm:mx-auto sm:w-full sm:max-w-sm text-center">
+      <div class="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400 mb-4 border border-emerald-500/20">
+        <i class="fa-solid fa-terminal text-xl"></i>
       </div>
-      <form id="login-form">
-        <div class="form-group">
-          <label for="email">Archivist Email</label>
-          <input type="email" id="email" placeholder="name@domain.com" required autocomplete="email">
-        </div>
-        <div class="form-group">
-          <label for="password">Security Phrase</label>
-          <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password">
-        </div>
-        <button type="submit" class="btn btn-primary" id="login-btn">Authenticate</button>
-      </form>
-      <div id="auth-error" class="error-msg hidden"></div>
+      <h2 class="text-2xl font-bold tracking-tight text-white uppercase tracking-widest">Archive Core</h2>
+      <p class="mt-1 text-xs text-zinc-500">Identity verification required for console access.</p>
+    </div>
+
+    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-sm">
+      <div class="bg-zinc-900/50 border border-zinc-800/80 rounded-2xl p-6 backdrop-blur-md">
+        <form id="login-form" class="space-y-4">
+          <div>
+            <label for="email" class="block text-xs font-medium uppercase tracking-wider text-zinc-400">Archivist Identity</label>
+            <input id="email" type="email" autocomplete="email" required class="mt-1.5 block w-full rounded-lg bg-zinc-950 border border-zinc-800 px-3 py-2 text-sm text-white placeholder-zinc-600 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500">
+          </div>
+          <div>
+            <label for="password" class="block text-xs font-medium uppercase tracking-wider text-zinc-400">Security Phrase</label>
+            <input id="password" type="password" autocomplete="current-password" required class="mt-1.5 block w-full rounded-lg bg-zinc-950 border border-zinc-800 px-3 py-2 text-sm text-white placeholder-zinc-600 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500">
+          </div>
+          <button type="submit" class="w-full flex justify-center rounded-lg bg-emerald-600 px-3 py-2.5 text-sm font-semibold text-white hover:bg-emerald-500 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600">
+            Verify Session
+          </button>
+        </form>
+        <div id="auth-error" class="mt-4 text-xs bg-red-950/40 border border-red-900/50 text-red-400 p-3 rounded-lg hidden"></div>
+      </div>
     </div>
   </div>
 
-  <div id="dashboard-screen" class="dashboard-container hidden">
-    <header class="main-header">
-      <div class="header-title">
-        <h1>V A U L T</h1>
-        <span class="user-badge" id="user-display"></span>
+  <div id="dashboard-screen" class="hidden flex-1 flex flex-col min-h-screen">
+    <header class="border-b border-zinc-800 bg-zinc-900/20 backdrop-blur-md px-6 py-4 flex items-center justify-between sticky top-0 z-50">
+      <div class="flex items-center gap-3">
+        <span class="text-xl font-black tracking-widest text-white">VAULT</span>
+        <span id="user-display" class="text-xs font-mono px-2 py-0.5 rounded bg-zinc-800 text-emerald-400 border border-zinc-700/50"></span>
       </div>
-      <button id="logout-btn" class="btn btn-secondary btn-sm">Terminate Session</button>
+      <button id="logout-btn" class="text-xs font-medium px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-800 transition">
+        Terminate Console
+      </button>
     </header>
 
-    <main class="dashboard-content">
-      <section class="control-panel card bg-surface">
-        <h3>File Upload Pipeline</h3>
-        <form id="upload-form" class="upload-grid">
-          <div class="form-group">
-            <label for="doc-title">Document Title</label>
-            <input type="text" id="doc-title" placeholder="e.g., Tax Statement 2026" required>
+    <main class="flex-1 max-w-6xl w-full mx-auto p-6 space-y-6">
+      
+      <section class="bg-zinc-900/30 border border-zinc-800/80 rounded-2xl p-5">
+        <h3 class="text-sm font-bold uppercase tracking-wider text-zinc-300 mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-cloud-arrow-up text-emerald-400"></i> Document Ingest Pipeline
+        </h3>
+        <form id="upload-form" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+          <div>
+            <label for="doc-title" class="block text-xs font-medium text-zinc-400 uppercase tracking-wider">Index Title</label>
+            <input type="text" id="doc-title" placeholder="e.g., Fiscal Ledger 2026" required class="mt-1.5 block w-full rounded-lg bg-zinc-950 border border-zinc-800 px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none">
           </div>
-          <div class="form-group">
-            <label for="doc-file">Select File Target</label>
-            <input type="file" id="doc-file" required>
+          <div>
+            <label for="doc-file" class="block text-xs font-medium text-zinc-400 uppercase tracking-wider">Target File Source</label>
+            <input type="file" id="doc-file" required class="mt-1.5 block w-full text-sm text-zinc-400 file:mr-4 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-zinc-800 file:text-zinc-200 hover:file:bg-zinc-700 file:cursor-pointer">
           </div>
-          <button type="submit" class="btn btn-primary align-end" id="upload-btn">Upload to Storage</button>
+          <button type="submit" id="upload-btn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-lg px-4 py-2 text-sm transition shadow-lg shadow-emerald-950/20">
+            Commit Entry
+          </button>
         </form>
-        <div id="upload-status" class="status-msg hidden"></div>
+        <div id="upload-status" class="mt-3 text-xs p-2.5 rounded-lg border hidden"></div>
       </section>
 
-      <section class="archive-panel">
-        <div class="search-bar-wrapper">
-          <input type="text" id="search-input" placeholder="Search archive indexes by title or filename...">
+      <section class="space-y-4">
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-zinc-500">
+            <i class="fa-solid fa-magnifying-glass text-sm"></i>
+          </span>
+          <input type="text" id="search-input" placeholder="Query secure registry by title or literal file sequence..." class="block w-full rounded-xl bg-zinc-900/40 border border-zinc-800 pl-10 pr-4 py-3 text-sm text-white placeholder-zinc-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500">
         </div>
 
-        <div class="table-container card bg-surface">
-          <table class="archive-table">
-            <thead>
-              <tr>
-                <th>Document Title</th>
-                <th>Filename</th>
-                <th>Indexed Date</th>
-                <th class="text-right">Action</th>
-              </tr>
-            </thead>
-            <tbody id="archive-table-body">
-              </tbody>
-          </table>
-          <div id="empty-state" class="empty-state hidden">No matching archival files identified.</div>
+        <div class="bg-zinc-900/20 border border-zinc-800/80 rounded-2xl overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-zinc-800 bg-zinc-950/40 text-[11px] uppercase tracking-wider font-semibold text-zinc-400">
+                  <th class="p-4">Archival Tracking Title</th>
+                  <th class="p-4">System File Identification</th>
+                  <th class="p-4">Registration Matrix</th>
+                  <th class="p-4 text-right">Access Link</th>
+                </tr>
+              </thead>
+              <tbody id="archive-table-body" class="divide-y divide-zinc-800/50 text-sm">
+                </tbody>
+            </table>
+          </div>
+          <div id="empty-state" class="p-12 text-center text-sm text-zinc-500 hidden">
+            <i class="fa-solid fa-box-open block text-2xl mb-2 text-zinc-600"></i> No confirmed tracking coordinates identified in current database query.
+          </div>
         </div>
       </section>
     </main>
   </div>
 
+  <script type="module">
+    // Injected seamlessly by build.js workflow engine
+    const SUPABASE_URL = '{{SUPABASE_URL}}';
+    const SUPABASE_ANON_KEY = '{{SUPABASE_ANON_KEY}}';
+    const BUCKET_NAME = 'documents'; 
+    
+    // Replace with your exact operational email address string
+    const HARD_LOCK_EMAIL = 'your-email@example.com'; 
+
+    const { createClient } = window.supabase;
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Dom cache registry
+    const authScreen = document.getElementById('auth-screen');
+    const dashboardScreen = document.getElementById('dashboard-screen');
+    const loginForm = document.getElementById('login-form');
+    const authError = document.getElementById('auth-error');
+    const userDisplay = document.getElementById('user-display');
+    const logoutBtn = document.getElementById('logout-btn');
+    const uploadForm = document.getElementById('upload-form');
+    const uploadStatus = document.getElementById('upload-status');
+    const searchInput = document.getElementById('search-input');
+    const tableBody = document.getElementById('archive-table-body');
+    const emptyState = document.getElementById('empty-state');
+
+    let archiveRegistryCache = [];
+    let authenticatedUserInstance = null;
+
+    async function evaluateActiveSession() {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (session?.user && session.user.email === HARD_LOCK_EMAIL) {
+        initializeConsoleEnvironment(session.user);
+      } else {
+        if (session) await supabase.auth.signOut();
+        呈现GatekeeperPortal();
+      }
+    }
+
+    function 呈现GatekeeperPortal() {
+      authScreen.classList.remove('hidden');
+      dashboardScreen.classList.add('hidden');
+    }
+
+    function initializeConsoleEnvironment(user) {
+      authenticatedUserInstance = user;
+      authScreen.classList.add('hidden');
+      dashboardScreen.classList.remove('hidden');
+      userDisplay.textContent = user.email;
+      loadArchiveCatalog();
+    }
+
+    // Auth submission
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      authError.classList.add('hidden');
+      
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      if (email !== HARD_LOCK_EMAIL) {
+        authError.textContent = "Security Isolation Error: Identification credentials invalid.";
+        authError.classList.remove('hidden');
+        return;
+      }
+
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        authError.textContent = error.message;
+        authError.classList.remove('hidden');
+      } else if (data?.user) {
+        initializeConsoleEnvironment(data.user);
+      }
+    });
+
+    logoutBtn.addEventListener('click', async () => {
+      await supabase.auth.signOut();
+      authenticatedUserInstance = null;
+      呈现GatekeeperPortal();
+    });
+
+    // Main fetch
+    async function loadArchiveCatalog() {
+      const { data, error } = await supabase
+        .from('personal_documents')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('System synchronization exception:', error.message);
+        return;
+      }
+
+      archiveRegistryCache = data || [];
+      renderCatalogRows(archiveRegistryCache);
+    }
+
+    function renderCatalogRows(records) {
+      tableBody.innerHTML = '';
+      if (records.length === 0) {
+        emptyState.classList.remove('hidden');
+        return;
+      }
+      emptyState.classList.add('hidden');
+
+      records.forEach(entry => {
+        const row = document.createElement('tr');
+        row.className = 'hover:bg-zinc-900/40 transition group';
+        const formattedTimestamp = new Date(entry.created_at).toLocaleDateString(undefined, {
+          year: 'numeric', month: 'short', day: 'numeric'
+        });
+
+        row.innerHTML = `
+          <td class="p-4 text-white font-medium">${escapeMarkup(entry.title)}</td>
+          <td class="p-4 font-mono text-xs text-zinc-400">${escapeMarkup(entry.file_name)}</td>
+          <td class="p-4 text-xs text-zinc-500">${formattedTimestamp}</td>
+          <td class="p-4 text-right">
+            <button data-path="${escapeMarkup(entry.file_path)}" class="download-trigger-btn text-xs text-emerald-400 hover:text-emerald-300 font-medium inline-flex items-center gap-1 bg-emerald-500/5 hover:bg-emerald-500/10 px-2.5 py-1 rounded border border-emerald-500/10 transition">
+              <i class="fa-solid fa-download text-[10px]"></i> Extract
+            </button>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+
+      // Secure dynamic down-stream generation
+      document.querySelectorAll('.download-trigger-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const targetPath = e.currentTarget.getAttribute('data-path');
+          const { data, error } = await supabase.storage.from(BUCKET_NAME).createSignedUrl(targetPath, 60);
+
+          if (error) {
+            alert('Security negotiation failed: ' + error.message);
+          } else if (data?.signedUrl) {
+            window.open(data.signedUrl, '_blank');
+          }
+        });
+      });
+    }
+
+    // Binary file commit flow
+    uploadForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      uploadStatus.className = "mt-3 text-xs p-2.5 rounded-lg border bg-zinc-950/80 text-zinc-400 border-zinc-800";
+      uploadStatus.textContent = "Streaming binary objects to object store...";
+      uploadStatus.classList.remove('hidden');
+
+      if (!authenticatedUserInstance) return;
+
+      const userTitle = document.getElementById('doc-title').value.trim();
+      const filePayload = document.getElementById('doc-file').files[0];
+
+      if (!filePayload) return;
+
+      const isolatedUniquePath = `${authenticatedUserInstance.id}/${Date.now()}_${filePayload.name}`;
+
+      try {
+        const { error: uploadError } = await supabase.storage
+          .from(BUCKET_NAME)
+          .upload(isolatedUniquePath, filePayload, { cacheControl: '3600', upsert: false });
+
+        if (uploadError) throw uploadError;
+
+        const { error: entryInsertError } = await supabase
+          .from('personal_documents')
+          .insert({
+            user_id: authenticatedUserInstance.id,
+            title: userTitle,
+            file_name: filePayload.name,
+            file_path: isolatedUniquePath
+          });
+
+        if (entryInsertError) throw entryInsertError;
+
+        uploadStatus.className = "mt-3 text-xs p-2.5 rounded-lg border bg-emerald-950/30 text-emerald-400 border-emerald-500/20";
+        uploadStatus.textContent = "Archival integration complete. Registry row successfully indexed.";
+        uploadForm.reset();
+        loadArchiveCatalog();
+
+      } catch (err) {
+        uploadStatus.className = "mt-3 text-xs p-2.5 rounded-lg border bg-red-950/30 text-red-400 border-red-500/20";
+        uploadStatus.textContent = `Ingest pipeline exception: ${err.message}`;
+      }
+    });
+
+    // Real-time keyword filter evaluation
+    searchInput.addEventListener('input', (e) => {
+      const searchTerm = e.target.value.toLowerCase().trim();
+      if (!searchTerm) {
+        renderCatalogRows(archiveRegistryCache);
+        return;
+      }
+      const matchingRows = archiveRegistryCache.filter(doc => 
+        doc.title.toLowerCase().includes(searchTerm) || 
+        doc.file_name.toLowerCase().includes(searchTerm)
+      );
+      renderCatalogRows(matchingRows);
+    });
+
+    function escapeMarkup(val) {
+      return val.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    document.addEventListener('DOMContentLoaded', evaluateActiveSession);
+  </script>
 </body>
 </html>
