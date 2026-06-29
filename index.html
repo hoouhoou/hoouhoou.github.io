@@ -7,7 +7,7 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔒</text></svg>">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body class="h-full text-zinc-100 flex flex-col justify-between selection:bg-emerald-500/30">
 
@@ -52,7 +52,6 @@
     </header>
 
     <main class="flex-1 max-w-6xl w-full mx-auto p-6 space-y-6">
-      
       <section class="bg-zinc-900/30 border border-zinc-800/80 rounded-2xl p-5">
         <h3 class="text-sm font-bold uppercase tracking-wider text-zinc-300 mb-4 flex items-center gap-2">
           <i class="fa-solid fa-cloud-arrow-up text-emerald-400"></i> Document Ingest Pipeline
@@ -92,8 +91,7 @@
                   <th class="p-4 text-right">Access Link</th>
                 </tr>
               </thead>
-              <tbody id="archive-table-body" class="divide-y divide-zinc-800/50 text-sm">
-                </tbody>
+              <tbody id="archive-table-body" class="divide-y divide-zinc-800/50 text-sm"></tbody>
             </table>
           </div>
           <div id="empty-state" class="p-12 text-center text-sm text-zinc-500 hidden">
@@ -104,209 +102,7 @@
     </main>
   </div>
 
-  <script type="module">
-    // Injected seamlessly by build.js workflow engine
-    const SUPABASE_URL = '{{SUPABASE_URL}}';
-    const SUPABASE_ANON_KEY = '{{SUPABASE_ANON_KEY}}';
-    const BUCKET_NAME = 'documents'; 
-    
-    // Replace with your exact operational email address string
-    const HARD_LOCK_EMAIL = 'your-email@example.com'; 
-
-    const { createClient } = window.supabase;
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    // Dom cache registry
-    const authScreen = document.getElementById('auth-screen');
-    const dashboardScreen = document.getElementById('dashboard-screen');
-    const loginForm = document.getElementById('login-form');
-    const authError = document.getElementById('auth-error');
-    const userDisplay = document.getElementById('user-display');
-    const logoutBtn = document.getElementById('logout-btn');
-    const uploadForm = document.getElementById('upload-form');
-    const uploadStatus = document.getElementById('upload-status');
-    const searchInput = document.getElementById('search-input');
-    const tableBody = document.getElementById('archive-table-body');
-    const emptyState = document.getElementById('empty-state');
-
-    let archiveRegistryCache = [];
-    let authenticatedUserInstance = null;
-
-    async function evaluateActiveSession() {
-      const { data: { session }, error } = await supabase.auth.getSession();
-      if (session?.user && session.user.email === HARD_LOCK_EMAIL) {
-        initializeConsoleEnvironment(session.user);
-      } else {
-        if (session) await supabase.auth.signOut();
-        呈现GatekeeperPortal();
-      }
-    }
-
-    function 呈现GatekeeperPortal() {
-      authScreen.classList.remove('hidden');
-      dashboardScreen.classList.add('hidden');
-    }
-
-    function initializeConsoleEnvironment(user) {
-      authenticatedUserInstance = user;
-      authScreen.classList.add('hidden');
-      dashboardScreen.classList.remove('hidden');
-      userDisplay.textContent = user.email;
-      loadArchiveCatalog();
-    }
-
-    // Auth submission
-    loginForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      authError.classList.add('hidden');
-      
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
-
-      if (email !== HARD_LOCK_EMAIL) {
-        authError.textContent = "Security Isolation Error: Identification credentials invalid.";
-        authError.classList.remove('hidden');
-        return;
-      }
-
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) {
-        authError.textContent = error.message;
-        authError.classList.remove('hidden');
-      } else if (data?.user) {
-        initializeConsoleEnvironment(data.user);
-      }
-    });
-
-    logoutBtn.addEventListener('click', async () => {
-      await supabase.auth.signOut();
-      authenticatedUserInstance = null;
-      呈现GatekeeperPortal();
-    });
-
-    // Main fetch
-    async function loadArchiveCatalog() {
-      const { data, error } = await supabase
-        .from('personal_documents')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('System synchronization exception:', error.message);
-        return;
-      }
-
-      archiveRegistryCache = data || [];
-      renderCatalogRows(archiveRegistryCache);
-    }
-
-    function renderCatalogRows(records) {
-      tableBody.innerHTML = '';
-      if (records.length === 0) {
-        emptyState.classList.remove('hidden');
-        return;
-      }
-      emptyState.classList.add('hidden');
-
-      records.forEach(entry => {
-        const row = document.createElement('tr');
-        row.className = 'hover:bg-zinc-900/40 transition group';
-        const formattedTimestamp = new Date(entry.created_at).toLocaleDateString(undefined, {
-          year: 'numeric', month: 'short', day: 'numeric'
-        });
-
-        row.innerHTML = `
-          <td class="p-4 text-white font-medium">${escapeMarkup(entry.title)}</td>
-          <td class="p-4 font-mono text-xs text-zinc-400">${escapeMarkup(entry.file_name)}</td>
-          <td class="p-4 text-xs text-zinc-500">${formattedTimestamp}</td>
-          <td class="p-4 text-right">
-            <button data-path="${escapeMarkup(entry.file_path)}" class="download-trigger-btn text-xs text-emerald-400 hover:text-emerald-300 font-medium inline-flex items-center gap-1 bg-emerald-500/5 hover:bg-emerald-500/10 px-2.5 py-1 rounded border border-emerald-500/10 transition">
-              <i class="fa-solid fa-download text-[10px]"></i> Extract
-            </button>
-          </td>
-        `;
-        tableBody.appendChild(row);
-      });
-
-      // Secure dynamic down-stream generation
-      document.querySelectorAll('.download-trigger-btn').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-          const targetPath = e.currentTarget.getAttribute('data-path');
-          const { data, error } = await supabase.storage.from(BUCKET_NAME).createSignedUrl(targetPath, 60);
-
-          if (error) {
-            alert('Security negotiation failed: ' + error.message);
-          } else if (data?.signedUrl) {
-            window.open(data.signedUrl, '_blank');
-          }
-        });
-      });
-    }
-
-    // Binary file commit flow
-    uploadForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      uploadStatus.className = "mt-3 text-xs p-2.5 rounded-lg border bg-zinc-950/80 text-zinc-400 border-zinc-800";
-      uploadStatus.textContent = "Streaming binary objects to object store...";
-      uploadStatus.classList.remove('hidden');
-
-      if (!authenticatedUserInstance) return;
-
-      const userTitle = document.getElementById('doc-title').value.trim();
-      const filePayload = document.getElementById('doc-file').files[0];
-
-      if (!filePayload) return;
-
-      const isolatedUniquePath = `${authenticatedUserInstance.id}/${Date.now()}_${filePayload.name}`;
-
-      try {
-        const { error: uploadError } = await supabase.storage
-          .from(BUCKET_NAME)
-          .upload(isolatedUniquePath, filePayload, { cacheControl: '3600', upsert: false });
-
-        if (uploadError) throw uploadError;
-
-        const { error: entryInsertError } = await supabase
-          .from('personal_documents')
-          .insert({
-            user_id: authenticatedUserInstance.id,
-            title: userTitle,
-            file_name: filePayload.name,
-            file_path: isolatedUniquePath
-          });
-
-        if (entryInsertError) throw entryInsertError;
-
-        uploadStatus.className = "mt-3 text-xs p-2.5 rounded-lg border bg-emerald-950/30 text-emerald-400 border-emerald-500/20";
-        uploadStatus.textContent = "Archival integration complete. Registry row successfully indexed.";
-        uploadForm.reset();
-        loadArchiveCatalog();
-
-      } catch (err) {
-        uploadStatus.className = "mt-3 text-xs p-2.5 rounded-lg border bg-red-950/30 text-red-400 border-red-500/20";
-        uploadStatus.textContent = `Ingest pipeline exception: ${err.message}`;
-      }
-    });
-
-    // Real-time keyword filter evaluation
-    searchInput.addEventListener('input', (e) => {
-      const searchTerm = e.target.value.toLowerCase().trim();
-      if (!searchTerm) {
-        renderCatalogRows(archiveRegistryCache);
-        return;
-      }
-      const matchingRows = archiveRegistryCache.filter(doc => 
-        doc.title.toLowerCase().includes(searchTerm) || 
-        doc.file_name.toLowerCase().includes(searchTerm)
-      );
-      renderCatalogRows(matchingRows);
-    });
-
-    function escapeMarkup(val) {
-      return val.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-    }
-
-    document.addEventListener('DOMContentLoaded', evaluateActiveSession);
-  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>
