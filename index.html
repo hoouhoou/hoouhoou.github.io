@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Table Editor | Supabase</title>
+  <title>Table Editor | Supabase Studio</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
     .hidden { display: none !important; }
@@ -14,6 +15,7 @@
     ::-webkit-scrollbar-track { background: #171717; }
     ::-webkit-scrollbar-thumb { background: #2e2e2e; border-radius: 3px; }
     ::-webkit-scrollbar-thumb:hover { background: #3e3e3e; }
+    .grid-cell { border-right: 1px solid #2e2e2e; border-bottom: 1px solid #2e2e2e; padding: 0 12px; height: 36px; display: flex; align-items: center; font-family: monospace; font-size: 11px; }
   </style>
 </head>
 <body class="h-full text-[#ededed] bg-[#171717] antialiased overflow-hidden select-none">
@@ -23,25 +25,25 @@
       <div class="h-10 w-10 mx-auto bg-[#3ecf8e]/10 text-[#3ecf8e] rounded-xl flex items-center justify-center border border-[#3ecf8e]/20 mb-3 shadow-md">
         <i class="fa-solid fa-bolt text-lg"></i>
       </div>
-      <h2 class="text-md font-bold text-white uppercase tracking-[0.2em]">Verify Instance Security</h2>
+      <h2 class="text-xs font-bold text-white uppercase tracking-[0.2em]">Console Gateway</h2>
     </div>
 
     <div class="mt-6 sm:mx-auto sm:w-full sm:max-w-sm">
       <div class="bg-[#1c1c1c] border border-[#2e2e2e] rounded-xl p-5 shadow-2xl">
         <form id="login-form" class="space-y-4">
           <div>
-            <label for="email" class="block text-[10px] font-semibold uppercase tracking-wider text-zinc-400">Archivist Identity</label>
+            <label for="email" class="block text-[10px] font-semibold uppercase tracking-wider text-zinc-400">Account Mail</label>
             <input id="email" type="email" autocomplete="email" required class="mt-1 block w-full rounded-lg bg-[#121212] border border-[#2e2e2e] px-3 py-2 text-xs text-white focus:border-[#3ecf8e] focus:outline-none transition">
           </div>
           <div>
-            <label for="password" class="block text-[10px] font-semibold uppercase tracking-wider text-zinc-400">Security Phrase</label>
+            <label for="password" class="block text-[10px] font-semibold uppercase tracking-wider text-zinc-400">Security Key</label>
             <input id="password" type="password" autocomplete="current-password" required class="mt-1 block w-full rounded-lg bg-[#121212] border border-[#2e2e2e] px-3 py-2 text-xs text-white focus:border-[#3ecf8e] focus:outline-none transition">
           </div>
           <button type="submit" class="w-full flex justify-center rounded-lg bg-[#3ecf8e] hover:bg-[#34b279] py-2 text-xs font-bold text-[#121212] transition">
-            Initialize Studio Terminal
+            Open Terminal Session
           </button>
         </form>
-        <div id="auth-error" class="mt-3 text-[11px] bg-red-950/20 border border-red-900/30 text-red-400 p-2.5 rounded-lg hidden"></div>
+        <div id="auth-error" class="mt-3 text-[11px] bg-red-950/20 border border-red-900/30 text-red-400 p-2.5 rounded-lg hidden font-mono"></div>
       </div>
     </div>
   </div>
@@ -50,54 +52,40 @@
     
     <aside class="w-12 bg-[#1c1c1c] border-r border-[#2e2e2e] flex flex-col justify-between items-center py-4 shrink-0">
       <div class="flex flex-col gap-5 items-center w-full">
-        <div class="text-[#3ecf8e] text-lg hover:scale-105 transition duration-150 cursor-pointer">
-          <i class="fa-solid fa-bolt"></i>
-        </div>
+        <div class="text-[#3ecf8e] text-lg hover:scale-105 transition cursor-pointer"><i class="fa-solid fa-bolt"></i></div>
         <div class="h-[1px] w-6 bg-[#2e2e2e]"></div>
-        <button class="w-8 h-8 rounded-lg bg-[#2e2e2e] text-[#3ecf8e] flex items-center justify-center text-xs shadow-sm">
-          <i class="fa-solid fa-table-list"></i>
-        </button>
-        <button class="w-8 h-8 rounded-lg text-zinc-500 hover:text-zinc-300 flex items-center justify-center text-xs transition">
-          <i class="fa-solid fa-database"></i>
-        </button>
-        <button class="w-8 h-8 rounded-lg text-zinc-500 hover:text-zinc-300 flex items-center justify-center text-xs transition">
-          <i class="fa-solid fa-user-shield"></i>
-        </button>
+        <button class="w-8 h-8 rounded-lg bg-[#2e2e2e] text-[#3ecf8e] flex items-center justify-center text-xs"><i class="fa-solid fa-table-list"></i></button>
+        <a href="sheets.html" class="w-8 h-8 rounded-lg text-zinc-500 hover:text-zinc-300 flex items-center justify-center text-xs transition" title="Reference Redirect Table"><i class="fa-solid fa-share-nodes"></i></a>
       </div>
-      <div class="flex flex-col items-center gap-4">
-        <div class="h-2 w-2 rounded-full bg-[#3ecf8e] animate-pulse" title="System Stable"></div>
-        <button id="logout-btn" class="text-zinc-500 hover:text-red-400 text-xs transition" title="Disconnect Session">
-          <i class="fa-solid fa-power-off"></i>
-        </button>
-      </div>
+      <button id="logout-btn" class="text-zinc-500 hover:text-red-400 text-xs transition" title="Kill Core Session"><i class="fa-solid fa-power-off"></i></button>
     </aside>
 
     <aside class="w-60 bg-[#171717] border-r border-[#2e2e2e] flex flex-col shrink-0 overflow-hidden">
       <div class="p-3 border-b border-[#2e2e2e] flex items-center justify-between">
         <div class="flex items-center gap-2">
-          <span class="text-[11px] font-semibold text-zinc-400 bg-[#2e2e2e] px-1.5 py-0.5 rounded uppercase tracking-wider font-mono">public</span>
-          <span class="text-xs font-semibold text-white">Database Schemas</span>
+          <span class="text-[10px] font-semibold text-zinc-400 bg-[#2e2e2e] px-1.5 py-0.5 rounded font-mono uppercase">public</span>
+          <span class="text-xs font-semibold text-white">Database Studio</span>
         </div>
       </div>
       
       <div class="flex-1 overflow-y-auto p-2 space-y-4">
         <div>
-          <div class="px-2 py-1 text-[10px] uppercase tracking-wider font-bold text-zinc-500 flex items-center justify-between">
+          <div class="px-2 py-1 text-[10px] uppercase font-bold text-zinc-500 flex items-center justify-between">
             <span>Tables</span>
-            <span id="schema-count-badge" class="font-mono text-[9px] bg-[#222222] px-1.5 py-0.2 rounded text-zinc-400">0</span>
+            <span id="schema-badge" class="font-mono text-[9px] bg-[#222222] px-1.5 py-0.2 rounded text-zinc-400">1</span>
           </div>
           <nav class="mt-1 space-y-0.5">
             <button class="w-full text-left px-2 py-1.5 text-xs rounded-md bg-[#2e2e2e] text-white flex items-center justify-between font-mono group">
-              <span class="truncate"><i class="fa-solid fa-table text-zinc-500 mr-2 group-hover:text-[#3ecf8e]"></i>personal_documents</span>
+              <span class="truncate text-zinc-200"><i class="fa-solid fa-table text-zinc-500 mr-2 group-hover:text-[#3ecf8e]"></i>personal_documents</span>
               <span class="text-[9px] bg-[#171717] text-zinc-500 px-1 rounded border border-[#2e2e2e]" id="side-row-counter">0</span>
             </button>
           </nav>
         </div>
       </div>
 
-      <div class="p-3 border-t border-[#2e2e2e] bg-[#141414] flex items-center justify-between text-xs overflow-hidden">
-        <span id="user-display" class="font-mono text-zinc-400 text-[10px] truncate max-w-[140px]">archivist@core.io</span>
-        <span class="text-[9px] font-mono text-[#3ecf8e] bg-[#3ecf8e]/5 border border-[#3ecf8e]/10 px-1.5 py-0.2 rounded uppercase shrink-0">owner</span>
+      <div class="p-3 border-t border-[#2e2e2e] bg-[#141414] flex items-center justify-between text-xs overflow-hidden font-mono">
+        <span id="user-display" class="text-zinc-400 text-[10px] truncate max-w-[140px]">...</span>
+        <span id="role-display" class="text-[9px] text-[#3ecf8e] bg-[#3ecf8e]/5 border border-[#3ecf8e]/20 px-1.5 py-0.2 rounded uppercase shrink-0">user</span>
       </div>
     </aside>
 
@@ -106,94 +94,76 @@
       <header class="h-12 border-b border-[#2e2e2e] bg-[#171717] px-4 flex items-center justify-between gap-4 shrink-0">
         <div class="flex items-center gap-3 flex-1 min-w-0">
           <div class="relative max-w-xs w-full">
-            <span class="absolute inset-y-0 left-2.5 flex items-center pointer-events-none text-zinc-500 text-[10px]">
-              <i class="fa-solid fa-magnifying-glass"></i>
-            </span>
-            <input type="text" id="search-input" placeholder="Filter rows across data arrays..." class="block w-full rounded-md bg-[#121212] border border-[#2e2e2e] pl-7 pr-3 py-1 text-xs text-white placeholder-zinc-600 focus:border-[#3ecf8e] focus:outline-none transition font-mono">
+            <span class="absolute inset-y-0 left-2.5 flex items-center text-zinc-500 text-[10px]"><i class="fa-solid fa-magnifying-glass"></i></span>
+            <input type="text" id="search-input" placeholder="Query records..." class="block w-full rounded-md bg-[#121212] border border-[#2e2e2e] pl-7 pr-3 py-1 text-xs text-white placeholder-zinc-600 focus:border-[#3ecf8e] focus:outline-none transition font-mono">
           </div>
           <div class="h-4 w-[1px] bg-[#2e2e2e]"></div>
-          <span class="text-xs text-zinc-400 font-mono hidden sm:inline-block">
-            Table View: <strong class="text-white">personal_documents</strong>
-          </span>
+          <span class="text-xs text-zinc-400 font-mono hidden sm:inline-block">Table: <strong class="text-white">personal_documents</strong></span>
         </div>
 
         <div class="flex items-center gap-2 shrink-0">
           <div class="relative">
-            <button id="new-row-trigger-btn" class="bg-[#3ecf8e] hover:bg-[#34b279] text-[#121212] font-semibold text-xs px-3 py-1 rounded transition flex items-center gap-1.5 active:scale-[0.98]">
+            <button id="new-row-btn" class="bg-[#3ecf8e] hover:bg-[#34b279] text-[#121212] font-semibold text-xs px-3 py-1 rounded transition flex items-center gap-1.5 active:scale-[0.98] hidden">
               <i class="fa-solid fa-plus"></i> Insert row
             </button>
             
             <div id="upload-dropdown" class="hidden absolute top-full right-0 mt-2 w-72 bg-[#171717] border border-[#2e2e2e] rounded-xl p-4 shadow-2xl z-40 space-y-4">
               <div class="flex items-center justify-between border-b border-[#2e2e2e] pb-2">
-                <h4 class="text-xs font-bold uppercase tracking-wider text-zinc-400 font-mono">Insert New Record</h4>
+                <h4 class="text-xs font-bold uppercase tracking-wider text-zinc-400 font-mono">Insert New Row</h4>
                 <button id="close-dropdown-btn" class="text-zinc-500 hover:text-white text-xs"><i class="fa-solid fa-xmark"></i></button>
               </div>
               
               <form id="upload-form" class="space-y-3 font-mono text-[11px]">
                 <div>
                   <label class="block uppercase font-bold text-zinc-500 mb-1">title (text)</label>
-                  <input type="text" id="doc-title" placeholder="Descriptive key identification" required class="block w-full rounded bg-[#121212] border border-[#2e2e2e] px-2.5 py-1.5 text-xs text-white focus:border-[#3ecf8e] focus:outline-none">
+                  <input type="text" id="doc-title" placeholder="Index categorization title" required class="block w-full rounded bg-[#121212] border border-[#2e2e2e] px-2.5 py-1.5 text-xs text-white focus:border-[#3ecf8e] focus:outline-none">
                 </div>
                 <div>
                   <label class="block uppercase font-bold text-zinc-500 mb-1">file_binary (storage)</label>
                   <input type="file" id="doc-file" required class="block w-full text-xs text-zinc-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border file:border-[#2e2e2e] file:text-[10px] file:bg-[#121212] file:text-zinc-300 hover:file:bg-[#2e2e2e] file:cursor-pointer">
                 </div>
-                <button type="submit" id="upload-btn" class="w-full bg-[#3ecf8e] text-[#121212] font-bold rounded py-2 text-xs transition uppercase tracking-wider">
-                  Save Row Entry
-                </button>
+                <button type="submit" id="upload-btn" class="w-full bg-[#3ecf8e] text-[#121212] font-bold rounded py-2 text-xs uppercase tracking-wider transition">Save Transaction</button>
               </form>
               <div id="upload-status" class="text-[10px] p-2 rounded border border-[#2e2e2e] hidden break-all bg-[#121212]"></div>
             </div>
           </div>
           
           <button id="refresh-btn" class="bg-[#2a2a2a] hover:bg-[#343434] text-zinc-300 border border-[#3e3e3e] px-2.5 py-1 rounded text-xs transition flex items-center gap-1">
-            <i class="fa-solid fa-rotate text-[10px]"></i> Refresh
+            <i class="fa-solid fa-rotate text-[10px]"></i> Sync
           </button>
         </div>
       </header>
 
-      <div class="flex-1 overflow-auto bg-[#1c1c1c] relative">
-        <table class="w-full text-left border-collapse table-fixed font-mono text-[11px]">
-          <thead>
-            <tr class="bg-[#171717] border-b border-[#2e2e2e] text-zinc-400 h-9 sticky top-0 z-10">
-              <th class="w-12 border-r border-[#2e2e2e] px-2 text-center text-[10px]">#</th>
-              <th class="w-48 border-r border-[#2e2e2e] px-3 font-semibold text-zinc-300">id <span class="text-zinc-600 text-[10px]">uuid</span></th>
-              <th class="w-64 border-r border-[#2e2e2e] px-3 font-semibold text-zinc-300">title <span class="text-zinc-600 text-[10px]">text</span></th>
-              <th class="w-64 border-r border-[#2e2e2e] px-3 font-semibold text-zinc-300">file_name <span class="text-zinc-600 text-[10px]">text</span></th>
-              <th class="w-56 border-r border-[#2e2e2e] px-3 font-semibold text-zinc-300">created_at <span class="text-zinc-600 text-[10px]">timestamptz</span></th>
-              <th class="w-32 px-3 text-right pr-4 font-semibold text-[#3ecf8e]">action <span class="text-zinc-600 text-[10px]">link</span></th>
-            </tr>
-          </thead>
-          <tbody id="archive-table-body" class="divide-y divide-[#2e2e2e]">
-            </tbody>
-        </table>
+      <div class="flex-1 overflow-auto bg-[#1c1c1c]">
+        <div class="min-w-[1200px]">
+          <div class="grid grid-cols-[48px_240px_320px_320px_180px_1fr] bg-[#171717] border-b border-[#2e2e2e] text-zinc-400 uppercase tracking-wider font-mono text-[10px] font-bold h-9 sticky top-0 z-10 items-center">
+            <div class="grid-cell justify-center">#</div>
+            <div class="grid-cell text-zinc-300">id <span class="text-zinc-600 ml-1 font-normal">uuid</span></div>
+            <div class="grid-cell text-zinc-300">title <span class="text-zinc-600 ml-1 font-normal">text</span></div>
+            <div class="grid-cell text-zinc-300">file_name <span class="text-zinc-600 ml-1 font-normal">text</span></div>
+            <div class="grid-cell text-zinc-300">created_at <span class="text-zinc-600 ml-1 font-normal">timestamptz</span></div>
+            <div class="grid-cell text-[#3ecf8e] border-r-0 justify-end pr-4">Link Actions</div>
+          </div>
+          <div id="grid-rows-container" class="bg-[#1c1c1c]"></div>
+        </div>
         
         <div id="empty-state" class="p-20 text-center text-xs text-zinc-500 hidden font-mono">
-          <i class="fa-solid fa-triangle-exclamation block text-lg mb-2 text-zinc-600"></i>
-          Returned 0 data row records mapping this query context sequence.
+          <i class="fa-solid fa-circle-nodes block text-lg mb-2 text-zinc-600"></i> No row indexes parsed inside this data view array.
         </div>
       </div>
 
       <footer class="h-8 border-t border-[#2e2e2e] bg-[#171717] px-4 flex items-center justify-between text-[10px] font-mono text-zinc-500 shrink-0">
-        <div>
-          <span id="footer-row-counter">0 rows loaded</span>
-        </div>
-        <div>
-          <span>Database Cluster: <strong class="text-[#3ecf8e]">Active</strong></span>
-        </div>
+        <div><span id="footer-row-counter">0 rows loaded</span></div>
+        <div>Engine Status: <strong class="text-[#3ecf8e]">Live Cluster</strong></div>
       </footer>
 
     </section>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module">
     const SUPABASE_URL = '{{SUPABASE_URL}}';
     const SUPABASE_ANON_KEY = '{{SUPABASE_ANON_KEY}}';
     const BUCKET_NAME = 'documents'; 
-
-    // CHOOSE AND ENTER YOUR AUTHENTIC SECURITY ACCOUNT LOCKOUT TARGET EMAIL
-    const HARD_LOCK_EMAIL = 'your-email@example.com'; 
 
     const { createClient } = window.supabase;
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -203,106 +173,104 @@
     const loginForm = document.getElementById('login-form');
     const authError = document.getElementById('auth-error');
     const userDisplay = document.getElementById('user-display');
+    const roleDisplay = document.getElementById('role-display');
     const logoutBtn = document.getElementById('logout-btn');
 
-    const newRowTriggerBtn = document.getElementById('new-row-trigger-btn');
+    const newRowBtn = document.getElementById('new-row-btn');
     const closeDropdownBtn = document.getElementById('close-dropdown-btn');
     const uploadDropdown = document.getElementById('upload-dropdown');
     const uploadForm = document.getElementById('upload-form');
     const uploadStatus = document.getElementById('upload-status');
     const searchInput = document.getElementById('search-input');
     const refreshBtn = document.getElementById('refresh-btn');
-    const tableBody = document.getElementById('archive-table-body');
+    const gridRowsContainer = document.getElementById('grid-rows-container');
     const emptyState = document.getElementById('empty-state');
     
-    const schemaCountBadge = document.getElementById('schema-count-badge');
     const sideRowCounter = document.getElementById('side-row-counter');
     const footerRowCounter = document.getElementById('footer-row-counter');
 
-    let archiveRegistryCache = [];
-    let authenticatedUserInstance = null;
+    let archiveCache = [];
+    let activeUser = null;
+    let userRole = 'user';
 
-    async function evaluateActiveSession() {
+    async function checkActiveSession() {
       const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user && session.user.email === HARD_LOCK_EMAIL) {
-        initializeConsoleEnvironment(session.user);
+      if (session?.user) {
+        await resolveUserRoleAndAccess(session.user);
       } else {
-        if (session) await supabase.auth.signOut();
-        presentGatekeeperPortal();
+        showLoginScreen();
       }
     }
 
-    function presentGatekeeperPortal() {
+    function showLoginScreen() {
       authScreen.classList.remove('hidden');
       dashboardScreen.classList.add('hidden');
     }
 
-    function initializeConsoleEnvironment(user) {
-      authenticatedUserInstance = user;
+    async function resolveUserRoleAndAccess(user) {
+      activeUser = user;
+      userDisplay.textContent = user.email;
+      
+      try {
+        const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+        userRole = profile?.role || 'user';
+      } catch (e) {
+        userRole = 'user';
+      }
+
+      roleDisplay.textContent = userRole;
+      if (userRole === 'admin') {
+        newRowBtn.classList.remove('hidden');
+        roleDisplay.className = "text-[9px] text-[#3ecf8e] bg-[#3ecf8e]/10 border border-[#3ecf8e]/30 px-1.5 py-0.2 rounded uppercase shrink-0 font-bold";
+      } else {
+        newRowBtn.classList.add('hidden');
+        roleDisplay.className = "text-[9px] text-zinc-400 bg-zinc-800 px-1.5 py-0.2 rounded uppercase shrink-0";
+      }
+
       authScreen.classList.add('hidden');
       dashboardScreen.classList.remove('hidden');
-      userDisplay.textContent = user.email;
-      loadArchiveCatalog();
+      fetchRecords();
     }
 
-    newRowTriggerBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      uploadDropdown.classList.toggle('hidden');
-    });
+    newRowBtn.addEventListener('click', (e) => { e.stopPropagation(); uploadDropdown.classList.toggle('hidden'); });
     closeDropdownBtn.addEventListener('click', () => uploadDropdown.classList.add('hidden'));
-    document.addEventListener('click', (e) => {
-      if (!uploadDropdown.contains(e.target) && e.target !== newRowTriggerBtn) {
-        uploadDropdown.classList.add('hidden');
-      }
-    });
+    document.addEventListener('click', (e) => { if (!uploadDropdown.contains(e.target) && e.target !== newRowBtn) uploadDropdown.classList.add('hidden'); });
 
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       authError.classList.add('hidden');
-      
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
-
-      if (email !== HARD_LOCK_EMAIL) {
-        authError.textContent = "Security Isolation Error: Identification credentials matching lock level not found.";
-        authError.classList.remove('hidden');
-        return;
-      }
 
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
         authError.textContent = error.message;
         authError.classList.remove('hidden');
       } else if (data?.user) {
-        initializeConsoleEnvironment(data.user);
+        await resolveUserRoleAndAccess(data.user);
       }
     });
 
     logoutBtn.addEventListener('click', async () => {
       await supabase.auth.signOut();
-      authenticatedUserInstance = null;
-      presentGatekeeperPortal();
+      activeUser = null;
+      showLoginScreen();
     });
 
-    refreshBtn.addEventListener('click', loadArchiveCatalog);
+    refreshBtn.addEventListener('click', fetchRecords);
 
-    async function loadArchiveCatalog() {
-      const { data, error } = await supabase
-        .from('personal_documents')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) return;
-
-      archiveRegistryCache = data || [];
-      renderDatabaseRows(archiveRegistryCache);
+    async function fetchRecords() {
+      const { data, error } = await supabase.from('personal_documents').select('*').order('created_at', { ascending: false });
+      if (!error) {
+        archiveCache = data || [];
+        renderGridSystem(archiveCache);
+      }
     }
 
-    function renderDatabaseRows(records) {
-      tableBody.innerHTML = '';
-      schemaCountBadge.textContent = records.length > 0 ? "1" : "0";
+    function renderGridSystem(records) {
+      gridRowsContainer.innerHTML = '';
       sideRowCounter.textContent = records.length;
-      footerRowCounter.textContent = `${records.length} rows loaded`;
+      footerRowCounter.textContent = `${records.length} rows sync'd`;
 
       if (records.length === 0) {
         emptyState.classList.remove('hidden');
@@ -310,29 +278,29 @@
       }
       emptyState.classList.add('hidden');
 
-      records.forEach((entry, idx) => {
-        const row = document.createElement('tr');
-        row.className = 'hover:bg-[#222222]/80 h-8 group border-b border-[#2e2e2e]/50 text-zinc-300';
+      records.forEach((row, idx) => {
+        const rowElement = document.createElement('div');
+        rowElement.className = "grid grid-cols-[48px_240px_320px_320px_180px_1fr] hover:bg-[#222222]/50 transition h-9 items-center text-zinc-300 border-b border-[#2e2e2e]/30";
         
-        row.innerHTML = `
-          <td class="border-r border-[#2e2e2e]/40 text-center text-zinc-600 bg-[#171717]/40 text-[10px]">${idx + 1}</td>
-          <td class="border-r border-[#2e2e2e]/40 px-3 text-zinc-500 truncate text-[10px] select-all">${entry.id}</td>
-          <td class="border-r border-[#2e2e2e]/40 px-3 font-sans text-white font-medium truncate">${escapeMarkup(entry.title)}</td>
-          <td class="border-r border-[#2e2e2e]/40 px-3 font-mono text-zinc-400 truncate text-[11px]">${escapeMarkup(entry.file_name)}</td>
-          <td class="border-r border-[#2e2e2e]/40 px-3 text-zinc-500 text-[11px] truncate">${new Date(entry.created_at).toISOString()}</td>
-          <td class="px-3 text-right pr-4">
-            <button data-path="${escapeMarkup(entry.file_path)}" class="download-btn text-[10px] text-[#3ecf8e] hover:text-white font-bold tracking-wide uppercase transition bg-[#3ecf8e]/5 hover:bg-[#3ecf8e] border border-[#3ecf8e]/20 hover:border-transparent px-2 py-0.5 rounded shadow-sm">
-              Sign URL
+        rowElement.innerHTML = `
+          <div class="grid-cell justify-center text-zinc-600 bg-[#171717]/20">${idx + 1}</div>
+          <div class="grid-cell text-zinc-500 select-all truncate">${row.id}</div>
+          <div class="grid-cell text-zinc-100 font-sans font-medium truncate">${escapeMarkup(row.title)}</div>
+          <div class="grid-cell text-zinc-400 truncate">${escapeMarkup(row.file_name)}</div>
+          <div class="grid-cell text-zinc-500 truncate">${new Date(row.created_at).toISOString()}</div>
+          <div class="grid-cell border-r-0 justify-end pr-4">
+            <button data-path="${escapeMarkup(row.file_path)}" class="download-trigger text-[10px] text-[#3ecf8e] hover:text-white font-bold uppercase tracking-wider transition bg-[#3ecf8e]/5 hover:bg-[#3ecf8e] border border-[#3ecf8e]/20 hover:border-transparent px-2.5 py-1 rounded">
+              Extract Link
             </button>
-          </td>
+          </div>
         `;
-        tableBody.appendChild(row);
+        gridRowsContainer.appendChild(rowElement);
       });
 
-      document.querySelectorAll('.download-btn').forEach(btn => {
+      document.querySelectorAll('.download-trigger').forEach(btn => {
         btn.addEventListener('click', async (e) => {
-          const targetPath = e.currentTarget.getAttribute('data-path');
-          const { data, error } = await supabase.storage.from(BUCKET_NAME).createSignedUrl(targetPath, 60);
+          const path = e.currentTarget.getAttribute('data-path');
+          const { data } = await supabase.storage.from(BUCKET_NAME).createSignedUrl(path, 60);
           if (data?.signedUrl) window.open(data.signedUrl, '_blank');
         });
       });
@@ -340,64 +308,45 @@
 
     uploadForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      uploadStatus.className = "text-[10px] p-2 rounded border border-[#2e2e2e] bg-[#121212] text-zinc-500 font-mono";
-      uploadStatus.textContent = "Executing transaction layer bucket pipeline upload...";
+      uploadStatus.className = "text-[10px] p-2 rounded border border-[#2e2e2e] bg-[#121212] text-zinc-400 font-mono";
+      uploadStatus.textContent = "Processing binary transaction link...";
       uploadStatus.classList.remove('hidden');
 
-      if (!authenticatedUserInstance) return;
-      const userTitle = document.getElementById('doc-title').value.trim();
-      const filePayload = document.getElementById('doc-file').files[0];
-      if (!filePayload) return;
+      const title = document.getElementById('doc-title').value.trim();
+      const file = document.getElementById('doc-file').files[0];
+      if (!file || !activeUser) return;
 
-      const isolatedUniquePath = `${authenticatedUserInstance.id}/${Date.now()}_${filePayload.name}`;
+      const path = `${activeUser.id}/${Date.now()}_${file.name}`;
 
       try {
-        const { error: uploadError } = await supabase.storage
-          .from(BUCKET_NAME)
-          .upload(isolatedUniquePath, filePayload, { cacheControl: '3600', upsert: false });
+        const { error: storageError } = await supabase.storage.from(BUCKET_NAME).upload(path, file, { cacheControl: '3600', upsert: false });
+        if (storageError) throw storageError;
 
-        if (uploadError) throw uploadError;
+        const { error: dbError } = await supabase.from('personal_documents').insert({ user_id: activeUser.id, title, file_name: file.name, file_path: path });
+        if (dbError) throw dbError;
 
-        const { error: insertError } = await supabase
-          .from('personal_documents')
-          .insert({
-            user_id: authenticatedUserInstance.id,
-            title: userTitle,
-            file_name: filePayload.name,
-            file_path: isolatedUniquePath
-          });
-
-        if (insertError) throw insertError;
-
-        uploadStatus.className = "text-[10px] p-2 rounded border border-[#3ecf8e]/20 bg-[#3ecf8e]/5 text-[#3ecf8e] font-mono";
-        uploadStatus.textContent = "SUCCESS: Commit sequence successful.";
+        uploadStatus.className = "text-[10px] p-2 rounded border border-[#3ecf8e]/30 bg-[#3ecf8e]/5 text-[#3ecf8e] font-mono";
+        uploadStatus.textContent = "Transaction committed successfully.";
         uploadForm.reset();
         setTimeout(() => uploadDropdown.classList.add('hidden'), 800);
-        loadArchiveCatalog();
+        fetchRecords();
       } catch (err) {
-        uploadStatus.className = "text-[10px] p-2 rounded border border-red-900/30 bg-red-950/10 text-red-400 font-mono";
-        uploadStatus.textContent = `ERR_FAIL: ${err.message}`;
+        uploadStatus.className = "text-[10px] p-2 rounded border border-red-900/40 bg-red-950/10 text-red-400 font-mono";
+        uploadStatus.textContent = `Transaction aborted: ${err.message}`;
       }
     });
 
     searchInput.addEventListener('input', (e) => {
-      const searchTerm = e.target.value.toLowerCase().trim();
-      if (!searchTerm) {
-        renderDatabaseRows(archiveRegistryCache);
-        return;
-      }
-      renderDatabaseRows(archiveRegistryCache.filter(doc => 
-        doc.title.toLowerCase().includes(searchTerm) || 
-        doc.file_name.toLowerCase().includes(searchTerm) ||
-        doc.id.toLowerCase().includes(searchTerm)
-      ));
+      const term = e.target.value.toLowerCase().trim();
+      if (!term) return renderGridSystem(archiveCache);
+      renderGridSystem(archiveCache.filter(r => r.title.toLowerCase().includes(term) || r.file_name.toLowerCase().includes(term) || r.id.toLowerCase().includes(term)));
     });
 
     function escapeMarkup(val) {
       return val.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
 
-    document.addEventListener('DOMContentLoaded', evaluateActiveSession);
+    document.addEventListener('DOMContentLoaded', checkActiveSession);
   </script>
 </body>
 </html>
