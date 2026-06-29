@@ -1,34 +1,31 @@
 const fs = require('fs');
 const path = require('path');
 
-console.log('🔍 Executing production deployment compilation pipeline...');
+console.log('🔍 Executing compiled asset transformation pipeline...');
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
 
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-  console.error('❌ Build Error: Missing environment variables (SUPABASE_URL / SUPABASE_ANON_KEY)');
+  console.error('❌ Build Interrupted: Environment variables are missing.');
   process.exit(1);
 }
 
-const indexPath = path.join(__dirname, 'index.html');
-console.log('📄 Sourcing base workspace layout from:', indexPath);
+const srcIndex = path.join(__dirname, 'index.html');
+const distDir = path.join(__dirname, 'dist');
 
-if (!fs.existsSync(indexPath)) {
-  console.error('❌ Error: Base index.html template file not found!');
+if (!fs.existsSync(srcIndex)) {
+  console.error(`❌ Template script absent at: ${srcIndex}`);
   process.exit(1);
 }
 
-let htmlContent = fs.readFileSync(indexPath, 'utf8');
-
-// Inject the environment keys into the client script
+let htmlContent = fs.readFileSync(srcIndex, 'utf8');
 htmlContent = htmlContent.replace(/\{\{SUPABASE_URL\}\}/g, SUPABASE_URL);
 htmlContent = htmlContent.replace(/\{\{SUPABASE_ANON_KEY\}\}/g, SUPABASE_ANON_KEY);
 
-const distDir = path.join(__dirname, 'dist');
 if (!fs.existsSync(distDir)) {
   fs.mkdirSync(distDir);
 }
 
 fs.writeFileSync(path.join(distDir, 'index.html'), htmlContent);
-console.log('✅ Staged and compiled index.html successfully within /dist container.');
+console.log('✅ Staged clean production index mapping directly inside /dist folder array.');
