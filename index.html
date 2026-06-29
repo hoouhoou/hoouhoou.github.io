@@ -23,14 +23,14 @@
       <div class="h-10 w-10 mx-auto bg-[#3ecf8e]/10 text-[#3ecf8e] rounded-xl flex items-center justify-center border border-[#3ecf8e]/20 mb-3 shadow-md">
         <i class="fa-solid fa-bolt text-lg"></i>
       </div>
-      <h2 class="text-md font-bold text-white uppercase tracking-[0.2em]">Verify Identity</h2>
+      <h2 class="text-md font-bold text-white uppercase tracking-[0.2em]">Verify Instance Security</h2>
     </div>
 
     <div class="mt-6 sm:mx-auto sm:w-full sm:max-w-sm">
       <div class="bg-[#1c1c1c] border border-[#2e2e2e] rounded-xl p-5 shadow-2xl">
         <form id="login-form" class="space-y-4">
           <div>
-            <label for="email" class="block text-[10px] font-semibold uppercase tracking-wider text-zinc-400">Archivist Email</label>
+            <label for="email" class="block text-[10px] font-semibold uppercase tracking-wider text-zinc-400">Archivist Identity</label>
             <input id="email" type="email" autocomplete="email" required class="mt-1 block w-full rounded-lg bg-[#121212] border border-[#2e2e2e] px-3 py-2 text-xs text-white focus:border-[#3ecf8e] focus:outline-none transition">
           </div>
           <div>
@@ -38,7 +38,7 @@
             <input id="password" type="password" autocomplete="current-password" required class="mt-1 block w-full rounded-lg bg-[#121212] border border-[#2e2e2e] px-3 py-2 text-xs text-white focus:border-[#3ecf8e] focus:outline-none transition">
           </div>
           <button type="submit" class="w-full flex justify-center rounded-lg bg-[#3ecf8e] hover:bg-[#34b279] py-2 text-xs font-bold text-[#121212] transition">
-            Access Core Workspace
+            Initialize Studio Terminal
           </button>
         </form>
         <div id="auth-error" class="mt-3 text-[11px] bg-red-950/20 border border-red-900/30 text-red-400 p-2.5 rounded-lg hidden"></div>
@@ -65,8 +65,8 @@
         </button>
       </div>
       <div class="flex flex-col items-center gap-4">
-        <div class="h-2 w-2 rounded-full bg-[#3ecf8e] animate-pulse" title="System Connected"></div>
-        <button id="logout-btn" class="text-zinc-500 hover:text-red-400 text-xs transition" title="Sign Out">
+        <div class="h-2 w-2 rounded-full bg-[#3ecf8e] animate-pulse" title="System Stable"></div>
+        <button id="logout-btn" class="text-zinc-500 hover:text-red-400 text-xs transition" title="Disconnect Session">
           <i class="fa-solid fa-power-off"></i>
         </button>
       </div>
@@ -76,7 +76,7 @@
       <div class="p-3 border-b border-[#2e2e2e] flex items-center justify-between">
         <div class="flex items-center gap-2">
           <span class="text-[11px] font-semibold text-zinc-400 bg-[#2e2e2e] px-1.5 py-0.5 rounded uppercase tracking-wider font-mono">public</span>
-          <span class="text-xs font-semibold text-white">Table Schemas</span>
+          <span class="text-xs font-semibold text-white">Database Schemas</span>
         </div>
       </div>
       
@@ -105,16 +105,13 @@
       
       <header class="h-12 border-b border-[#2e2e2e] bg-[#171717] px-4 flex items-center justify-between gap-4 shrink-0">
         <div class="flex items-center gap-3 flex-1 min-w-0">
-          
           <div class="relative max-w-xs w-full">
             <span class="absolute inset-y-0 left-2.5 flex items-center pointer-events-none text-zinc-500 text-[10px]">
               <i class="fa-solid fa-magnifying-glass"></i>
             </span>
             <input type="text" id="search-input" placeholder="Filter rows across data arrays..." class="block w-full rounded-md bg-[#121212] border border-[#2e2e2e] pl-7 pr-3 py-1 text-xs text-white placeholder-zinc-600 focus:border-[#3ecf8e] focus:outline-none transition font-mono">
           </div>
-
           <div class="h-4 w-[1px] bg-[#2e2e2e]"></div>
-          
           <span class="text-xs text-zinc-400 font-mono hidden sm:inline-block">
             Table View: <strong class="text-white">personal_documents</strong>
           </span>
@@ -135,7 +132,7 @@
               <form id="upload-form" class="space-y-3 font-mono text-[11px]">
                 <div>
                   <label class="block uppercase font-bold text-zinc-500 mb-1">title (text)</label>
-                  <input type="text" id="doc-title" placeholder="Descriptive matrix index name" required class="block w-full rounded bg-[#121212] border border-[#2e2e2e] px-2.5 py-1.5 text-xs text-white focus:border-[#3ecf8e] focus:outline-none">
+                  <input type="text" id="doc-title" placeholder="Descriptive key identification" required class="block w-full rounded bg-[#121212] border border-[#2e2e2e] px-2.5 py-1.5 text-xs text-white focus:border-[#3ecf8e] focus:outline-none">
                 </div>
                 <div>
                   <label class="block uppercase font-bold text-zinc-500 mb-1">file_binary (storage)</label>
@@ -173,12 +170,12 @@
         
         <div id="empty-state" class="p-20 text-center text-xs text-zinc-500 hidden font-mono">
           <i class="fa-solid fa-triangle-exclamation block text-lg mb-2 text-zinc-600"></i>
-          Returned 0 data row records mapping this query sequence configuration.
+          Returned 0 data row records mapping this query context sequence.
         </div>
       </div>
 
       <footer class="h-8 border-t border-[#2e2e2e] bg-[#171717] px-4 flex items-center justify-between text-[10px] font-mono text-zinc-500 shrink-0">
-        <div class="flex items-center gap-4">
+        <div>
           <span id="footer-row-counter">0 rows loaded</span>
         </div>
         <div>
@@ -187,23 +184,20 @@
       </footer>
 
     </section>
-
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module">
-    // Variable token configuration parameters synced explicitly by build.js framework
     const SUPABASE_URL = '{{SUPABASE_URL}}';
     const SUPABASE_ANON_KEY = '{{SUPABASE_ANON_KEY}}';
     const BUCKET_NAME = 'documents'; 
 
-    // SECURE DIRECT ARCHIVE LOCK IDENTITY FILTER
+    // CHOOSE AND ENTER YOUR AUTHENTIC SECURITY ACCOUNT LOCKOUT TARGET EMAIL
     const HARD_LOCK_EMAIL = 'your-email@example.com'; 
 
     const { createClient } = window.supabase;
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // DOM Target Registry Elements Cache
     const authScreen = document.getElementById('auth-screen');
     const dashboardScreen = document.getElementById('dashboard-screen');
     const loginForm = document.getElementById('login-form');
@@ -221,7 +215,6 @@
     const tableBody = document.getElementById('archive-table-body');
     const emptyState = document.getElementById('empty-state');
     
-    // Counter Components Metrics
     const schemaCountBadge = document.getElementById('schema-count-badge');
     const sideRowCounter = document.getElementById('side-row-counter');
     const footerRowCounter = document.getElementById('footer-row-counter');
@@ -230,7 +223,7 @@
     let authenticatedUserInstance = null;
 
     async function evaluateActiveSession() {
-      const { data: { session }, error } = await supabase.auth.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
       if (session?.user && session.user.email === HARD_LOCK_EMAIL) {
         initializeConsoleEnvironment(session.user);
       } else {
@@ -252,7 +245,6 @@
       loadArchiveCatalog();
     }
 
-    // Modal Control Operations
     newRowTriggerBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       uploadDropdown.classList.toggle('hidden');
@@ -264,7 +256,6 @@
       }
     });
 
-    // Security Gate Verification submission
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       authError.classList.add('hidden');
@@ -273,7 +264,7 @@
       const password = document.getElementById('password').value;
 
       if (email !== HARD_LOCK_EMAIL) {
-        authError.textContent = "Security Isolation Error: Access verification credentials invalid.";
+        authError.textContent = "Security Isolation Error: Identification credentials matching lock level not found.";
         authError.classList.remove('hidden');
         return;
       }
@@ -295,17 +286,13 @@
 
     refreshBtn.addEventListener('click', loadArchiveCatalog);
 
-    // Dynamic Database Operations
     async function loadArchiveCatalog() {
       const { data, error } = await supabase
         .from('personal_documents')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('Database connection synchronization exception:', error.message);
-        return;
-      }
+      if (error) return;
 
       archiveRegistryCache = data || [];
       renderDatabaseRows(archiveRegistryCache);
@@ -313,8 +300,6 @@
 
     function renderDatabaseRows(records) {
       tableBody.innerHTML = '';
-      
-      // Update Telemetry Counters Natively
       schemaCountBadge.textContent = records.length > 0 ? "1" : "0";
       sideRowCounter.textContent = records.length;
       footerRowCounter.textContent = `${records.length} rows loaded`;
@@ -344,22 +329,15 @@
         tableBody.appendChild(row);
       });
 
-      // Tie File URL Generation to Dynamic Row Elements
       document.querySelectorAll('.download-btn').forEach(btn => {
         btn.addEventListener('click', async (e) => {
           const targetPath = e.currentTarget.getAttribute('data-path');
           const { data, error } = await supabase.storage.from(BUCKET_NAME).createSignedUrl(targetPath, 60);
-
-          if (error) {
-            alert('Security access level validation failed: ' + error.message);
-          } else if (data?.signedUrl) {
-            window.open(data.signedUrl, '_blank');
-          }
+          if (data?.signedUrl) window.open(data.signedUrl, '_blank');
         });
       });
     }
 
-    // Real-Time Object Stream Binary Pipeline Ingestion
     uploadForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       uploadStatus.className = "text-[10px] p-2 rounded border border-[#2e2e2e] bg-[#121212] text-zinc-500 font-mono";
@@ -367,10 +345,8 @@
       uploadStatus.classList.remove('hidden');
 
       if (!authenticatedUserInstance) return;
-
       const userTitle = document.getElementById('doc-title').value.trim();
       const filePayload = document.getElementById('doc-file').files[0];
-
       if (!filePayload) return;
 
       const isolatedUniquePath = `${authenticatedUserInstance.id}/${Date.now()}_${filePayload.name}`;
@@ -398,26 +374,23 @@
         uploadForm.reset();
         setTimeout(() => uploadDropdown.classList.add('hidden'), 800);
         loadArchiveCatalog();
-
       } catch (err) {
         uploadStatus.className = "text-[10px] p-2 rounded border border-red-900/30 bg-red-950/10 text-red-400 font-mono";
         uploadStatus.textContent = `ERR_FAIL: ${err.message}`;
       }
     });
 
-    // Multi-Column Row Filter Implementation
     searchInput.addEventListener('input', (e) => {
       const searchTerm = e.target.value.toLowerCase().trim();
       if (!searchTerm) {
         renderDatabaseRows(archiveRegistryCache);
         return;
       }
-      const matchingRows = archiveRegistryCache.filter(doc => 
+      renderDatabaseRows(archiveRegistryCache.filter(doc => 
         doc.title.toLowerCase().includes(searchTerm) || 
         doc.file_name.toLowerCase().includes(searchTerm) ||
         doc.id.toLowerCase().includes(searchTerm)
-      );
-      renderDatabaseRows(matchingRows);
+      ));
     });
 
     function escapeMarkup(val) {
