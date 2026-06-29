@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-[#1c1c1c]">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sheets Redirect Index</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #171717; }
+    ::-webkit-scrollbar-thumb { background: #2e2e2e; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3e3e3e; }
+  </style>
+</head>
+<body class="h-full text-[#ededed] bg-[#171717] antialiased p-6 font-mono select-none">
+  <div class="max-w-5xl mx-auto flex flex-col h-full space-y-4">
+    
+    <header class="flex items-center justify-between border-b border-[#2e2e2e] pb-3 shrink-0">
+      <div class="flex items-center gap-2">
+        <i class="fa-solid fa-chart-simple text-[#3ecf8e]"></i>
+        <h1 class="text-sm font-bold text-white uppercase tracking-wider">Sheets Redirect Mapping Matrix</h1>
+      </div>
+      <a href="index.html" class="text-xs text-zinc-400 hover:text-[#3ecf8e] transition flex items-center gap-1">
+        <i class="fa-solid fa-arrow-left-long text-[10px]"></i> Studio Table Editor
+      </a>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-[320px_1fr] gap-6 items-start flex-1 overflow-hidden h-full pb-6">
+      
+      <div class="bg-[#1c1c1c] border border-[#2e2e2e] rounded-xl p-4 space-y-4">
+        <div class="border-b border-[#2e2e2e] pb-1.5">
+          <h3 id="form-heading" class="text-xs font-bold uppercase tracking-wide text-zinc-400">Add Map Target</h3>
+        </div>
+        
+        <div class="space-y-3 text-[11px]">
+          <div>
+            <label class="block text-zinc-500 uppercase font-bold mb-1">Title Index</label>
+            <input type="text" id="sheet-title" placeholder="Descriptive tracking flag" class="block w-full bg-[#121212] border border-[#2e2e2e] rounded px-2.5 py-1.5 text-xs text-white focus:border-[#3ecf8e] focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-zinc-500 uppercase font-bold mb-1">Target URL</label>
+            <input type="url" id="sheet-url" placeholder="https://docs.google.com/..." class="block w-full bg-[#121212] border border-[#2e2e2e] rounded px-2.5 py-1.5 text-xs text-white focus:border-[#3ecf8e] focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-zinc-500 uppercase font-bold mb-1">Description</label>
+            <textarea id="sheet-desc" placeholder="Operational comments context metadata" rows="3" class="block w-full bg-[#121212] border border-[#2e2e2e] rounded px-2.5 py-1.5 text-xs text-white focus:border-[#3ecf8e] focus:outline-none font-sans resize-none"></textarea>
+          </div>
+          
+          <div class="flex gap-2 pt-1">
+            <button id="save-btn" class="flex-1 bg-[#3ecf8e] hover:bg-[#34b279] text-[#121212] font-bold text-xs py-2 rounded uppercase tracking-wide transition">Save Map</button>
+            <button id="cancel-btn" class="bg-[#2a2a2a] hover:bg-[#343434] text-zinc-400 border border-[#2e2e2e] px-3 rounded text-xs transition hidden">Clear</button>
+          </div>
+          <div id="form-message" class="text-[10px] text-[#3ecf8e] mt-1 text-center font-bold"></div>
+        </div>
+      </div>
+
+      <div class="bg-[#1c1c1c] border border-[#2e2e2e] rounded-xl flex flex-col h-full overflow-hidden">
+        <div class="p-3 border-b border-[#2e2e2e] bg-[#171717] flex items-center shrink-0">
+          <div class="relative w-full max-w-xs">
+            <span class="absolute inset-y-0 left-2.5 flex items-center text-zinc-600 text-[10px]"><i class="fa-solid fa-filter"></i></span>
+            <input type="text" id="search-bar" placeholder="Filter sheet arrays..." class="block w-full rounded bg-[#121212] border border-[#2e2e2e] pl-7 pr-3 py-1 text-xs text-white focus:border-[#3ecf8e] focus:outline-none">
+          </div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-4 space-y-2" id="sheets-card-list">
+          </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    let sheetsRegistry = [];
+    let activeEditingId = null;
+
+    const listContainer = document.getElementById('sheets-card-list');
+    const searchBar = document.getElementById('search-bar');
+    const formHeading = document.getElementById('form-heading');
+    const inputTitle = document.getElementById('sheet-title');
+    const inputUrl = document.getElementById('sheet-url');
+    const inputDesc = document.getElementById('sheet-desc');
+    const saveBtn = document.getElementById('save-btn');
+    const cancelBtn = document.getElementById('cancel-btn');
+    const msgOutput = document.getElementById('form-message');
+
+    function syncRegistryLocalStorage() {
+      localStorage.setItem('studio_sheets_registry', JSON.stringify(sheetsRegistry));
+    }
+
+    function initLoadData() {
+      const cache = localStorage.getItem('studio_sheets_registry');
+      sheetsRegistry = cache ? JSON.parse(cache) : [];
+      renderSheets(sheetsRegistry);
+    }
+
+    function renderSheets(records) {
+      listContainer.innerHTML = '';
+      if(records.length === 0) {
+        listContainer.innerHTML = `<div class="text-zinc-600 text-xs text-center py-12">No active redirect maps compiled inside this matrix system view.</div>`;
+        return;
+      }
+
+      records.forEach(sheet => {
+        const card = document.createElement('div');
+        card.className = "bg-[#171717] border border-[#2e2e2e] rounded-lg p-3.5 flex justify-between items-start gap-4 hover:border-zinc-700 transition";
+        card.innerHTML = `
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold text-white font-sans">${escapeHTML(sheet.title)}</span>
+              <span class="text-[9px] text-[#3ecf8e] bg-[#3ecf8e]/5 border border-[#3ecf8e]/10 px-1 rounded uppercase font-mono">active</span>
+            </div>
+            <p class="text-[11px] text-zinc-500 font-sans mt-1 max-w-xl truncate">${escapeHTML(sheet.description || 'No comment tracking context updated.')}</p>
+            <div class="text-[10px] text-zinc-400 mt-2 truncate"><i class="fa-solid fa-link text-zinc-600 mr-1"></i><a href="${sheet.url}" target="_blank" class="hover:underline hover:text-[#3ecf8e]">${escapeHTML(sheet.url)}</a></div>
+          </div>
+          <div class="flex gap-1.5 shrink-0">
+            <button onclick="editSheet('${sheet.id}')" class="text-[10px] border border-[#2e2e2e] bg-[#222222] hover:bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded transition uppercase font-bold">Edit</button>
+            <button onclick="purgeSheet('${sheet.id}')" class="text-[10px] border border-red-950 bg-red-950/20 hover:bg-red-900/30 text-red-400 px-2 py-0.5 rounded transition uppercase font-bold">Drop</button>
+          </div>
+        `;
+        listContainer.appendChild(card);
+      });
+    }
+
+    saveBtn.onclick = () => {
+      const title = inputTitle.value.trim();
+      const url = inputUrl.value.trim();
+      const description = inputDesc.value.trim();
+
+      if (!title || !url) { updateFeedbackMessage('❌ Fields validation failed.', true); return; }
+      if (!url.startsWith('http')) { updateFeedbackMessage('❌ Invalid URL sequence protocol.', true); return; }
+
+      if (activeEditingId) {
+        const item = sheetsRegistry.find(x => x.id === activeEditingId);
+        if (item) { item.title = title; item.url = url; item.description = description; }
+      } else {
+        sheetsRegistry.push({ id: 'sheet_' + Date.now().toString(36), title, url, description });
+      }
+
+      syncRegistryLocalStorage();
+      clearFormState();
+      renderSheets(sheetsRegistry);
+      updateFeedbackMessage('✅ Map updated.');
+    };
+
+    window.editSheet = (id) => {
+      const sheet = sheetsRegistry.find(x => x.id === id);
+      if (!sheet) return;
+      activeEditingId = id;
+      inputTitle.value = sheet.title;
+      inputUrl.value = sheet.url;
+      inputDesc.value = sheet.description || '';
+      formHeading.textContent = "Modify Map Row";
+      cancelBtn.classList.remove('hidden');
+    };
+
+    window.purgeSheet = (id) => {
+      if(!confirm("Drop structural map entry pointer sequence?")) return;
+      sheetsRegistry = sheetsRegistry.filter(x => x.id !== id);
+      syncRegistryLocalStorage();
+      if(activeEditingId === id) clearFormState();
+      renderSheets(sheetsRegistry);
+    };
+
+    function clearFormState() {
+      activeEditingId = null;
+      inputTitle.value = '';
+      inputUrl.value = '';
+      inputDesc.value = '';
+      formHeading.textContent = "Add Map Target";
+      cancelBtn.classList.add('hidden');
+    }
+
+    cancelBtn.onclick = clearFormState;
+
+    searchBar.oninput = (e) => {
+      const query = e.target.value.toLowerCase().trim();
+      if(!query) return renderSheets(sheetsRegistry);
+      renderSheets(sheetsRegistry.filter(s => s.title.toLowerCase().includes(query) || s.url.toLowerCase().includes(query)));
+    };
+
+    function updateFeedbackMessage(txt, error = false) {
+      msgOutput.textContent = txt;
+      msgOutput.className = `text-[10px] mt-1 text-center font-bold ${error ? 'text-red-400' : 'text-[#3ecf8e]'}`;
+      setTimeout(() => { msgOutput.textContent = ''; }, 3000);
+    }
+
+    function escapeHTML(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    initLoadData();
+  </script>
+</body>
+</html>
