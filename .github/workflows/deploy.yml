@@ -19,13 +19,13 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Build with secrets
-        run: node build.js
+      - name: Build layout assets with secure variables
+        run: npm run build
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
 
-      - name: Upload artifact
+      - name: Stage build artifact distribution
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist
@@ -37,6 +37,6 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Deploy to GitHub Pages
+      - name: Deploy static assets to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
