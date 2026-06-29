@@ -20,7 +20,13 @@ jobs:
           node-version: '22'
 
       - name: Build layout assets with secure variables
-        run: npm run build
+        run: |
+          if [ -d "book-archive" ]; then
+            cd book-archive
+            node build.js
+          else
+            node build.js
+          fi
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
@@ -28,7 +34,16 @@ jobs:
       - name: Stage build artifact distribution
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./dist
+          path: ${{ github.workspace }}/book-archive/dist/
+          if-no-files-found: warn
+
+      # Fallback step in case files are in the absolute root context
+      - name: Fallback Stage if not nested
+        if: failure() || success()
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist/
+          if-no-files-found: ignore
 
   deploy:
     needs: build
