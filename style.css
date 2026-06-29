@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personal Document Archive</title>
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="script.js"></script>
+</head>
+<body>
+
+  <div id="auth-screen" class="auth-container">
+    <div class="card bg-surface auth-card">
+      <div class="brand">
+        <h2>ARCHIVE // SECURE</h2>
+        <p class="subtitle">Personal Document Management Vault</p>
+      </div>
+      <form id="login-form">
+        <div class="form-group">
+          <label for="email">Archivist Email</label>
+          <input type="email" id="email" placeholder="name@domain.com" required autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label for="password">Security Phrase</label>
+          <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn btn-primary" id="login-btn">Authenticate</button>
+      </form>
+      <div id="auth-error" class="error-msg hidden"></div>
+    </div>
+  </div>
+
+  <div id="dashboard-screen" class="dashboard-container hidden">
+    <header class="main-header">
+      <div class="header-title">
+        <h1>V A U L T</h1>
+        <span class="user-badge" id="user-display"></span>
+      </div>
+      <button id="logout-btn" class="btn btn-secondary btn-sm">Terminate Session</button>
+    </header>
+
+    <main class="dashboard-content">
+      <section class="control-panel card bg-surface">
+        <h3>File Upload Pipeline</h3>
+        <form id="upload-form" class="upload-grid">
+          <div class="form-group">
+            <label for="doc-title">Document Title</label>
+            <input type="text" id="doc-title" placeholder="e.g., Tax Statement 2026" required>
+          </div>
+          <div class="form-group">
+            <label for="doc-file">Select File Target</label>
+            <input type="file" id="doc-file" required>
+          </div>
+          <button type="submit" class="btn btn-primary align-end" id="upload-btn">Upload to Storage</button>
+        </form>
+        <div id="upload-status" class="status-msg hidden"></div>
+      </section>
+
+      <section class="archive-panel">
+        <div class="search-bar-wrapper">
+          <input type="text" id="search-input" placeholder="Search archive indexes by title or filename...">
+        </div>
+
+        <div class="table-container card bg-surface">
+          <table class="archive-table">
+            <thead>
+              <tr>
+                <th>Document Title</th>
+                <th>Filename</th>
+                <th>Indexed Date</th>
+                <th class="text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody id="archive-table-body">
+              </tbody>
+          </table>
+          <div id="empty-state" class="empty-state hidden">No matching archival files identified.</div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+</body>
+</html>
