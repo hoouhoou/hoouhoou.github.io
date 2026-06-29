@@ -1,7 +1,7 @@
 {
-  "name": "supabase-table-archive",
+  "name": "supabase-studio-archive",
   "version": "1.0.0",
-  "description": "Secure archival file management grid styled natively after Supabase Studio Dashboard.",
+  "description": "Clean personal data cloud dashboard engineered on Supabase Studio UI grids.",
   "main": "build.js",
   "scripts": {
     "build": "node build.js"
